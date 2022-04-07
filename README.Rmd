@@ -10,7 +10,8 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-",
   fig.width=6, 
-  fig.height=6
+  fig.height=6,
+  fig.align="center"
 )
 ```
 
@@ -19,16 +20,22 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of localSCR is to provide user-friendly functions to implement spatially-explicit mark recapture (SECR) models using the nimble package in R. The package currently has functions to 1) assist with defining the state-space grid and extent for a given 2-dimensional or 3-dimensional trap array (i.e., when traps are clustered in space), 2) simulate data under different encounter distributions and other parameters, 3) create habitat masks from either raster data or spatial polygons, 4) provide template SECR models that are easily customizable, and 4) fit and summarize SECR models using nimble with options for parallel processing. Future functionality will include 1) creating realized density surfaces from MCMC output and 2) implementing localized approaches as in Milleret et al. (2019) and Woodruff et al. (2020). The package also uses block updating of x-and y- activity center coordinates to decrease run time.  Another useful package is nimbleSCR (Bischof et al. 2021) that implements custom sampling distributions to increase sampling speed and efficiency and recent methods of localized activity area approaches (see Milleret et al. 2019) along with other custom functionality. These custom distributions from nimbleSCR can be used within our template models, but the idea with the localSCR package is to provide a more user-friendly means of implementing SCR models in nimble similar to the functionality provided by the jagsUI package (Keller 2019) for JAGS (Plummer 2017). Our intention is to ease the transistion for users that were previously using JAGS or those that have yet to switch over to Bayesian methods because of the complexity of implementing these approaches.
+The goal of 'localSCR' is to provide user-friendly functions to implement spatially-explicit mark recapture (SECR) models using the 'nimble' package in R. The package currently has functions to 1) assist with defining the state-space grid and extent for a given 2-dimensional or 3-dimensional trap array (i.e., when traps are clustered in space), 2) simulate data under different encounter distributions and other parameters, 3) create habitat masks from either raster data or spatial polygons, 4) provide template SECR models that are easily customizable, and 4) fit and summarize SECR models using nimble with options for parallel processing. Future functionality will include creating realized density surfaces from MCMC output and implementing localized approaches as in Milleret et al. (2019) and Woodruff et al. (2020). The package also uses block updating of x-and y- activity center coordinates to decrease run time.  
+
+Another useful package is 'nimbleSCR' (Bischof et al. 2021) that implements custom sampling distributions to increase sampling speed and efficiency and recent methods of localized activity area approaches (see Milleret et al. 2019) along with other custom functionality. These custom distributions from 'nimbleSCR' can be used within our template models, but the idea with the 'localSCR' package is to provide a more user-friendly implemention of SECR models in nimble similar to the functionality provided by the 'jagsUI' package (Keller 2019) for JAGS (Plummer 2017). Our intention is to ease the transition for users that were previously using JAGS or those that have yet to switch over to Bayesian methods from frequentist because of the complexity of implementing these approaches.
 
 ## Installation
 
-You can install the development version of localSCR like so:
+You can install the development version of 'localSCR' like so:
 
 ```{r }
 library(remotes)
 install_github("sitkensis22/localSCR")
 ```
+
+Be sure to see important information about using 'nimble' on your computer (including installing rtools):
+<https://r-nimble.org/download>
+
 
 ## Example
 
@@ -71,7 +78,8 @@ points(traps, col="blue",pch=20)
 ```{r, fig.align = "center"}
 
 # simulate SCR data
-data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = mysigma, prop_sex = 1, N = 200, K = 4, base_encounter = 0.25, enc_dist = "binomial", hab_mask = FALSE, setSeed = 50)
+data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = mysigma, prop_sex = 1,
+N = 200, K = 4, base_encounter = 0.25, enc_dist = "binomial", hab_mask = FALSE, setSeed = 50)
 
 # inspect simulated data
 str(data3d)
@@ -81,8 +89,8 @@ str(data3d)
 par(mfrow=c(1,1))
 plot(Grid$grid, pch=20,ylab="Northing",xlab="Easting")
 points(traps, col="blue",pch=20)
-points(data3d$s,col="red",pch = 20)
-points(data3d$s[which(apply(data3d$y,1,sum)!=0),],col="green",pch = 20)
+points(data3d$s,col="red",pch = 20) # all simulated activity centers
+points(data3d$s[which(apply(data3d$y,1,sum)!=0),],col="green",pch = 20) # detected individuals
 
 
 ```
@@ -108,13 +116,15 @@ Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*max(mysigma), res = pixelW
 
 # create polygon for mask
 library(sf)
-poly = st_sfc(st_polygon(x=list(matrix(c(-1765,-1765,1730,-1650,1600,1650,0,1350,-800,1700,-1850,1000,-1765,-1765),ncol=2, byrow=TRUE))), crs =  mycrs)
+poly = st_sfc(st_polygon(x=list(matrix(c(-1765,-1765,1730,-1650,1600,1650,0,1350,-800,1700,
+-1850,1000,-1765,-1765),ncol=2, byrow=TRUE))), crs =  mycrs)
 
 # create habitat mask
 hab_mask = mask_polygon(poly = poly, grid = Grid$grid, crs_ = mycrs, prev_mask = NULL)
 
 # simulate data for uniform state-space and habitat mask
-data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = mysigma, prop_sex = 0.7, N = 200, K = 4, base_encounter = 0.15, enc_dist = "binomial",hab_mask = hab_mask, setSeed = 50)
+data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = mysigma, prop_sex = 0.7,
+N = 200, K = 4, base_encounter = 0.15, enc_dist = "binomial",hab_mask = hab_mask, setSeed = 50)
 
 # get initial activity center starting values
 s.st3d = initialize_classic(y=data3d$y, M=400, X=traps, buff = 3*max(mysigma), hab_mask = hab_mask)
@@ -124,7 +134,7 @@ par(mfrow=c(1,1))
 plot(Grid$grid, pch=20, xlim=c(-2000,2000),ylim=c(-2000,2000))
 points(traps, col="blue",pch=20)
 plot(poly, add=TRUE)
-points(s.st3d,col="red",pch=20)
+points(s.st3d,col="red",pch=20) # all initalized activity centers
 
 # rescale inputs
 rescale_list = rescale_classic(X = traps, ext = Grid$ext, s.st = s.st3d, hab_mask = hab_mask)
@@ -141,7 +151,9 @@ data$y = apply(data$y, c(1,2), sum) # covert to 2d by summing over occasions
 data$X = rescale_list$X
 
 # prepare constants (note get density in km2 rather than m2)
-constants = list(M = 400,n0 = nrow(data$y),J=dim(data$y)[2], K=dim(data3d$y)[3],x_lower = ext[1], x_upper = ext[2], y_lower = ext[3], y_upper = ext[4],sigma_upper = 1000, A = (sum(hab_mask)*(pixelWidth/1000)^2),pixelWidth=pixelWidth)
+constants = list(M = 400,n0 = nrow(data$y),J=dim(data$y)[2], K=dim(data3d$y)[3],
+x_lower = ext[1], x_upper = ext[2], y_lower = ext[3], y_upper = ext[4],
+sigma_upper = 1000, A = (sum(hab_mask)*(pixelWidth/1000)^2),pixelWidth=pixelWidth)
 
 # augment sex
 data$sex = c(data3d$sex,rep(NA,constants$M-length(data3d$sex)))
@@ -158,7 +170,7 @@ data$OK = rep(1,constants$M)
 s.st3d = rescale_list$s.st
 
 # define all initial values
-inits = list(sigma = runif(2, 250, 350), s = s.st3d,psi=runif(1,0.2,0.3), p0 = runif(1, 0.05, 0.15),pOK = data$OK,z=c(rep(NA,constants$n0),rep(0,constants$M-constants$n0)))
+inits = list(sigma = runif(2, 250, 350), s = s.st3d,psi=runif(1,0.2,0.3), p0 = runif(1, 0.05, 0.15),pOK=data$OK,z=c(rep(NA,constants$n0),rep(0,constants$M-constants$n0)))
 
 # parameters to monitor
 params = c("sigma","psi","p0","N","D","psi_sex")
@@ -188,18 +200,16 @@ nimSummary(out)
 
 Bischof R., D. Turek, C. Milleret, T. Ergon, P. Dupont, S.
 Dey, W. Zhang and P. de Valpine. 2021. nimbleSCR: Spatial Capture-Recapture (SCR)
-Methods Using 'nimble'. R package version 0.1.3.
-https://CRAN.R-project.org/package=nimbleSCR
+Methods Using 'nimble'. R package version 0.1.3. <https://CRAN.R-project.org/package=nimbleSCR>.
 
 Kellner, K. 2018. jagsUI: a wrapper around ‘rjags’ to streamline
-‘JAGS’ analyses. R package version 1.5.0. https://CRAN.R-project.org/
-package=jagsUI.
+‘JAGS’ analyses. R package version 1.5.0. <https://CRAN.R-project.org/package=jagsUI>.
 
 Milleret, C., P. Dupont, C. Bonenfant, H. Henrik Brøseth, Ø. Flagstad,
 C. Sutherland, and R. Bischof. 2019. A local evaluation of the individual
 state‐space to scale up Bayesian spatial capture‐recapture. Ecology and
 Evolution 9:352–363.
  
-Plummer, M. 2017. JAGS version 4.3.0. user manual. https://people.stat.sc.edu/hansont/stat740/jags_user_manual.pdf. 
+Plummer, M. 2017. JAGS version 4.3.0. user manual. <https://people.stat.sc.edu/hansont/stat740/jags_user_manual.pdf>. 
 
 Woodruff, S., D. R. Eacker, and L. Waits. 2020. Estimating coyote density in local, discrete  Bayesian capture-recapture models. Journal of Wildlife Management 10.1002/jwmg.21967
