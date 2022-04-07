@@ -299,7 +299,8 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter, en
 #' scr_model
 #' @export
 get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask = FALSE){
-  
+    M <- J <- s <- X <- p0 <- sigma <- n0 <- z <- A <- lam0 <- K <- sex <- nSites <-
+    site <- pixelWidth <- psi <- prop.habitat <- NULL
   if(dim_y !=2 & dim_y!=3 & dim_y !=4){
     stop("dim_y must be either 2, 3, or 4")
   }
@@ -1820,6 +1821,7 @@ run_classic <- function(model, data, constants, inits, params,
 #' @importFrom stringr str_extract str_locate
 #' @importFrom coda effectiveSize mcmc.list as.mcmc gelman.diag
 #' @importFrom stats na.omit sd quantile
+#' @importFrom crayon red
 #' @examples
 #' # simulate a single trap array with random positional noise
 #' x <- seq(-800, 800, length.out = 5)
@@ -1890,7 +1892,6 @@ nimSummary = function(d, trace=FALSE, exclude.params = NULL, digits=3){
   }else
     if(is.null(exclude.params)){
       d2 = d
-     # d.remove = list() # summed like this wasn't being used
       d.remove = 0
     }
   if((length(attributes(d[[1]])$dimnames[[2]])-length(d.remove[[1]])==1)){
@@ -1916,13 +1917,29 @@ nimSummary = function(d, trace=FALSE, exclude.params = NULL, digits=3){
       Rhat = round(coda::gelman.diag(coda::mcmc.list(lapply(d2, coda::as.mcmc)), multivariate = FALSE)[[1]][,1],3)
     }
   if(trace==TRUE  & (length(attributes(d[[1]])$dimnames[[2]])-length(d.remove[[1]])>1)){
-    par(mfrow=c(ncol(d3),2))
-    for(i in 1:ncol(d3)){
+     par(mfrow=c(3,2))
+     for(i in 1:3){ 
       plot(1:dim(d2[[1]])[1],d2[[1]][,i],xlab="iteration",ylab=colnames(d3)[i],type="l",ylim=range(do.call(rbind, lapply(d2,function(x) apply(x, 2, range)))[,i]))
       for(j in 2:length(d2)){
         lines(1:dim(d2[[1]])[1],d2[[j]][,i],xlab="iteration",ylab=colnames(d3)[i],type="l",col="red")
       }
       hist(d3[,i],main="",xlab=colnames(d3)[i])
+     }
+      if(ncol(d3)>3){
+      i <- i + 1
+      if(any(i == seq(4,4000,3)) & interactive()){
+        answer <- readline(cat(crayon::red("Plot next set of parameters? (1 = Yes or 0 = No) "))) # need to add crayon red to importFrom above
+        while(answer == "1"){
+        for(i in i:(i+2)){
+         plot(1:dim(d2[[1]])[1],d2[[1]][,i],xlab="iteration",ylab=colnames(d3)[i],type="l",ylim=range(do.call(rbind, lapply(d2,function(x) apply(x, 2, range)))[,i]))
+          for(j in 2:length(d2)){
+           lines(1:dim(d2[[1]])[1],d2[[j]][,i],xlab="iteration",ylab=colnames(d3)[i],type="l",col="red")
+          }
+         hist(d3[,i],main="",xlab=colnames(d3)[i])
+        }
+        answer <- readline(cat(crayon::red("Plot next set of parameters? (1 = Yes or 0 = No) "))) # need to add crayon red to importFrom above
+        }
+      }
     }
   }else
     if(trace==TRUE  & (length(attributes(d[[1]])$dimnames[[2]])-length(d.remove[[1]])==1)){
