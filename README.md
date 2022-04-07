@@ -28,7 +28,7 @@ efficiency and recent methods of localized activity area approaches (see
 Milleret et al. 2019) along with other custom functionality. These
 custom distributions from ‘nimbleSCR’ can be used within our template
 models, but the idea with the ‘localSCR’ package is to provide a more
-user-friendly implemention of SECR models in nimble similar to the
+user-friendly implemention of SECR models in ‘nimble’ similar to the
 functionality provided by the ‘jagsUI’ package (Keller 2019) for JAGS
 (Plummer 2017). Our intention is to ease the transition for users that
 were previously using JAGS or those that have yet to switch over to
@@ -42,7 +42,7 @@ You can install the development version of ‘localSCR’ like so:
 ``` r
 library(remotes)
 install_github("sitkensis22/localSCR")
-#> Skipping install of 'localSCR' from a github remote, the SHA1 (1be89abc) has not changed since last install.
+#> Skipping install of 'localSCR' from a github remote, the SHA1 (f53d932a) has not changed since last install.
 #>   Use `force = TRUE` to force installation
 ```
 
@@ -97,7 +97,7 @@ str(data3d)
 #> List of 3
 #>  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...
 #>  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...
-#>  $ s  : num [1:200, 1:2] 718 -212 -1027 918 47 ...
+#>  $ s  : num [1:200, 1:2] 718.8 -206.2 -1017.1 917.9 51.5 ...
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : NULL
 #>   .. ..$ : chr [1:2] "sx" "sy"
@@ -192,7 +192,8 @@ data$OK = rep(1,constants$M)
 s.st3d = rescale_list$s.st
 
 # define all initial values
-inits = list(sigma = runif(2, 250, 350), s = s.st3d,psi=runif(1,0.2,0.3), p0 = runif(1, 0.05, 0.15),pOK=data$OK,z=c(rep(NA,constants$n0),rep(0,constants$M-constants$n0)))
+inits = list(sigma = runif(2, 250, 350), s = s.st3d,psi=runif(1,0.2,0.3),
+p0 = runif(1, 0.05, 0.15),pOK=data$OK,z=c(rep(NA,constants$n0),rep(0,constants$M-constants$n0)))
 
 # parameters to monitor
 params = c("sigma","psi","p0","N","D","psi_sex")
@@ -203,9 +204,10 @@ scr_model = get_classic(dim_y = 2, enc_dist = "binomial",sex_sigma = TRUE,hab_ma
 # run model
 library(tictoc)
 tic() # track time elapsed
-out = run_classic(model = scr_model, data=data, constants=constants, inits=inits, params = params,niter = 8000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
+out = run_classic(model = scr_model, data=data, constants=constants,
+inits=inits, params = params,niter = 8000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
 toc()
-#> 146.61 sec elapsed
+#> 135.83 sec elapsed
 
 # summarize output
 samples = do.call(rbind, out)

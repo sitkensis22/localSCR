@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 The goal of 'localSCR' is to provide user-friendly functions to implement spatially-explicit mark recapture (SECR) models using the 'nimble' package in R. The package currently has functions to 1) assist with defining the state-space grid and extent for a given 2-dimensional or 3-dimensional trap array (i.e., when traps are clustered in space), 2) simulate data under different encounter distributions and other parameters, 3) create habitat masks from either raster data or spatial polygons, 4) provide template SECR models that are easily customizable, and 4) fit and summarize SECR models using nimble with options for parallel processing. Future functionality will include creating realized density surfaces from MCMC output and implementing localized approaches as in Milleret et al. (2019) and Woodruff et al. (2020). The package also uses block updating of x-and y- activity center coordinates to decrease run time.  
 
-Another useful package is 'nimbleSCR' (Bischof et al. 2021) that implements custom sampling distributions to increase sampling speed and efficiency and recent methods of localized activity area approaches (see Milleret et al. 2019) along with other custom functionality. These custom distributions from 'nimbleSCR' can be used within our template models, but the idea with the 'localSCR' package is to provide a more user-friendly implemention of SECR models in nimble similar to the functionality provided by the 'jagsUI' package (Keller 2019) for JAGS (Plummer 2017). Our intention is to ease the transition for users that were previously using JAGS or those that have yet to switch over to Bayesian methods from frequentist because of the complexity of implementing these approaches.
+Another useful package is 'nimbleSCR' (Bischof et al. 2021) that implements custom sampling distributions to increase sampling speed and efficiency and recent methods of localized activity area approaches (see Milleret et al. 2019) along with other custom functionality. These custom distributions from 'nimbleSCR' can be used within our template models, but the idea with the 'localSCR' package is to provide a more user-friendly implemention of SECR models in 'nimble' similar to the functionality provided by the 'jagsUI' package (Keller 2019) for JAGS (Plummer 2017). Our intention is to ease the transition for users that were previously using JAGS or those that have yet to switch over to Bayesian methods from frequentist because of the complexity of implementing these approaches.
 
 ## Installation
 
@@ -170,7 +170,8 @@ data$OK = rep(1,constants$M)
 s.st3d = rescale_list$s.st
 
 # define all initial values
-inits = list(sigma = runif(2, 250, 350), s = s.st3d,psi=runif(1,0.2,0.3), p0 = runif(1, 0.05, 0.15),pOK=data$OK,z=c(rep(NA,constants$n0),rep(0,constants$M-constants$n0)))
+inits = list(sigma = runif(2, 250, 350), s = s.st3d,psi=runif(1,0.2,0.3),
+p0 = runif(1, 0.05, 0.15),pOK=data$OK,z=c(rep(NA,constants$n0),rep(0,constants$M-constants$n0)))
 
 # parameters to monitor
 params = c("sigma","psi","p0","N","D","psi_sex")
@@ -181,7 +182,8 @@ scr_model = get_classic(dim_y = 2, enc_dist = "binomial",sex_sigma = TRUE,hab_ma
 # run model
 library(tictoc)
 tic() # track time elapsed
-out = run_classic(model = scr_model, data=data, constants=constants, inits=inits, params = params,niter = 8000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
+out = run_classic(model = scr_model, data=data, constants=constants,
+inits=inits, params = params,niter = 8000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
 toc()
 
 # summarize output
