@@ -43,6 +43,7 @@ mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
 Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = 100)
 
 # create polygon to use as a mask
+library(sf)
 poly = st_sfc(st_polygon(x=list(matrix(c(-1765,-1765,1730,-1650,1600,1650,0,1350,-800,1700,-1850,1000,-1765,-1765),ncol=2, byrow=TRUE))), crs =  mycrs)
 
 # make simple plot

@@ -299,6 +299,7 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter, en
 #' scr_model
 #' @export
 get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask = FALSE){
+  
   if(dim_y !=2 & dim_y!=3 & dim_y !=4){
     stop("dim_y must be either 2, 3, or 4")
   }
@@ -1335,6 +1336,7 @@ initialize_classic <- function(y, M, X, buff, hab_mask = FALSE){
 #' Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = 100)
 #'
 #' # create polygon to use as a mask
+#' library(sf)
 #' poly = st_sfc(st_polygon(x=list(matrix(c(-1765,-1765,1730,-1650,1600,1650,0,1350,-800,1700,-1850,1000,-1765,-1765),ncol=2, byrow=TRUE))), crs =  mycrs)
 #'
 #' # make simple plot
