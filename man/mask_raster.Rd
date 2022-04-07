@@ -46,6 +46,7 @@ poly = st_sfc(st_polygon(x=list(matrix(c(-1665,-1665,1730,-1650,1600,1650,0,1350
 hab_mask = mask_polygon(poly = poly, grid = Grid$grid, crs_ = mycrs, prev_mask = NULL)
 
 # create raster for demonstration purposes
+library(raster)
 rast <- raster(nrow=dim(hab_mask)[1], ncol=dim(hab_mask)[2],ext=Grid$ext,crs=CRS(st_crs(mycrs)$proj4string))
 rast[] = apply(hab_mask,2,rev)
 

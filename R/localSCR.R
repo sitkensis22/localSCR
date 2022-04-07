@@ -1468,6 +1468,7 @@ rescale_classic <- function(X, ext, s.st, site, hab_mask){
 #'
 #' # make simple plot
 #' par(mfrow=c(1,2))
+#' library(raster)
 #' apply(hab_mask,3,function(x) plot(raster(apply(x,2,rev))))
 #' @export
 mask_polygon <- function(poly, grid, crs_, prev_mask){
@@ -1550,6 +1551,7 @@ mask_polygon <- function(poly, grid, crs_, prev_mask){
 #' hab_mask = mask_polygon(poly = poly, grid = Grid$grid, crs_ = mycrs, prev_mask = NULL)
 #'
 #' # create raster for demonstration purposes
+#' library(raster)
 #' rast <- raster(nrow=dim(hab_mask)[1], ncol=dim(hab_mask)[2],ext=Grid$ext,crs=CRS(st_crs(mycrs)$proj4string))
 #' rast[] = apply(hab_mask,2,rev)
 #'
@@ -1675,7 +1677,8 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
 # create grid and extent
 #' Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = pixelWidth) # create slightly larger buffer area for example
 #'
-# create polygon to use as a mask
+#' # create polygon to use as a mask
+#' library(sf)
 #' poly = st_sfc(st_polygon(x=list(matrix(c(-1765,-1765,1730,-1650,1600,1650,0,1350,-800,1700,-1850,1000,-1765,-1765),ncol=2, byrow=TRUE))), crs =  mycrs)
 #'
 #' # create habitat mask
@@ -1935,12 +1938,3 @@ nimSummary = function(d, trace=FALSE, exclude.params = NULL, digits=3){
 
 
 
-##' Function to generate realized density surface from MCMC output
-##'
-##'
-#realized_density <- function(samples, grid, crs_, hab_mask = FALSE){
-#      n.iter <- dim(samples[[1]])[1] # store number of iterations
-#      all.samples <- do.call(rbind, samples) # rbind mcmc samples
-#      
-#  
-#}

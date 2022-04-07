@@ -91,6 +91,7 @@ hab_mask = mask_polygon(poly = poly, grid = GridX$grid, crs_ = mycrs, prev_mask 
 
 # make simple plot
 par(mfrow=c(1,2))
+library(raster)
 apply(hab_mask,3,function(x) plot(raster(apply(x,2,rev))))
 }
 \seealso{
