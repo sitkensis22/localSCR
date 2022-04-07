@@ -2,7 +2,6 @@ Package: localSCR
 Type: Package
 Title: Supporting functions for advanced Bayesian spatially-explicit mark recapture modeling using 'nimble'
 Version: 0.1.0
-Year: 2022
 Authors@R: person("Daniel", "Eacker",email = "daniel.eacker@alaska.gov", role = c("aut","cre"), comment=c(ORCID = "https://orcid.org/0000-0002-2112-0250"))
 Maintainer: Daniel Eacer <daniel.eacker@alaska.gov>
 Description: Functionality for recent developments in Bayesian spatially-explicit mark recapture modeling. Specifically, model run time is greatly reduced by taking advantage of the R package nimble, which provides users more control caompared to JAGS over sampling algorithms and incorporating custom functions. Additionally, the package currently supports habitat mask for uniform state-space implementation in nimble. Further, users can use the functionality to easily simulate data to aid in research design. All objects are kept in simple native R classes such as matrices and arrays for compatability. 
