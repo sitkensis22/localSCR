@@ -9,18 +9,18 @@
 
 The goal of ‘localSCR’ is to provide user-friendly functions to
 implement spatially-explicit mark recapture (SECR) models using the
-‘nimble’ package in R. The package currently has functions to 1)
-assist with defining the state-space grid and extent for a given
-2-dimensional or 3-dimensional trap array (i.e., when traps are
-clustered in space), 2) simulate data under different encounter
+‘nimble’ package (de Valpine et a. 2022) in R. The package currently
+has functions to 1) assist with defining the state-space grid and extent
+for a given 2-dimensional or 3-dimensional trap array (i.e., when traps
+are clustered in space), 2) simulate data under different encounter
 distributions and other parameters, 3) create habitat masks from either
 raster data or spatial polygons, 4) provide template SECR models that
 are easily customizable, and 4) fit and summarize SECR models using
-nimble with options for parallel processing. Future functionality will
-include creating realized density surfaces from MCMC output and
-implementing localized approaches as in Milleret et al. (2019) and
-Woodruff et al. (2020). The package also uses block updating of x-and y-
-activity center coordinates to decrease run time.
+‘nimble’ (de Valpine et a. 2022) with options for parallel processing.
+Future functionality will include creating realized density surfaces
+from MCMC output and implementing localized approaches as in Milleret et
+al. (2019) and Woodruff et al. (2020). The package also uses block
+updating of x-and y- activity center coordinates to decrease run time.
 
 Another useful package is ‘nimbleSCR’ (Bischof et al. 2021) that
 implements custom sampling distributions to increase sampling speed and
@@ -42,7 +42,7 @@ You can install the development version of ‘localSCR’ like so:
 ``` r
 library(remotes)
 install_github("sitkensis22/localSCR")
-#> Skipping install of 'localSCR' from a github remote, the SHA1 (f53d932a) has not changed since last install.
+#> Skipping install of 'localSCR' from a github remote, the SHA1 (e079639f) has not changed since last install.
 #>   Use `force = TRUE` to force installation
 ```
 
@@ -60,7 +60,7 @@ state-space with a habitat mask:
 library(localSCR)
 ```
 
-## (1) Simulate a single trap array with random positional noise and create state-space
+### (1) Simulate a single trap array with random positional noise and create state-space
 
 ``` r
 
@@ -84,7 +84,7 @@ points(traps, col="blue",pch=20)
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
 
-## (2) Simulate SCR data and make a plot of it.
+### (2) Simulate SCR data and make a plot of it.
 
 ``` r
 
@@ -97,7 +97,7 @@ str(data3d)
 #> List of 3
 #>  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...
 #>  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...
-#>  $ s  : num [1:200, 1:2] 718.8 -206.2 -1017.1 917.9 51.5 ...
+#>  $ s  : num [1:200, 1:2] 717.4 -214.8 -1032.1 918 44.8 ...
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : NULL
 #>   .. ..$ : chr [1:2] "sx" "sy"
@@ -113,7 +113,7 @@ points(data3d$s[which(apply(data3d$y,1,sum)!=0),],col="green",pch = 20) # detect
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" style="display: block; margin: auto;" />
 
-# (3) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask
+### (3) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask
 
 ``` r
 
@@ -207,7 +207,7 @@ tic() # track time elapsed
 out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 8000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
 toc()
-#> 135.83 sec elapsed
+#> 121.5 sec elapsed
 
 # summarize output
 samples = do.call(rbind, out)
@@ -238,6 +238,13 @@ Bischof R., D. Turek, C. Milleret, T. Ergon, P. Dupont, S. Dey, W. Zhang
 and P. de Valpine. 2021. nimbleSCR: Spatial Capture-Recapture (SCR)
 Methods Using ‘nimble’. R package version 0.1.3.
 <https://CRAN.R-project.org/package=nimbleSCR>.
+
+de Valpine P, C. Paciorek, D. Turek, N. Michaud, C. Anderson-Bergman, F.
+Obermeyer, C. C. Wehrhahn, A. Rodrìguez, L. D. Temple, and S. Paganin.
+2022. *NIMBLE: MCMC, Particle Filtering, and Programmable Hierarchical
+Modeling*. doi: 10.5281/zenodo.1211190 (URL:
+<https://doi.org/10.5281/zenodo.1211190>), R package version 0.12.2,
+URL:<https://cran.r-project.org/package=nimble>.
 
 Kellner, K. 2018. jagsUI: a wrapper around ‘rjags’ to streamline ‘JAGS’
 analyses. R package version 1.5.0.

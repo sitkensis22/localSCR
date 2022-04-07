@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of 'localSCR' is to provide user-friendly functions to implement spatially-explicit mark recapture (SECR) models using the 'nimble' package in R. The package currently has functions to 1) assist with defining the state-space grid and extent for a given 2-dimensional or 3-dimensional trap array (i.e., when traps are clustered in space), 2) simulate data under different encounter distributions and other parameters, 3) create habitat masks from either raster data or spatial polygons, 4) provide template SECR models that are easily customizable, and 4) fit and summarize SECR models using nimble with options for parallel processing. Future functionality will include creating realized density surfaces from MCMC output and implementing localized approaches as in Milleret et al. (2019) and Woodruff et al. (2020). The package also uses block updating of x-and y- activity center coordinates to decrease run time.  
+The goal of 'localSCR' is to provide user-friendly functions to implement spatially-explicit mark recapture (SECR) models using the 'nimble' package (de Valpine et a. 2022) in R. The package currently has functions to 1) assist with defining the state-space grid and extent for a given 2-dimensional or 3-dimensional trap array (i.e., when traps are clustered in space), 2) simulate data under different encounter distributions and other parameters, 3) create habitat masks from either raster data or spatial polygons, 4) provide template SECR models that are easily customizable, and 4) fit and summarize SECR models using 'nimble' (de Valpine et a. 2022) with options for parallel processing. Future functionality will include creating realized density surfaces from MCMC output and implementing localized approaches as in Milleret et al. (2019) and Woodruff et al. (2020). The package also uses block updating of x-and y- activity center coordinates to decrease run time.  
 
 Another useful package is 'nimbleSCR' (Bischof et al. 2021) that implements custom sampling distributions to increase sampling speed and efficiency and recent methods of localized activity area approaches (see Milleret et al. 2019) along with other custom functionality. These custom distributions from 'nimbleSCR' can be used within our template models, but the idea with the 'localSCR' package is to provide a more user-friendly implemention of SECR models in 'nimble' similar to the functionality provided by the 'jagsUI' package (Keller 2019) for JAGS (Plummer 2017). Our intention is to ease the transition for users that were previously using JAGS or those that have yet to switch over to Bayesian methods from frequentist because of the complexity of implementing these approaches.
 
@@ -48,7 +48,7 @@ library(localSCR)
 
 ```
 
-## (1) Simulate a single trap array with random positional noise and create state-space
+### (1) Simulate a single trap array with random positional noise and create state-space
 
 ```{r, fig.align = "center"}
 
@@ -73,7 +73,7 @@ points(traps, col="blue",pch=20)
 ```
 
 
-## (2) Simulate SCR data and make a plot of it.
+### (2) Simulate SCR data and make a plot of it.
 
 ```{r, fig.align = "center"}
 
@@ -97,7 +97,7 @@ points(data3d$s[which(apply(data3d$y,1,sum)!=0),],col="green",pch = 20) # detect
 
 
 
-# (3) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask
+### (3) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask
 
 ```{r, fig.align = "center"}
 
@@ -203,6 +203,10 @@ nimSummary(out)
 Bischof R., D. Turek, C. Milleret, T. Ergon, P. Dupont, S.
 Dey, W. Zhang and P. de Valpine. 2021. nimbleSCR: Spatial Capture-Recapture (SCR)
 Methods Using 'nimble'. R package version 0.1.3. <https://CRAN.R-project.org/package=nimbleSCR>.
+
+de Valpine P, C. Paciorek, D. Turek, N. Michaud, C. Anderson-Bergman, F. Obermeyer, C. C. Wehrhahn, A. Rodrìguez, L. D. Temple, and S. Paganin. 2022. _NIMBLE: MCMC, Particle
+Filtering, and Programmable Hierarchical Modeling_. doi: 10.5281/zenodo.1211190 (URL:
+<https://doi.org/10.5281/zenodo.1211190>), R package version 0.12.2, URL:<https://cran.r-project.org/package=nimble>.
 
 Kellner, K. 2018. jagsUI: a wrapper around ‘rjags’ to streamline
 ‘JAGS’ analyses. R package version 1.5.0. <https://CRAN.R-project.org/package=jagsUI>.
