@@ -200,7 +200,6 @@ C. Sutherland, and R. Bischof. 2019. A local evaluation of the individual
 state‐space to scale up Bayesian spatial capture‐recapture. Ecology and
 Evolution 9:352–363.
  
-Plummer, M. 2017. JAGS version 4.3.0. user manual. https://people.stat.
-sc.edu/hansont/stat740/jags_user_manual.pdf. 
+Plummer, M. 2017. JAGS version 4.3.0. user manual. https://people.stat.sc.edu/hansont/stat740/jags_user_manual.pdf. 
 
 Woodruff, S., D. R. Eacker, and L. Waits. 2020. Estimating coyote density in local, discrete  Bayesian capture-recapture models. Journal of Wildlife Management 10.1002/jwmg.21967
