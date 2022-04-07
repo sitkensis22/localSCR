@@ -1733,6 +1733,7 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
 #' scr_model = get_classic(dim_y = 2, enc_dist = "binomial",sex_sigma = FALSE,hab_mask=TRUE)
 #'
 #' # run model
+#' library(tictoc)
 #' tic() # track time elapsed
 #' out = run_classic(model = scr_model, data=data, constants=constants, inits=inits, params = params,
 #'                   niter = 1000, nburnin=500, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
