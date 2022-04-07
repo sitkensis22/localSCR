@@ -1864,6 +1864,7 @@ run_classic <- function(model, data, constants, inits, params,
 #' scr_model = get_classic(dim_y = 2, enc_dist = "binomial",sex_sigma = FALSE)
 #'
 #' # run model
+#' library(tictoc)
 #' tic() # track time elapsed
 #' out = run_classic(model = scr_model, data=data, constants=constants, inits=inits, params = params,
 #'                   niter = 5000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
