@@ -9,7 +9,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  fig.width=6, 
+  fig.height=6
 )
 ```
 
@@ -25,6 +26,7 @@ The goal of localSCR is to provide user-friendly functions to implement spatiall
 You can install the development version of localSCR like so:
 
 ```{r }
+library(remotes)
 install_github("sitkensis22/localSCR")
 ```
 
@@ -49,11 +51,11 @@ y <- seq(-800, 800, length.out = 5)
 traps <- as.matrix(expand.grid(x = x, y = y))
 traps <- traps + runif(prod(dim(traps)),-20,20) # add some random noise to locations
 
-sigma = 300 # simulate sigma of 300 m
+mysigma = 300 # simulate sigma of 300 m
 mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
 
 # create state-space
-Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*sigma, res = 100)
+Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = 100)
 
 # make plot of grid and trap locations
 par(mfrow=c(1,1))
@@ -69,7 +71,7 @@ points(traps, col="blue",pch=20)
 ```{r, fig.align = "center"}
 
 # simulate SCR data
-data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma = sigma, prop_sex = 1, N = 200, K = 4, base_encounter = 0.25, enc_dist = "binomial", hab_mask = FALSE, setSeed = 50)
+data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = mysigma, prop_sex = 1, N = 200, K = 4, base_encounter = 0.25, enc_dist = "binomial", hab_mask = FALSE, setSeed = 50)
 
 # inspect simulated data
 str(data3d)
@@ -97,24 +99,25 @@ y <- seq(-800, 800, length.out = 5)
 traps <- as.matrix(expand.grid(x = x, y = y))
 traps <- traps + runif(prod(dim(traps)),-20,20) # add some random noise to locations
 
-sigma = c(220, 300) # simulate sex-specific
+mysigma = c(220, 300) # simulate sex-specific
 mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
 pixelWidth = 100 # store pixelWidth
 
 # create state-space grid and extent
-Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*max(sigma), res = pixelWidth) 
+Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*max(mysigma), res = pixelWidth) 
 
 # create polygon for mask
-poly = sf::st_sfc(sf::st_polygon(x=list(matrix(c(-1765,-1765,1730,-1650,1600,1650,0,1350,-800,1700,-1850,1000,-1765,-1765),ncol=2, byrow=TRUE))), crs =  mycrs)
+library(sf)
+poly = st_sfc(st_polygon(x=list(matrix(c(-1765,-1765,1730,-1650,1600,1650,0,1350,-800,1700,-1850,1000,-1765,-1765),ncol=2, byrow=TRUE))), crs =  mycrs)
 
 # create habitat mask
 hab_mask = mask_polygon(poly = poly, grid = Grid$grid, crs_ = mycrs, prev_mask = NULL)
 
 # simulate data for uniform state-space and habitat mask
-data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma = sigma, prop_sex = 0.7, N = 200, K = 4, base_encounter = 0.15, enc_dist = "binomial",hab_mask = hab_mask, setSeed = 50)
+data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = mysigma, prop_sex = 0.7, N = 200, K = 4, base_encounter = 0.15, enc_dist = "binomial",hab_mask = hab_mask, setSeed = 50)
 
 # get initial activity center starting values
-s.st3d = initialize_classic(y=data3d$y, M=400, X=traps, buff = 3*max(sigma), hab_mask = hab_mask)
+s.st3d = initialize_classic(y=data3d$y, M=400, X=traps, buff = 3*max(mysigma), hab_mask = hab_mask)
 
 # make simple plot
 par(mfrow=c(1,1))
@@ -164,9 +167,10 @@ params = c("sigma","psi","p0","N","D","psi_sex")
 scr_model = get_classic(dim_y = 2, enc_dist = "binomial",sex_sigma = TRUE,hab_mask=TRUE)
 
 # run model
-tictoc::tic() # track time elapsed
+library(tictoc)
+tic() # track time elapsed
 out = run_classic(model = scr_model, data=data, constants=constants, inits=inits, params = params,niter = 8000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
-tictoc::toc()
+toc()
 
 # summarize output
 samples = do.call(rbind, out)
@@ -178,3 +182,25 @@ abline(v=200, col="red") # add line for simulated abundance
 nimSummary(out)
 
 ```
+
+
+## Literature Cited
+
+Bischof R., D. Turek, C. Milleret, T. Ergon, P. Dupont, S.
+Dey, W. Zhang and P. de Valpine. 2021. nimbleSCR: Spatial Capture-Recapture (SCR)
+Methods Using 'nimble'. R package version 0.1.3.
+https://CRAN.R-project.org/package=nimbleSCR
+
+Kellner, K. 2018. jagsUI: a wrapper around ‘rjags’ to streamline
+‘JAGS’ analyses. R package version 1.5.0. https://CRAN.R-project.org/
+package=jagsUI.
+
+Milleret, C., P. Dupont, C. Bonenfant, H. Henrik Brøseth, Ø. Flagstad,
+C. Sutherland, and R. Bischof. 2019. A local evaluation of the individual
+state‐space to scale up Bayesian spatial capture‐recapture. Ecology and
+Evolution 9:352–363.
+ 
+Plummer, M. 2017. JAGS version 4.3.0. user manual. https://people.stat.
+sc.edu/hansont/stat740/jags_user_manual.pdf. 
+
+Woodruff, S., D. R. Eacker, and L. Waits. 2020. Estimating coyote density in local, discrete  Bayesian capture-recapture models. Journal of Wildlife Management 10.1002/jwmg.21967

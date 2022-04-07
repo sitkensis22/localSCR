@@ -40,7 +40,7 @@ You can install the development version of localSCR like so:
 ``` r
 library(remotes)
 install_github("sitkensis22/localSCR")
-#> Skipping install of 'localSCR' from a github remote, the SHA1 (a7b67365) has not changed since last install.
+#> Skipping install of 'localSCR' from a github remote, the SHA1 (b82b3aec) has not changed since last install.
 #>   Use `force = TRUE` to force installation
 ```
 
@@ -77,7 +77,7 @@ plot(Grid$grid, pch=19)
 points(traps, col="blue",pch=20)
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
 
 ## (2) Simulate SCR data and make a plot of it.
 
@@ -91,7 +91,7 @@ str(data3d)
 #> List of 3
 #>  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...
 #>  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...
-#>  $ s  : num [1:200, 1:2] 713.3 -216.6 -1031.8 913.4 42.4 ...
+#>  $ s  : num [1:200, 1:2] 712.9 -216.1 -1030.5 912.8 42.7 ...
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : NULL
 #>   .. ..$ : chr [1:2] "sx" "sy"
@@ -105,7 +105,7 @@ points(data3d$s,col="red",pch = 20)
 points(data3d$s[which(apply(data3d$y,1,sum)!=0),],col="green",pch = 20)
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-4-1.png" style="display: block; margin: auto;" />
 
 # (3) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask
 
@@ -146,7 +146,7 @@ plot(poly, add=TRUE)
 points(s.st3d,col="red",pch=20)
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
 
 ``` r
 
@@ -195,7 +195,7 @@ library(tictoc)
 tic() # track time elapsed
 out = run_classic(model = scr_model, data=data, constants=constants, inits=inits, params = params,niter = 8000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
 toc()
-#> 123.35 sec elapsed
+#> 173.84 sec elapsed
 
 # summarize output
 samples = do.call(rbind, out)
@@ -204,7 +204,7 @@ hist(samples[,which(dimnames(out[[1]])[[2]]=="N")], xlab = "Abundance", xlim = c
 abline(v=200, col="red") # add line for simulated abundance
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-2.png" width="100%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-5-2.png" style="display: block; margin: auto;" />
 
 ``` r
 
@@ -219,3 +219,26 @@ nimSummary(out)
 #> sigma[1]   240.303  28.402 190.739 238.009 303.667  1 369.615 1.038
 #> sigma[2]   289.768  26.314 247.440 286.715 349.694  1 234.498 1.003
 ```
+
+## Literature Cited
+
+Bischof R., D. Turek, C. Milleret, T. Ergon, P. Dupont, S. Dey, W. Zhang
+and P. de Valpine. 2021. nimbleSCR: Spatial Capture-Recapture (SCR)
+Methods Using ‘nimble’. R package version 0.1.3.
+<https://CRAN.R-project.org/package=nimbleSCR>
+
+Kellner, K. 2018. jagsUI: a wrapper around ‘rjags’ to streamline ‘JAGS’
+analyses. R package version 1.5.0. <https://CRAN.R-project.org/>
+package=jagsUI.
+
+Milleret, C., P. Dupont, C. Bonenfant, H. Henrik Brøseth, Ø. Flagstad,
+C. Sutherland, and R. Bischof. 2019. A local evaluation of the
+individual state‐space to scale up Bayesian spatial capture‐recapture.
+Ecology and Evolution 9:352–363.
+
+Plummer, M. 2017. JAGS version 4.3.0. user manual.
+<https://people.stat>. sc.edu/hansont/stat740/jags\_user\_manual.pdf.
+
+Woodruff, S., D. R. Eacker, and L. Waits. 2020. Estimating coyote
+density in local, discrete Bayesian capture-recapture models. Journal of
+Wildlife Management 10.1002/jwmg.21967
