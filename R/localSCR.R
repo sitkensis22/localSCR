@@ -1416,6 +1416,7 @@ rescale_classic <- function(X, ext, s.st, site, hab_mask){
 #' Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = 100)
 #'
 #' # create polygon to use as a mask
+#' library(sf)
 #' poly = st_sfc(st_polygon(x=list(matrix(c(-1765,-1765,1730,-1650,1600,1650,0,1350,-800,1700,-1850,1000,-1765,-1765),ncol=2, byrow=TRUE))), crs =  mycrs)
 #'
 #' # make simple plot
@@ -1544,6 +1545,7 @@ mask_polygon <- function(poly, grid, crs_, prev_mask){
 #' Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = 100)
 #'
 #' # run previous code used for mask_polygon() to create raster for example
+#' library(sf)
 #' poly = st_sfc(st_polygon(x=list(matrix(c(-1665,-1665,1730,-1650,1600,1650,0,1350,-800,1700,-1850,1000,-1665,-1665),ncol=2, byrow=TRUE))), crs =  mycrs)
 #' hab_mask = mask_polygon(poly = poly, grid = Grid$grid, crs_ = mycrs, prev_mask = NULL)
 #'
@@ -1763,7 +1765,6 @@ run_classic <- function(model, data, constants, inits, params,
     if(parallel == TRUE){
       run_parallel <- function(seed,data,model,constants,inits, params,
                                niter,nburnin,thin){
-        library(nimble)
         SCRmodelR <- nimble::nimbleModel(code=model,data=data,constants=constants,inits=inits,check=FALSE,calculate=TRUE)
         SCRmodelR$initializeInfo()
         # compile model to C++#
@@ -1784,6 +1785,7 @@ run_classic <- function(model, data, constants, inits, params,
         stop("Must have at least 2 chains to run parallel processing")
       }
       this_cluster <- parallel::makeCluster(nchains)
+      parallel::clusterEvalQ(this_cluster, library("nimble")) # 
       if(is.null(RNGseed)==FALSE){
         parallel::clusterSetRNGStream(cl = this_cluster, RNGseed)
       }
@@ -1930,3 +1932,15 @@ nimSummary = function(d, trace=FALSE, exclude.params = NULL, digits=3){
   }
   return(round(tmp.frame, digits=digits))
 }
+
+
+
+##' Function to generate realized density surface from MCMC output
+##'
+##'
+#realized_density <- function(samples, grid, crs_, hab_mask = FALSE){
+#      n.iter <- dim(samples[[1]])[1] # store number of iterations
+#      all.samples <- do.call(rbind, samples) # rbind mcmc samples
+#      
+#  
+#}

@@ -41,6 +41,7 @@ mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
 Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = 100)
 
 # run previous code used for mask_polygon() to create raster for example
+library(sf)
 poly = st_sfc(st_polygon(x=list(matrix(c(-1665,-1665,1730,-1650,1600,1650,0,1350,-800,1700,-1850,1000,-1665,-1665),ncol=2, byrow=TRUE))), crs =  mycrs)
 hab_mask = mask_polygon(poly = poly, grid = Grid$grid, crs_ = mycrs, prev_mask = NULL)
 
