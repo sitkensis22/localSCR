@@ -1894,7 +1894,7 @@ nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude.params = NULL, di
   }else
     if(is.null(exclude.params)){
       if(dim(d[[1]])[2]>100){
-       param_length_check <- readline(cat(crayon::red(paste("Do you really want to summarize",ncol(d3),"parameters? (1 = Yes or 0 = No); note that this will take forever! "))))
+       param_length_check <- readline(cat(crayon::red(paste("Do you really want to build a summary table for",ncol(d3),"parameters? (1 = Yes or 0 = No); note that this will take forever! "))))
        if(param_length_check=="0"){stop("Exiting function...",call. = FALSE)}
       }
       d2 <- d
