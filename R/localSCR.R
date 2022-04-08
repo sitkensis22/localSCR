@@ -1316,8 +1316,7 @@ initialize_classic <- function(y, M, X, buff, hab_mask = FALSE){
 #' @param s.st a matrix of starting activity center coordinates. This is returned from \code{\link{initialize_classic}}
 #' buffered by as an integer. This is typically 3 times the sigma parameter.
 #' @param site Either \code{NULL} (if a 2D trap array is used) or a vector of integers denoting which trap array an individual (either detected or augmented) belongs to. Note that \code{site} is provided from \code{\link{sim_classic}} when a 3D trap array is used. However, this \code{site} variable must be correctly augmented based on the total augmented population size (i.e., \code{M}).
-#' @param hab_mask either \code{FALSE} (the default) or a matrix or arrary output from \code{\link{mask_polygon}}
-#' or \code{\link{mask_raster}} functions.
+#' @param hab_mask a matrix or arrary output from \code{\link{mask_polygon}} or \code{\link{mask_raster}} functions.
 #' @return a list of rescaled trap coordinates, grid extents, and starting activtiy center coordinates.
 #' @details This function is only meant to be used when habitat masking is incorporated into the model. The functions properly rescales inputs based on the dimensions of the habitat mask. Note that the \code{pixelWidth} needs to be included as an input in the model after inputs are rescaled to correctly estimate the scaling parameter (i.e., 'sigma').
 #' @author Daniel Eacker
@@ -1792,7 +1791,7 @@ run_classic <- function(model, data, constants, inits, params,
         stop("Must have at least 2 chains to run parallel processing")
       }
       this_cluster <- parallel::makeCluster(nchains)
-      parallel::clusterEvalQ(this_cluster, library("nimble")) # 
+      parallel::clusterEvalQ(this_cluster, library("nimble")) 
       if(is.null(RNGseed)==FALSE){
         parallel::clusterSetRNGStream(cl = this_cluster, RNGseed)
       }

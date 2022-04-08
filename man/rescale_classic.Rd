@@ -17,8 +17,7 @@ buffered by as an integer. This is typically 3 times the sigma parameter.}
 
 \item{site}{Either \code{NULL} (if a 2D trap array is used) or a vector of integers denoting which trap array an individual (either detected or augmented) belongs to. Note that \code{site} is provided from \code{\link{sim_classic}} when a 3D trap array is used. However, this \code{site} variable must be correctly augmented based on the total augmented population size (i.e., \code{M}).}
 
-\item{hab_mask}{either \code{FALSE} (the default) or a matrix or arrary output from \code{\link{mask_polygon}}
-or \code{\link{mask_raster}} functions.}
+\item{hab_mask}{a matrix or arrary output from \code{\link{mask_polygon}} or \code{\link{mask_raster}} functions.}
 }
 \value{
 a list of rescaled trap coordinates, grid extents, and starting activtiy center coordinates.
