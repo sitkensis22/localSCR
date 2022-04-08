@@ -1813,6 +1813,8 @@ run_classic <- function(model, data, constants, inits, params,
 #'
 #' @param d a list of MCMC samples from each chain returned from \code{\link{run_classic}}.
 #' @param trace a logical value indicating whether or not traces of MCMC samples should be plotted. Default is \code{FALSE}.
+#' @param plot_all a logical value indicating whether or not all parameters should be included in plots. This assumes that some parameters
+#' are excluded in the summary table. Default is \code{FALSE}.
 #' @param exclude.params either \code{NULL} or a scalar or vector containing parameter(s) to exclude from summary. Note that high dimensional parameters (e.g., \code{s[1, 1, 1]}) can be excluded by calling \code{exclude.params = "s"}. Default is \code{NULL}.
 #' @param digits an integer value indicating how many digits the output should be rounded to.
 #' @return a dataframe of summary statistics for MCMC samples.
@@ -1884,63 +1886,77 @@ run_classic <- function(model, data, constants, inits, params,
 #' # summarize output
 #' nimSummary(out)
 #' @export
-nimSummary = function(d, trace=FALSE, exclude.params = NULL, digits=3){
+nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude.params = NULL, digits=3){
   if(is.null(exclude.params)==FALSE){
-    tmp1 = ifelse(is.na(as.numeric(stringr::str_extract(attributes(d[[1]])$dimnames[[2]],"[1-9]+"))),attributes(d[[1]])$dimnames[[2]],substr(attributes(d[[1]])$dimnames[[2]],1,as.numeric(stringr::str_locate(attributes(d[[1]])$dimnames[[2]], "\\[")[, 1])-1))
-    d.remove = lapply(d, function(x) which(tmp1 %in% exclude.params))
-    d2 = lapply(d, function(x) x[,-d.remove[[1]]])
+    tmp1 <- ifelse(is.na(as.numeric(stringr::str_extract(attributes(d[[1]])$dimnames[[2]],"[1-9]+"))),attributes(d[[1]])$dimnames[[2]],substr(attributes(d[[1]])$dimnames[[2]],1,as.numeric(stringr::str_locate(attributes(d[[1]])$dimnames[[2]], "\\[")[, 1])-1))
+    d.remove <- lapply(d, function(x) which(tmp1 %in% exclude.params))
+    d2 <- lapply(d, function(x) x[,-d.remove[[1]]])
   }else
     if(is.null(exclude.params)){
-      d2 = d
-      d.remove = 0
+      if(dim(d[[1]])[2]>100){
+       param_length_check <- readline(cat(crayon::red(paste("Do you really want to summarize",ncol(d3),"parameters? (1 = Yes or 0 = No); note that this will take forever! "))))
+       if(param_length_check=="0"){stop("Exiting function...",call. = FALSE)}
+      }
+      d2 <- d
+      d.remove <- 0
     }
   if((length(attributes(d[[1]])$dimnames[[2]])-length(d.remove[[1]])==1)){
-    d3 = as.data.frame(do.call(c, d2))
-    Means = mean(d3[,1], na.rm=TRUE)
-    SDs = stats::sd(d3[,1], na.rm=TRUE)
-    q2.5 = stats::quantile(d3[,1], 0.025, na.rm=TRUE)
-    q50 = stats::quantile(d3[,1], 0.50, na.rm=TRUE)
-    q97.5 = stats::quantile(d3[,1], 0.975, na.rm=TRUE)
-    over.zero = round(mean(d3[,1]>0),2)
-    n.eff = coda::effectiveSize(mcmc.list(lapply(d2, coda::as.mcmc)))
-    Rhat = round(coda::gelman.diag(coda::mcmc.list(lapply(d2, coda::as.mcmc)), multivariate = FALSE)[[1]][,1],3)
+    d3 <- as.data.frame(do.call(c, d2))
+    Means <- mean(d3[,1], na.rm=TRUE)
+    SDs <- stats::sd(d3[,1], na.rm=TRUE)
+    q2.5 <- stats::quantile(d3[,1], 0.025, na.rm=TRUE)
+    q50 <- stats::quantile(d3[,1], 0.50, na.rm=TRUE)
+    q97.5 <- stats::quantile(d3[,1], 0.975, na.rm=TRUE)
+    over.zero <- round(mean(d3[,1]>0),2)
+    n.eff <- coda::effectiveSize(mcmc.list(lapply(d2, coda::as.mcmc)))
+    Rhat <- round(coda::gelman.diag(coda::mcmc.list(lapply(d2, coda::as.mcmc)), multivariate = FALSE)[[1]][,1],3)
   }else
     if((length(attributes(d[[1]])$dimnames[[2]])-length(d.remove[[1]])>1)){
-      d3=do.call(rbind,d2)
-      Means = apply(d3, 2,function(x) mean(x,na.rm=TRUE))
-      SDs = apply(d3, 2,function(x) stats::sd(x,na.rm=TRUE))
-      q2.5 = apply(d3, 2,function(x) stats::quantile(x, 0.025,na.rm=TRUE))
-      q50 = apply(d3, 2,function(x) stats::quantile(x, 0.50,na.rm=TRUE))
-      q97.5 = apply(d3, 2,function(x) stats::quantile(x, 0.975,na.rm=TRUE))
-      over.zero = round(apply(d3, 2, function(x) mean(x>0,na.rm=TRUE)),2)
-      n.eff = coda::effectiveSize(coda::mcmc.list(lapply(d2, coda::as.mcmc)))
-      Rhat = round(coda::gelman.diag(coda::mcmc.list(lapply(d2, coda::as.mcmc)), multivariate = FALSE)[[1]][,1],3)
+      d3 <- do.call(rbind,d2)
+      Means <- apply(d3, 2,function(x) mean(x,na.rm=TRUE))
+      SDs <- apply(d3, 2,function(x) stats::sd(x,na.rm=TRUE))
+      q2.5 <- apply(d3, 2,function(x) stats::quantile(x, 0.025,na.rm=TRUE))
+      q50 <- apply(d3, 2,function(x) stats::quantile(x, 0.50,na.rm=TRUE))
+      q97.5 <- apply(d3, 2,function(x) stats::quantile(x, 0.975,na.rm=TRUE))
+      over.zero <- round(apply(d3, 2, function(x) mean(x>0,na.rm=TRUE)),2)
+      n.eff <- coda::effectiveSize(coda::mcmc.list(lapply(d2, coda::as.mcmc)))
+      Rhat <- round(coda::gelman.diag(coda::mcmc.list(lapply(d2, coda::as.mcmc)), multivariate = FALSE)[[1]][,1],3)
     }
   if(trace==TRUE  & (length(attributes(d[[1]])$dimnames[[2]])-length(d.remove[[1]])>1)){
      par(mfrow=c(3,2))
-     for(i in 1:3){ 
+     g <- 1 # set g index
+     if(plot_all){
+     d2 <- d
+     d3 <- do.call(rbind, d2) # allow all parameters to be plotted despite excluding them from the summary table
+     }
+     plot.seq <- seq(3,3000,3)  # probably unlikely to want to plot more than 3,000 parameters
+     for(i in 1:3){ # plot first 3 variables to start out
       plot(1:dim(d2[[1]])[1],d2[[1]][,i],xlab="iteration",ylab=colnames(d3)[i],type="l",ylim=range(do.call(rbind, lapply(d2,function(x) apply(x, 2, range)))[,i]))
       for(j in 2:length(d2)){
         lines(1:dim(d2[[1]])[1],d2[[j]][,i],xlab="iteration",ylab=colnames(d3)[i],type="l",col="red")
       }
       hist(d3[,i],main="",xlab=colnames(d3)[i])
      }
-      if(ncol(d3)>3){
-      i <- i + 1
-      if(any(i == seq(4,4000,3)) & interactive()){
-        answer <- readline(cat(crayon::red("Plot next set of parameters? (1 = Yes or 0 = No) "))) # need to add crayon red to importFrom above
+      if(interactive()){
+        answer <- readline(cat(crayon::red("Plot next set of parameters? (1 = Yes or 0 = No) ")))
         while(answer == "1"){
-        for(i in i:(i+2)){
-         plot(1:dim(d2[[1]])[1],d2[[1]][,i],xlab="iteration",ylab=colnames(d3)[i],type="l",ylim=range(do.call(rbind, lapply(d2,function(x) apply(x, 2, range)))[,i]))
-          for(j in 2:length(d2)){
-           lines(1:dim(d2[[1]])[1],d2[[j]][,i],xlab="iteration",ylab=colnames(d3)[i],type="l",col="red")
+          upper_index <- ifelse(plot.seq[g+1] > ncol(d3), ncol(d3), plot.seq[g+1])
+          for(i in (plot.seq[g]+1):upper_index){
+             plot(1:dim(d2[[1]])[1],d2[[1]][,i],xlab="iteration",ylab=colnames(d3)[i],type="l",ylim=range(do.call(rbind, lapply(d2,function(x) apply(x, 2, range)))[,i]))
+              for(j in 2:length(d2)){
+              lines(1:dim(d2[[1]])[1],d2[[j]][,i],xlab="iteration",ylab=colnames(d3)[i],type="l",col="red")
+             }
+             hist(d3[,i],main="",xlab=colnames(d3)[i])
+            } # end i loop
+          g <- g + 1 
+          if(plot.seq[g+1] <= ncol(d3)){
+          answer <- readline(cat(crayon::red("Plot next set of parameters? (1 = Yes or 0 = No) ")))
+          }else
+          if(plot.seq[g+1] > ncol(d3)){
+          break
           }
-         hist(d3[,i],main="",xlab=colnames(d3)[i])
         }
-        answer <- readline(cat(crayon::red("Plot next set of parameters? (1 = Yes or 0 = No) "))) # need to add crayon red to importFrom above
-        }
-      }
-    }
+      } # interactive?
   }else
     if(trace==TRUE  & (length(attributes(d[[1]])$dimnames[[2]])-length(d.remove[[1]])==1)){
       par(mfrow=c(1,2))

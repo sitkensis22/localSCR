@@ -4,12 +4,21 @@
 \alias{nimSummary}
 \title{Function to summarize MCMC chain output from nimble}
 \usage{
-nimSummary(d, trace = FALSE, exclude.params = NULL, digits = 3)
+nimSummary(
+  d,
+  trace = FALSE,
+  plot_all = FALSE,
+  exclude.params = NULL,
+  digits = 3
+)
 }
 \arguments{
 \item{d}{a list of MCMC samples from each chain returned from \code{\link{run_classic}}.}
 
 \item{trace}{a logical value indicating whether or not traces of MCMC samples should be plotted. Default is \code{FALSE}.}
+
+\item{plot_all}{a logical value indicating whether or not all parameters should be included in plots. This assumes that some parameters
+are excluded in the summary table. Default is \code{FALSE}.}
 
 \item{exclude.params}{either \code{NULL} or a scalar or vector containing parameter(s) to exclude from summary. Note that high dimensional parameters (e.g., \code{s[1, 1, 1]}) can be excluded by calling \code{exclude.params = "s"}. Default is \code{NULL}.}
 
