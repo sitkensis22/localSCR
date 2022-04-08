@@ -87,7 +87,8 @@ grid_classic <- function(X, crs_, buff, res){
 #' @param ext an \code{Extent} object from the \code{raster} package. This is returned from \code{\link{grid_classic}}.
 #' @param crs_ the UTM coordinate reference system (EPSG code) used for your
 #' location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).
-#' @param N simulated abundance as an integer.
+#' @param N simulated abundance as an integer. Note that when traps are a 3D array,
+#' that \code{N} is the simulated abundance per trap array or cluster. 
 #' @param sigma_ the scaling parameter of the bivariate normal kernel either
 #' in meters or kilometers as an integer.
 #' @param prop_sex the portion of females or males as a numeric value. This

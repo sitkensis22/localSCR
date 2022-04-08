@@ -27,7 +27,8 @@ UTMs. An array is used when traps are clustered over a survey area.}
 \item{crs_}{the UTM coordinate reference system (EPSG code) used for your
 location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).}
 
-\item{N}{simulated abundance as an integer.}
+\item{N}{simulated abundance as an integer. Note that when traps are a 3D array,
+that \code{N} is the simulated abundance per trap array or cluster.}
 
 \item{sigma_}{the scaling parameter of the bivariate normal kernel either
 in meters or kilometers as an integer.}
