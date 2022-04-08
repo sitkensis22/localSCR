@@ -47,7 +47,7 @@ hab_mask = mask_polygon(poly = poly, grid = Grid$grid, crs_ = mycrs, prev_mask =
 
 # create raster for demonstration purposes
 library(raster)
-rast <- raster(nrow=dim(hab_mask)[1], ncol=dim(hab_mask)[2],ext=Grid$ext,crs=CRS(st_crs(mycrs)$proj4string))
+rast <- raster(nrow=dim(hab_mask)[1], ncol=dim(hab_mask)[2],ext=Grid$ext,crs=mycrs)
 rast[] = apply(hab_mask,2,rev)
 
 # create habitat mask using raster
@@ -78,7 +78,7 @@ poly = st_sfc(st_polygon(x=list(matrix(c(-1660,-1900,5730,-1050,5470,5650,0,6050
 plot(poly, add=TRUE)
 
 # make raster from polygon
-rast = raster(xmn=-2000, xmx=6000, ymn=-2000, ymx=6500,res=100,crs=CRS(st_crs(mycrs)$proj4string))
+rast = raster(xmn=-2000, xmx=6000, ymn=-2000, ymx=6500,res=100,crs=mycrs)
 rast[]=st_intersects(st_cast(st_sfc(st_multipoint(coordinates(rast)), crs =  mycrs),"POINT"),poly,sparse=FALSE)
 
 # make simple plot of raster

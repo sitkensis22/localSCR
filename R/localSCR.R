@@ -54,7 +54,7 @@ grid_classic <- function(X, crs_, buff, res){
   if(length(dim(X))==2){
     # get new extent
     ext <- raster::extent(c(apply(X, 2, min)-max(buff),apply(X, 2, max)+max(buff))[c(1,3,2,4)])
-    rast <- raster::raster(ext = ext, crs = sf::st_crs(crs_)$crs, res = res)
+    rast <- raster::raster(ext = ext, crs = crs_, res = res)
     gridOut <- raster::coordinates(rast)
   }else
     # for dim of length 3 (assumes different sites are in dimension 3)
@@ -66,8 +66,8 @@ grid_classic <- function(X, crs_, buff, res){
       y_lengths <- unlist(lapply(ext_initial, function(x) x[4]-x[3]))
       y_index <- which(y_lengths==max(y_lengths))[1]
       ext_standard <-extent(c(-x_lengths[x_index]/2,x_lengths[x_index]/2,-y_lengths[y_index]/2,y_lengths[y_index]/2))
-      coords <- raster::coordinates(raster(ext = ext_standard, crs = sf::st_crs(crs_)$crs, res = res))
-      rast <- lapply(centroids, function(x) raster::rasterFromXYZ(cbind(coords[,1]+x[,1],coords[,2]+x[,2]),crs = sf::st_crs(crs_)$crs))
+      coords <- raster::coordinates(raster(ext = ext_standard, crs = crs_, res = res))
+      rast <- lapply(centroids, function(x) raster::rasterFromXYZ(cbind(coords[,1]+x[,1],coords[,2]+x[,2]),crs = crs_))
       gridOut <- lapply(rast, raster::coordinates)
       ext <- lapply(rast, function(x) raster::extent(x))
       gridOut <- array(unlist(gridOut),dim=c(raster::ncell(rast[[1]]),dim(X)[2:3])) # convert to array
@@ -1482,8 +1482,8 @@ mask_polygon <- function(poly, grid, crs_, prev_mask){
   if(length(dim(grid))==2){
     grid_pts <- sf::st_cast(sf::st_sfc(sf::st_multipoint(grid), crs =  crs_),"POINT")
     habitat_mask <- apply(matrix(ifelse(is.na(as.numeric(sf::st_intersects(grid_pts,poly))),0,
-                                        as.numeric(sf::st_intersects(grid_pts,poly))),nrow=dim(raster::rasterFromXYZ(grid,crs=sf::st_crs(crs_)$crs))[1],
-                                 ncol=dim(raster::rasterFromXYZ(grid,crs=sf::st_crs(crs_)$crs))[2], byrow=TRUE),2,rev)
+                                        as.numeric(sf::st_intersects(grid_pts,poly))),nrow=dim(raster::rasterFromXYZ(grid,crs=crs_))[1],
+                                 ncol=dim(raster::rasterFromXYZ(grid,crs=crs_))[2], byrow=TRUE),2,rev)
     # to combine with a previous habitat mask
     if(is.null(prev_mask)==FALSE){
       # Check to see if dimensions of previous and current habitat
@@ -1497,8 +1497,8 @@ mask_polygon <- function(poly, grid, crs_, prev_mask){
     if(length(dim(grid))==3){
       grid_pts <- apply(grid, 3, function(x) sf::st_cast(sf::st_sfc(sf::st_multipoint(x), crs =  crs_),"POINT"))
       habitat_mask <- lapply(grid_pts, function(x) apply(matrix(ifelse(is.na(as.numeric(sf::st_intersects(x,poly))),0,
-                                                                       as.numeric(sf::st_intersects(x,poly))),nrow=dim(raster::rasterFromXYZ(grid[,,1],crs=sf::st_crs(crs_)$crs))[1],
-                                                                ncol=dim(raster::rasterFromXYZ(grid[,,1],crs=sf::st_crs(crs_)$crs))[2], byrow=TRUE),2,rev))
+                                                                       as.numeric(sf::st_intersects(x,poly))),nrow=dim(raster::rasterFromXYZ(grid[,,1],crs=crs_))[1],
+                                                                ncol=dim(raster::rasterFromXYZ(grid[,,1],crs=crs_))[2], byrow=TRUE),2,rev))
       habitat_mask <- array(unlist(habitat_mask),dim=c(dim(habitat_mask[[1]]),dim(grid)[3])) # convert to array
       # to combine with a previous habitat mask
       if(is.null(prev_mask)==FALSE){
@@ -1554,7 +1554,7 @@ mask_polygon <- function(poly, grid, crs_, prev_mask){
 #'
 #' # create raster for demonstration purposes
 #' library(raster)
-#' rast <- raster(nrow=dim(hab_mask)[1], ncol=dim(hab_mask)[2],ext=Grid$ext,crs=CRS(st_crs(mycrs)$proj4string))
+#' rast <- raster(nrow=dim(hab_mask)[1], ncol=dim(hab_mask)[2],ext=Grid$ext,crs=mycrs)
 #' rast[] = apply(hab_mask,2,rev)
 #'
 #' # create habitat mask using raster
@@ -1585,7 +1585,7 @@ mask_polygon <- function(poly, grid, crs_, prev_mask){
 #' plot(poly, add=TRUE)
 #'
 #' # make raster from polygon
-#' rast = raster(xmn=-2000, xmx=6000, ymn=-2000, ymx=6500,res=100,crs=CRS(st_crs(mycrs)$proj4string))
+#' rast = raster(xmn=-2000, xmx=6000, ymn=-2000, ymx=6500,res=100,crs=mycrs)
 #' rast[]=st_intersects(st_cast(st_sfc(st_multipoint(coordinates(rast)), crs =  mycrs),"POINT"),poly,sparse=FALSE)
 #'
 #' # make simple plot of raster
@@ -1610,8 +1610,8 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
     grid_pts <- sf::st_cast(sf::st_sfc(sf::st_multipoint(grid), crs =  crs_),"POINT")
     vals <- raster::extract(rast,methods::as(grid_pts,"Spatial"))
     rast_ind <- FUN(vals)
-    habitat_mask <- apply(matrix(as.numeric(rast_ind),nrow=dim(raster::rasterFromXYZ(grid,crs=sf::st_crs(crs_)$crs))[1],
-                                 ncol=dim(raster::rasterFromXYZ(grid,crs=sf::st_crs(crs_)$crs))[2], byrow=TRUE),2,rev)
+    habitat_mask <- apply(matrix(as.numeric(rast_ind),nrow=dim(raster::rasterFromXYZ(grid,crs=crs_))[1],
+                                 ncol=dim(raster::rasterFromXYZ(grid,crs=crs_))[2], byrow=TRUE),2,rev)
     # to combine with a previous habitat mask
     if(is.null(prev_mask)==FALSE){
       # Check to see if dimensions of previous and current habitat
@@ -1626,8 +1626,8 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
       grid_pts <- apply(grid, 3, function(x) sf::st_cast(sf::st_sfc(sf::st_multipoint(x), crs =  crs_),"POINT"))
       vals <- lapply(grid_pts,function(x) raster::extract(rast,methods::as(x,"Spatial")))
       rast_ind <- lapply(vals, function(x) FUN(x))
-      habitat_mask <- lapply(rast_ind, function(x) apply(matrix(as.numeric(x),nrow=dim(raster::rasterFromXYZ(grid[,,1],crs=sf::st_crs(crs_)$crs))[1],
-                                                                ncol=dim(raster::rasterFromXYZ(grid[,,1],crs=sf::st_crs(crs_)$crs))[2], byrow=TRUE),2,rev))
+      habitat_mask <- lapply(rast_ind, function(x) apply(matrix(as.numeric(x),nrow=dim(raster::rasterFromXYZ(grid[,,1],crs=crs_))[1],
+                                                                ncol=dim(raster::rasterFromXYZ(grid[,,1],crs=crs_))[2], byrow=TRUE),2,rev))
       habitat_mask <- array(unlist(habitat_mask),dim=c(dim(habitat_mask[[1]]),dim(grid)[3])) # convert to array
       # to combine with a previous habitat mask
       if(is.null(prev_mask)==FALSE){
@@ -1971,7 +1971,7 @@ nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude.params = NULL, di
   }
   on.exit(par(mfrow=c(1,1)))
   return(round(tmp.frame, digits=digits))
-}
+} # End function 'nimSummary'
 
 
 
