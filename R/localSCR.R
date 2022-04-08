@@ -565,17 +565,17 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
               } # i individuals
               # use zeros trick for marked individuals to speed up the computation
               for(g in 1:nSites){
-                for(i in 1:n0){
+                for(i in 1:n0[g]){
                   for(j in 1:J){
                     for(k in 1:K){
                       y[i,j,k,g] ~ dbin(p[i,j,k],1)
                     } # k occasions
                   } # j traps
                 } # i individuals
-              } # g sites
-              for(i in (n0+1):M){
+               for(i in (n0[g]+1):M){
                 zeros[i] ~ dbern((1 - prod(1 - p[i,1:J,1:K]))*z[i])
-              } # i individuals
+               } # i individuals
+              } # g sites 
               N <- sum(z[1:M])
               D <- N/A
             })
@@ -598,17 +598,17 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                 } # i individuals
                 # use zeros trick for marked individuals to speed up the computation
                 for(g in 1:nSites){
-                  for(i in 1:n0){
+                  for(i in 1:n0[g]){
                     for(j in 1:J){
                       for(k in 1:K){
                         y[i,j,k,g] ~ dpois(lam[i,j,k])
                       } # occasions
                     } # j traps
                   } # i individuals
-                } # g sites
-                for(i in (n0+1):M){
+                 for(i in (n0[g]+1):M){
                   zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
-                }
+                 } # i individuals
+                } # g sites  
                 N <- sum(z[1:M])
                 D <- N/A
               })
@@ -635,17 +635,17 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                   } # i marked individuals
                   # use zeros trick for marked individuals to speed up the computation
                   for(g in 1:nSites){
-                    for(i in 1:n0){
+                    for(i in 1:n0[g]){
                       for(j in 1:J){
                         for(k in 1:K){
                           y[i,j,k,g] ~ dbin(p[i,j,k],1)
                         } # k occasions
                       } # j traps
                     } # i individuals
-                  } # g sites
-                  for(i in (n0+1):M){
+                   for(i in (n0[g]+1):M){
                     zeros[i] ~ dbern((1 - prod(1 - p[i,1:J,1:K]))*z[i])
-                  } # i individuals
+                   } # i individuals
+                  } # g sites
                   N <- sum(z[1:M])
                   D <- N/A
                 })
@@ -670,17 +670,17 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                     } # i individuals
                     # use zeros trick for marked individuals to speed up the computation
                     for(g in 1:nSites){
-                      for(i in 1:n0){
+                      for(i in 1:n0[g]){
                         for(j in 1:J){
                           for(k in 1:K){
                             y[i,j,k,g] ~ dpois(lam[i,j,k])
                           } # occasions
                         } # j traps
                       } # i individuals
-                    } # g sites
-                    for(i in (n0+1):M){
+                     for(i in (n0[g]+1):M){
                       zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
-                    }
+                     } # i individuals
+                    } # g sites
                     N <- sum(z[1:M])
                     D <- N/A
                   })
@@ -978,17 +978,17 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                 } # i individuals
                 # use zeros trick for marked individuals to speed up the computation
                 for(g in 1:nSites){
-                  for(i in 1:n0){
+                  for(i in 1:n0[g]){
                     for(j in 1:J){
                       for(k in 1:K){
                         y[i,j,k,g] ~ dbin(p[i,j,k],1)
                       } # k occasions
                     } # j traps
                   } # i individuals
-                } # g sites
-                for(i in (n0+1):M){
+                 for(i in (n0[g]+1):M){
                   zeros[i] ~ dbern((1 - prod(1 - p[i,1:J,1:K]))*z[i])
-                } # i individuals
+                 } # i individuals
+                } # g sites
                 N <- sum(z[1:M])
                 D <- N/A
               })
@@ -1015,17 +1015,17 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                   } # i individuals
                   # use zeros trick for marked individuals to speed up the computation
                   for(g in 1:nSites){
-                    for(i in 1:n0){
+                    for(i in 1:n0[g]){
                       for(j in 1:J){
                         for(k in 1:K){
                           y[i,j,k,g] ~ dpois(lam[i,j,k])
                         } # occasions
                       } # j traps
                     } # i individuals
-                  } # g sites
-                  for(i in (n0+1):M){
+                   for(i in (n0[g]+1):M){
                     zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
-                  }
+                   }
+                  } # g sites
                   N <- sum(z[1:M])
                   D <- N/A
                 })
@@ -1055,19 +1055,19 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                         p[i,1:J,k] <- p0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma.pixel[sx[i]]^2))
                       } # k occasions
                     } # i marked individuals
-                    # use zeros trick for marked individuals to speed up the computation
-                    for(g in 1:nSites){
-                      for(i in 1:n0){
-                        for(j in 1:J){
-                          for(k in 1:K){
-                            y[i,j,k,g] ~ dbin(p[i,j,k],1)
-                          } # k occasions
-                        } # j traps
-                      } # i individuals
-                    } # g sites
-                    for(i in (n0+1):M){
-                      zeros[i] ~ dbern((1 - prod(1 - p[i,1:J,1:K]))*z[i])
+                   # use zeros trick for marked individuals to speed up the computation
+                   for(g in 1:nSites){
+                     for(i in 1:n0[g]){
+                       for(j in 1:J){
+                         for(k in 1:K){
+                           y[i,j,k,g] ~ dbin(p[i,j,k],1)
+                         } # k occasions
+                       } # j traps
+                     } # i individuals
+                    for(i in (n0[g]+1):M){
+                     zeros[i] ~ dbern((1 - prod(1 - p[i,1:J,1:K]))*z[i])
                     } # i individuals
+                   } # g sites
                     N <- sum(z[1:M])
                     D <- N/A
                   })
@@ -1097,17 +1097,17 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                       } # i individuals
                       # use zeros trick for marked individuals to speed up the computation
                       for(g in 1:nSites){
-                        for(i in 1:n0){
+                        for(i in 1:n0[g]){
                           for(j in 1:J){
                             for(k in 1:K){
                               y[i,j,k,g] ~ dpois(lam[i,j,k])
                             } # occasions
                           } # j traps
                         } # i individuals
-                      } # g sites
-                      for(i in (n0+1):M){
+                      for(i in (n0[g]+1):M){
                         zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
                       }
+                      } # g sites
                       N <- sum(z[1:M])
                       D <- N/A
                     })
