@@ -1125,7 +1125,8 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
 #' Generate a matrix of intial starting locations, possibly accounting for habitat mask.
 #'
 #' @param y either a matrix or array of encounter history data, possiblity from \code{sim_classic()}.
-#' @param M an integer of the total augmented population size (i.e., detected and augmented individuals)
+#' @param M an integer of the total augmented population size (i.e., detected and augmented individuals). Note
+#' that if traps are an array (i.e., clustered), then M is the augmented size per trap array.
 #' @param X either a matrix or array representing the coordinates of traps in
 #' UTMs. An array is used when traps are clustered over a survey area.
 #' @param buff the distance (m or km) that the traps should be

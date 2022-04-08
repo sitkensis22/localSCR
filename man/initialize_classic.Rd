@@ -9,7 +9,8 @@ initialize_classic(y, M, X, buff, hab_mask = FALSE)
 \arguments{
 \item{y}{either a matrix or array of encounter history data, possiblity from \code{sim_classic()}.}
 
-\item{M}{an integer of the total augmented population size (i.e., detected and augmented individuals)}
+\item{M}{an integer of the total augmented population size (i.e., detected and augmented individuals). Note
+that if traps are an array (i.e., clustered), then M is the augmented size per trap array.}
 
 \item{X}{either a matrix or array representing the coordinates of traps in
 UTMs. An array is used when traps are clustered over a survey area.}
