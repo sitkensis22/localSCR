@@ -1937,7 +1937,7 @@ nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude.params = NULL, di
       }
       hist(d3[,i],main="",xlab=colnames(d3)[i])
      }
-      if(interactive()){
+      if(interactive() & ncol(d3) > 3){
         answer <- readline(cat(crayon::red("Plot next set of parameters? (1 = Yes or 0 = No) ")))
         while(answer == "1"){
           upper_index <- ifelse(plot.seq[g+1] > ncol(d3), ncol(d3), plot.seq[g+1])
