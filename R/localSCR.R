@@ -1970,6 +1970,7 @@ nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude.params = NULL, di
   if(nrow(tmp.frame)==1){
     row.names(tmp.frame) = attributes(d[[1]])$dimnames[[2]][-d.remove[[1]]]
   }
+  on.exit(par(mfrow=c(1,1)))
   return(round(tmp.frame, digits=digits))
 }
 
