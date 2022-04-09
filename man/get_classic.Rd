@@ -4,7 +4,13 @@
 \alias{get_classic}
 \title{Function to retrieve nimbleCode for spatially-explicit mark recapture models}
 \usage{
-get_classic(dim_y, enc_dist = "binomial", sex_sigma = FALSE, hab_mask = FALSE)
+get_classic(
+  dim_y,
+  enc_dist = "binomial",
+  sex_sigma = FALSE,
+  hab_mask = FALSE,
+  trapsClustered = FALSE
+)
 }
 \arguments{
 \item{dim_y}{an integer of either 2 (the default), 3, or 4 that defines what dimensional format the encounter history data are in.}
@@ -15,6 +21,8 @@ get_classic(dim_y, enc_dist = "binomial", sex_sigma = FALSE, hab_mask = FALSE)
 \item{sex_sigma}{a logical value indicating whether the scaling parameter ('sigma') is sex-specific}
 
 \item{hab_mask}{a logical value indicating whether a habitat mask will be used. Default is \code{FALSE}.}
+
+\item{trapsClusters}{a logical value indicating if traps are clustered in arrays across the sampling area. Note that if traps are not clustered, the \code{dim_y} can only be 2 or 3, while having traps clustered in an array requires that \code{dim_y} be only 3 or 4.}
 }
 \value{
 a \code{nimbleCode} object from the \code{nimble} package.

@@ -287,6 +287,7 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter, en
 #' \code{"binomial"}.
 #' @param sex_sigma a logical value indicating whether the scaling parameter ('sigma') is sex-specific
 #' @param hab_mask a logical value indicating whether a habitat mask will be used. Default is \code{FALSE}.
+#' @param trapsClusters a logical value indicating if traps are clustered in arrays across the sampling area. Note that if traps are not clustered, the \code{dim_y} can only be 2 or 3, while having traps clustered in an array requires that \code{dim_y} be only 3 or 4.
 #' @return a \code{nimbleCode} object from the \code{nimble} package.
 #' @details This function provides templates that could be copied and easily modified to include further model
 #'  complexity such as covariates explaining detection probability. The models include different encounter probability distributions, sex-specific scaling parameters, and habitat masking.
@@ -299,7 +300,7 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter, en
 #' # inspect model
 #' scr_model
 #' @export
-get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask = FALSE){
+get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask = FALSE,trapsClustered = FALSE){
     M <- J <- s <- X <- p0 <- sigma <- n0 <- z <- A <- lam0 <- K <- sex <- nSites <-
     site <- pixelWidth <- psi <- prop.habitat <- NULL
   if(dim_y !=2 & dim_y!=3 & dim_y !=4){
@@ -308,6 +309,13 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
   if(enc_dist != "poisson" & enc_dist != "binomial"){
     stop("Encounter distribution has to be either binomial or poisson")
   }
+  if(trapsClustered & dim_y == 2){
+    stop("Encounter data dimensions can only be 3 or 4 when traps are clustered")
+  }
+  if(trapsClustered==FALSE & dim_y == 4){
+    stop("Encounter data dimensions can only be 2 or 3 when traps are not clustered")
+  }
+ if(trapsClustered == FALSE){    
   if(isFALSE(hab_mask)){ # determine if hab_mask is included
     if(dim_y == 2){
       if(enc_dist == "binomial" & sex_sigma  == FALSE){
@@ -546,148 +554,7 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                 })
               }
         return(scrcode)
-      } else  # End 3D models
-        if(dim_y == 4){
-          if(enc_dist == "binomial" & sex_sigma  == FALSE){
-            scrcode <- nimble::nimbleCode({
-              sigma ~ dunif(0, sigma_upper) # scaling parameter
-              psi ~ dunif(0, 1) # inclusion prob
-              for(g in 1:nSites){
-                p0[g] ~ dunif(0,1) # site-specific baseline encounter probability
-              } # g sites
-              for(i in 1:M){
-                z[i]~dbern(psi)
-                s[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
-                s[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
-                dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
-                for(k in 1:K){
-                  p[i,1:J,k] <- p0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma^2))
-                }
-              } # i individuals
-              # use zeros trick for marked individuals to speed up the computation
-              for(g in 1:nSites){
-                for(i in 1:n0[g]){
-                  for(j in 1:J){
-                    for(k in 1:K){
-                      y[i,j,k,g] ~ dbin(p[i,j,k],1)
-                    } # k occasions
-                  } # j traps
-                } # i individuals
-               for(i in (n0[g]+1):M){
-                zeros[i] ~ dbern((1 - prod(1 - p[i,1:J,1:K]))*z[i])
-               } # i individuals
-              } # g sites 
-              N <- sum(z[1:M])
-              D <- N/A
-            })
-          } else
-            if(enc_dist == "poisson" & sex_sigma  == FALSE){
-              scrcode <- nimble::nimbleCode({
-                sigma ~ dunif(0, sigma_upper) # scaling parameter
-                psi ~ dunif(0, 1) # inclusion prob
-                for(g in 1:nSites){
-                  lam0[g] ~ dunif(0,lam0_upper) # site-specific baseline encounter rate
-                } # g sites
-                for(i in 1:M){
-                  z[i]~dbern(psi)
-                  s[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
-                  s[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
-                  dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
-                  for(k in 1:K){
-                    lam[i,1:J,k] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma^2))
-                  } # k occasions
-                } # i individuals
-                # use zeros trick for marked individuals to speed up the computation
-                for(g in 1:nSites){
-                  for(i in 1:n0[g]){
-                    for(j in 1:J){
-                      for(k in 1:K){
-                        y[i,j,k,g] ~ dpois(lam[i,j,k])
-                      } # occasions
-                    } # j traps
-                  } # i individuals
-                 for(i in (n0[g]+1):M){
-                  zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
-                 } # i individuals
-                } # g sites  
-                N <- sum(z[1:M])
-                D <- N/A
-              })
-            }else
-              if(enc_dist == "binomial" & sex_sigma  == TRUE){
-                scrcode <- nimble::nimbleCode({
-                  psi_sex ~ dunif(0,1) # probability sex = 1
-                  sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
-                  sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
-                  psi ~ dunif(0, 1) # inclusion prob
-                  for(g in 1:nSites){
-                    p0[g] ~ dunif(0,1) # site-specific baseline encounter probability
-                  } # g sites
-                  for(i in 1:M){
-                    z[i]~dbern(psi)
-                    sex[i] ~ dbern(psi_sex)
-                    sx[i] <- sex[i] + 1
-                    s[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
-                    s[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
-                    dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
-                    for(k in 1:K){
-                      p[i,1:J,k] <- p0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
-                    } # k occasions
-                  } # i marked individuals
-                  # use zeros trick for marked individuals to speed up the computation
-                  for(g in 1:nSites){
-                    for(i in 1:n0[g]){
-                      for(j in 1:J){
-                        for(k in 1:K){
-                          y[i,j,k,g] ~ dbin(p[i,j,k],1)
-                        } # k occasions
-                      } # j traps
-                    } # i individuals
-                   for(i in (n0[g]+1):M){
-                    zeros[i] ~ dbern((1 - prod(1 - p[i,1:J,1:K]))*z[i])
-                   } # i individuals
-                  } # g sites
-                  N <- sum(z[1:M])
-                  D <- N/A
-                })
-              } else
-                if(enc_dist == "poisson" & sex_sigma  == TRUE){
-                  scrcode <- nimble::nimbleCode({
-                    lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
-                    psi_sex ~ dunif(0,1) # probability sex = 1
-                    sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
-                    sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
-                    psi ~ dunif(0, 1) # inclusion prob
-                    for(i in 1:M){
-                      z[i]~dbern(psi)
-                      sex[i] ~ dbern(psi_sex)
-                      sx[i] <- sex[i] + 1
-                      s[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
-                      s[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
-                      dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
-                      for(k in 1:K){
-                        lam[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
-                      } # k occasions
-                    } # i individuals
-                    # use zeros trick for marked individuals to speed up the computation
-                    for(g in 1:nSites){
-                      for(i in 1:n0[g]){
-                        for(j in 1:J){
-                          for(k in 1:K){
-                            y[i,j,k,g] ~ dpois(lam[i,j,k])
-                          } # occasions
-                        } # j traps
-                      } # i individuals
-                     for(i in (n0[g]+1):M){
-                      zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
-                     } # i individuals
-                    } # g sites
-                    N <- sum(z[1:M])
-                    D <- N/A
-                  })
-                }
-          return(scrcode)
-        } # end 4D model
+      }  # End 3D models
   } else
     if(hab_mask==TRUE){
       if(dim_y == 2){
@@ -955,7 +822,416 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                   })
                 }
           return(scrcode)
-        } else  # End 3D models
+        }  # End 3D model
+    } # end models with hab_mask
+  }else # trapsClustered 
+ if(trapsClustered){
+  if(isFALSE(hab_mask)){ # determine if hab_mask is included
+      if(dim_y == 3){
+        if(enc_dist == "binomial" & sex_sigma  == FALSE){
+          scrcode <- nimble::nimbleCode({
+           for(g in 1:nSites){  
+            p0[g] ~ dunif(0,1) # baseline encounter probability
+           } # g sites
+            sigma ~ dunif(0, sigma_upper) # scaling parameter
+            psi ~ dunif(0, 1) # inclusion prob
+            for(i in 1:M){
+              z[i]~dbern(psi)
+              s[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+              s[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+              dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
+              p[i,1:J] <- p0[g]*exp(-dist[i,1:J]^2/(2*sigma^2))
+            } # i individuals
+            # use zeros trick for individuals to speed up the computation
+           for(g in 1:nSites){  
+            for(i in 1:n0[g]){
+              for(j in 1:J){
+                  y[i,j,g] ~ dbin(p[i,j],K)
+              } # j traps
+            } # i individuals
+            for(i in (n0[g]+1):M){
+              zeros[i] ~ dbern((1 - prod(1 - p[i,1:J])^K)*z[i])
+            } # i individuals
+           } # g sites
+            N <- sum(z[1:M])
+            D <- N/A
+          })
+        } else
+          if(enc_dist == "poisson" & sex_sigma  == FALSE){
+           scrcode <- nimble::nimbleCode({
+              for(g in 1:nSites){  
+               lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
+              }
+              sigma ~ dunif(0, sigma_upper) # scaling parameter
+              psi ~ dunif(0, 1) # inclusion prob
+              for(i in 1:M){
+                z[i]~dbern(psi)
+                s[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+                s[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+                dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
+                lam[i,1:J] <- lam0[g]*K*exp(-dist[i,1:J]^2/(2*sigma^2))
+              } # i individuals
+              # use zeros trick for individuals to speed up the computation
+             for(g in 1:nSites){
+              for(i in 1:n0[g]){
+                for(j in 1:J){
+                    y[i,j,g] ~ dpois(lam[i,j])
+                } # j traps
+              } # i individuals
+              for(i in (n0[g]+1):M){
+                zeros[i] ~ dpois(sum(lam[i,1:J])*z[i])
+              } # individuals
+           } # g sites
+              N <- sum(z[1:M])
+              D <- N/A
+            })
+          }else
+            if(enc_dist == "binomial" & sex_sigma  == TRUE){
+              scrcode <- nimble::nimbleCode({
+                for(g in 1:nSites){  
+                 p0[g] ~ dunif(0,1) # baseline encounter probability
+                } # g sites
+                psi_sex ~ dunif(0,1) # probability sex = 1
+                sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+                sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+                psi ~ dunif(0, 1) # inclusion prob
+                for(i in 1:M){
+                  z[i]~dbern(psi)
+                  sex[i] ~ dbern(psi_sex)
+                  sx[i] <- sex[i] + 1
+                  s[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+                  s[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+                  dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
+                  p[i,1:J] <- p0[g]*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
+                } # i individuals
+                # use zeros trick for individuals to speed up the computation
+              for(g in 1:nSites){  
+                for(i in 1:n0[g]){
+                  for(j in 1:J){
+                      y[i,j,g] ~ dbin(p[i,j],K)
+                  } # j traps
+                } # i individuals
+                for(i in (n0[g]+1):M){
+                    zeros[i] ~ dbern((1 - prod(1 - p[i,1:J])^K)*z[i])
+                } # i individuals
+               } # g sites
+                N <- sum(z[1:M])
+                D <- N/A
+              })
+            } else
+              if(enc_dist == "poisson" & sex_sigma  == TRUE){
+                scrcode <- nimble::nimbleCode({
+                  lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
+                  psi_sex ~ dunif(0,1) # probability sex = 1
+                  sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+                  sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+                  psi ~ dunif(0, 1) # inclusion prob
+                  for(i in 1:M){
+                    z[i]~dbern(psi)
+                    sex[i] ~ dbern(psi_sex)
+                    sx[i] <- sex[i] + 1
+                    s[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+                    s[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+                    dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
+                    lam[i,1:J,k] <- lam0*K*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
+                  } # i marked individuals
+                  # use zeros trick for marked individuals to speed up the computation
+                  for(g in 1:nSites){ 
+                   for(i in 1:n0[g]){
+                    for(j in 1:J){
+                        y[i,j,g] ~ dpois(lam[i,j])
+                    } # j traps
+                  } # i individuals
+                  for(i in (n0[g]+1):M){
+                    zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
+                  } # individuals
+                  } # g sites    
+                  N <- sum(z[1:M])
+                  D <- N/A
+                })
+              }
+        return(scrcode)
+      } else  # End 3D models
+        if(dim_y == 4){
+          if(enc_dist == "binomial" & sex_sigma  == FALSE){
+            scrcode <- nimble::nimbleCode({
+              sigma ~ dunif(0, sigma_upper) # scaling parameter
+              psi ~ dunif(0, 1) # inclusion prob
+              for(g in 1:nSites){
+                p0[g] ~ dunif(0,1) # site-specific baseline encounter probability
+              } # g sites
+              for(i in 1:M){
+                z[i]~dbern(psi)
+                s[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+                s[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+                dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
+                for(k in 1:K){
+                  p[i,1:J,k] <- p0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma^2))
+                }
+              } # i individuals
+              # use zeros trick for marked individuals to speed up the computation
+              for(g in 1:nSites){
+                for(i in 1:n0[g]){
+                  for(j in 1:J){
+                    for(k in 1:K){
+                      y[i,j,k,g] ~ dbin(p[i,j,k],1)
+                    } # k occasions
+                  } # j traps
+                } # i individuals
+               for(i in (n0[g]+1):M){
+                zeros[i] ~ dbern((1 - prod(1 - p[i,1:J,1:K]))*z[i])
+               } # i individuals
+              } # g sites 
+              N <- sum(z[1:M])
+              D <- N/A
+            })
+          } else
+            if(enc_dist == "poisson" & sex_sigma  == FALSE){
+              scrcode <- nimble::nimbleCode({
+                sigma ~ dunif(0, sigma_upper) # scaling parameter
+                psi ~ dunif(0, 1) # inclusion prob
+                for(g in 1:nSites){
+                  lam0[g] ~ dunif(0,lam0_upper) # site-specific baseline encounter rate
+                } # g sites
+                for(i in 1:M){
+                  z[i]~dbern(psi)
+                  s[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+                  s[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+                  dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
+                  for(k in 1:K){
+                    lam[i,1:J,k] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma^2))
+                  } # k occasions
+                } # i individuals
+                # use zeros trick for marked individuals to speed up the computation
+                for(g in 1:nSites){
+                  for(i in 1:n0[g]){
+                    for(j in 1:J){
+                      for(k in 1:K){
+                        y[i,j,k,g] ~ dpois(lam[i,j,k])
+                      } # occasions
+                    } # j traps
+                  } # i individuals
+                 for(i in (n0[g]+1):M){
+                  zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
+                 } # i individuals
+                } # g sites  
+                N <- sum(z[1:M])
+                D <- N/A
+              })
+            }else
+              if(enc_dist == "binomial" & sex_sigma  == TRUE){
+                scrcode <- nimble::nimbleCode({
+                  psi_sex ~ dunif(0,1) # probability sex = 1
+                  sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+                  sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+                  psi ~ dunif(0, 1) # inclusion prob
+                  for(g in 1:nSites){
+                    p0[g] ~ dunif(0,1) # site-specific baseline encounter probability
+                  } # g sites
+                  for(i in 1:M){
+                    z[i]~dbern(psi)
+                    sex[i] ~ dbern(psi_sex)
+                    sx[i] <- sex[i] + 1
+                    s[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+                    s[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+                    dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
+                    for(k in 1:K){
+                      p[i,1:J,k] <- p0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
+                    } # k occasions
+                  } # i marked individuals
+                  # use zeros trick for marked individuals to speed up the computation
+                  for(g in 1:nSites){
+                    for(i in 1:n0[g]){
+                      for(j in 1:J){
+                        for(k in 1:K){
+                          y[i,j,k,g] ~ dbin(p[i,j,k],1)
+                        } # k occasions
+                      } # j traps
+                    } # i individuals
+                   for(i in (n0[g]+1):M){
+                    zeros[i] ~ dbern((1 - prod(1 - p[i,1:J,1:K]))*z[i])
+                   } # i individuals
+                  } # g sites
+                  N <- sum(z[1:M])
+                  D <- N/A
+                })
+              } else
+                if(enc_dist == "poisson" & sex_sigma  == TRUE){
+                  scrcode <- nimble::nimbleCode({
+                    lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
+                    psi_sex ~ dunif(0,1) # probability sex = 1
+                    sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+                    sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+                    psi ~ dunif(0, 1) # inclusion prob
+                    for(i in 1:M){
+                      z[i]~dbern(psi)
+                      sex[i] ~ dbern(psi_sex)
+                      sx[i] <- sex[i] + 1
+                      s[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+                      s[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+                      dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
+                      for(k in 1:K){
+                        lam[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
+                      } # k occasions
+                    } # i individuals
+                    # use zeros trick for marked individuals to speed up the computation
+                    for(g in 1:nSites){
+                      for(i in 1:n0[g]){
+                        for(j in 1:J){
+                          for(k in 1:K){
+                            y[i,j,k,g] ~ dpois(lam[i,j,k])
+                          } # occasions
+                        } # j traps
+                      } # i individuals
+                     for(i in (n0[g]+1):M){
+                      zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
+                     } # i individuals
+                    } # g sites
+                    N <- sum(z[1:M])
+                    D <- N/A
+                  })
+                }
+          return(scrcode)
+        } # end 4D model
+    } else
+    if(hab_mask==TRUE){
+      if(dim_y == 3){
+        if(enc_dist == "binomial" & sex_sigma  == FALSE){
+          scrcode <- nimble::nimbleCode({
+           for(g in 1:nSites){  
+            p0[g] ~ dunif(0,1) # baseline encounter probability
+           } # g sites
+            sigma ~ dunif(0, sigma_upper) # scaling parameter
+            psi ~ dunif(0, 1) # inclusion prob
+            for(i in 1:M){
+              z[i]~dbern(psim[i])
+              psim[i] <- (1-(1-psi)^prop.habitat[site[i]]) # adjust psi for the proportion of available habitat at each site
+              s[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+              s[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+              pOK[i] <- hab_mask[(trunc(s[i,2])+1),(trunc(s[i,1])+1),site[i]] # habitat check
+              OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
+              dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
+              p[i,1:J] <- p0[g]*exp(-dist[i,1:J]^2/(2*sigma^2))
+            } # i individuals
+            # use zeros trick for individuals to speed up the computation
+           for(g in 1:nSites){  
+            for(i in 1:n0[g]){
+              for(j in 1:J){
+                  y[i,j,g] ~ dbin(p[i,j],K)
+              } # j traps
+            } # i individuals
+            for(i in (n0[g]+1):M){
+              zeros[i] ~ dbern((1 - prod(1 - p[i,1:J])^K)*z[i])
+            } # i individuals
+           } # g sites
+            N <- sum(z[1:M])
+            D <- N/A
+          })
+        } else
+          if(enc_dist == "poisson" & sex_sigma  == FALSE){
+           scrcode <- nimble::nimbleCode({
+              for(g in 1:nSites){  
+               lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
+              }
+              sigma ~ dunif(0, sigma_upper) # scaling parameter
+              psi ~ dunif(0, 1) # inclusion prob
+              for(i in 1:M){
+                z[i]~dbern(psim[i])
+                psim[i] <- (1-(1-psi)^prop.habitat[site[i]]) # adjust psi for the proportion of available habitat at each site
+                s[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+                s[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+                pOK[i] <- hab_mask[(trunc(s[i,2])+1),(trunc(s[i,1])+1),site[i]] # habitat check
+                OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
+                dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
+                lam[i,1:J] <- lam0[g]*K*exp(-dist[i,1:J]^2/(2*sigma^2))
+              } # i individuals
+              # use zeros trick for individuals to speed up the computation
+             for(g in 1:nSites){
+              for(i in 1:n0[g]){
+                for(j in 1:J){
+                    y[i,j,g] ~ dpois(lam[i,j])
+                } # j traps
+              } # i individuals
+              for(i in (n0[g]+1):M){
+                zeros[i] ~ dpois(sum(lam[i,1:J])*z[i])
+              } # individuals
+           } # g sites
+              N <- sum(z[1:M])
+              D <- N/A
+            })
+          }else
+            if(enc_dist == "binomial" & sex_sigma  == TRUE){
+              scrcode <- nimble::nimbleCode({
+                for(g in 1:nSites){  
+                 p0[g] ~ dunif(0,1) # baseline encounter probability
+                } # g sites
+                psi_sex ~ dunif(0,1) # probability sex = 1
+                sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+                sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+                psi ~ dunif(0, 1) # inclusion prob
+                for(i in 1:M){
+                  sex[i] ~ dbern(psi_sex)
+                  sx[i] <- sex[i] + 1
+                  z[i]~dbern(psim[i])
+                  psim[i] <- (1-(1-psi)^prop.habitat[site[i]]) # adjust psi for the proportion of available habitat at each site
+                  s[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+                  s[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+                  pOK[i] <- hab_mask[(trunc(s[i,2])+1),(trunc(s[i,1])+1),site[i]] # habitat check
+                  OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
+                  dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
+                  p[i,1:J] <- p0[g]*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
+                } # i individuals
+                # use zeros trick for individuals to speed up the computation
+              for(g in 1:nSites){  
+                for(i in 1:n0[g]){
+                  for(j in 1:J){
+                      y[i,j,g] ~ dbin(p[i,j],K)
+                  } # j traps
+                } # i individuals
+                for(i in (n0[g]+1):M){
+                    zeros[i] ~ dbern((1 - prod(1 - p[i,1:J])^K)*z[i])
+                } # i individuals
+               } # g sites
+                N <- sum(z[1:M])
+                D <- N/A
+              })
+            } else
+              if(enc_dist == "poisson" & sex_sigma  == TRUE){
+                scrcode <- nimble::nimbleCode({
+                  lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
+                  psi_sex ~ dunif(0,1) # probability sex = 1
+                  sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+                  sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+                  psi ~ dunif(0, 1) # inclusion prob
+                  for(i in 1:M){
+                    sex[i] ~ dbern(psi_sex)
+                    sx[i] <- sex[i] + 1
+                    z[i]~dbern(psim[i])
+                    psim[i] <- (1-(1-psi)^prop.habitat[site[i]]) # adjust psi for the proportion of available habitat at each site
+                    s[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+                    s[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+                    pOK[i] <- hab_mask[(trunc(s[i,2])+1),(trunc(s[i,1])+1),site[i]] # habitat check
+                    OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
+                    dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
+                    lam[i,1:J,k] <- lam0*K*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
+                  } # i marked individuals
+                  # use zeros trick for marked individuals to speed up the computation
+                  for(g in 1:nSites){ 
+                   for(i in 1:n0[g]){
+                    for(j in 1:J){
+                        y[i,j,g] ~ dpois(lam[i,j])
+                    } # j traps
+                  } # i individuals
+                  for(i in (n0[g]+1):M){
+                    zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
+                  } # individuals
+                  } # g sites    
+                  N <- sum(z[1:M])
+                  D <- N/A
+                })
+              }
+        return(scrcode)
+      } else  # End 3D models
           if(dim_y == 4){
             if(enc_dist == "binomial" & sex_sigma  == FALSE){
               scrcode <- nimble::nimbleCode({
@@ -1116,6 +1392,9 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
             return(scrcode)
           } # end 4D model
     } # end models with hab_mask
+  } # end trapsClustered
+    
+    
 } # End function 'get_classic"
 
 
