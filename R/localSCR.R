@@ -258,20 +258,23 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter, en
                 Y[i,j,1:K] <- rpois(K,prob[i,j])
               }}
           }
-        Y <- Y[c(which(apply(Y,1,sum)!=0),which(apply(Y,1,sum)==0)),,] # organize encountered and then 0's (augmented)
-        Y4d[,,,g] <- Y
-        smat[1:N,1:2,g] <- s[c(which(apply(Y,1,sum)!=0),which(apply(Y,1,sum)==0)),]
+        smat[1:N,1:2,g] <- s[c(which(apply(Y,1,sum)!=0),which(apply(Y,1,sum)==0)),] # organize activity centers
+        sex[1:N,g] <- sex[c(which(apply(Y,1,sum)!=0),which(apply(Y,1,sum)==0)),g] # organize sex
         sex[which(apply(Y,1,sum)==0),g] <- NA
         site[,g] <- g
+        site[which(apply(Y,1,sum)==0),g] <- NA
+        Y4d[,,,g] <- Y[c(which(apply(Y,1,sum)!=0),which(apply(Y,1,sum)==0)),,] # organize encountered and then 0's (augmented)
       }
     }
   if(length(dim(X))==2){
     dataList <- list(y=Y3d,sex=sex,s=s)
   }else
     if(length(dim(X))==3){
-      t.data <- data.frame(ind=1:length(as.vector(sex)),sex=as.vector(sex),site=as.vector(site))
-      t.data <- t.data[c(which(is.na(t.data$sex)==FALSE),which(is.na(t.data$sex)==TRUE)),]
-      dataList <- list(y=Y4d,sex=t.data$sex,site=t.data$site,s=smat)
+      sex <- as.vector(sex)
+      sex <- sex[c(which(is.na(sex)==FALSE),which(is.na(sex)))]
+      site <- as.vector(site)
+      site <- site[c(which(is.na(sex)==FALSE),which(is.na(sex)))]
+      dataList <- list(y=Y4d,sex=sex,site=site,s=smat)
     }
   return(dataList)
 } # end 'sim_encounter' function
@@ -2391,15 +2394,15 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
      if(length(dim(grid))==3){
        if(isFALSE(hab_mask)){
            r <- apply(grid,3,function(x) raster::rasterFromXYZ(x,crs = crs_))
-           for(g in 1:dim(grid)[3]){
              # process z indicator variable and sx and sy acticity center coordinates as vectors for speed
              z <- samples[,grep(paste0(z_alias,"\\["), colnames(samples))] # indicator variable
+             sx <- samples[,grep(paste0(s_alias,"\\["), colnames(samples))][,1:dim(z)[2]] # x-coordinate
+             sy <- samples[,grep(paste0(s_alias,"\\["), colnames(samples))][,(dim(z)[2]+1):(dim(z)[2]*2)] # y-coordinates
+           for(g in 1:dim(grid)[3]){
              z_site <- z[,site==g]
              z_vec <- as.vector(z_site)
-             sx <- samples[,grep(paste0(s_alias,"\\["), colnames(samples))][,1:dim(z)[2]] # x-coordinate
              sx_site <- sx[,site==g]
              sx_vec <- as.vector(sx_site)[z_vec==1]
-             sy <- samples[,grep(paste0(s_alias,"\\["), colnames(samples))][,(dim(z)[2]+1):(dim(z)[2]*2)] # y-coordinates
              sy_site <- sy[,site==g]             
              sy_vec <- as.vector(sy_site)[z_vec==1]
              ac_pts <- sp::SpatialPoints(cbind(sx_vec, sy_vec),proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
