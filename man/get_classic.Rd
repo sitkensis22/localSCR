@@ -13,7 +13,7 @@ get_classic(
 )
 }
 \arguments{
-\item{dim_y}{an integer of either 2 (the default), 3, or 4 that defines what dimensional format the encounter history data are in.}
+\item{dim_y}{an integer of either 2 (the default) or that defines what dimensional format the encounter history data are in.}
 
 \item{enc_dist}{either \code{"binomial"} or \code{"poisson"}. Default is
 \code{"binomial"}.}
@@ -22,7 +22,7 @@ get_classic(
 
 \item{hab_mask}{a logical value indicating whether a habitat mask will be used. Default is \code{FALSE}.}
 
-\item{trapsClusters}{a logical value indicating if traps are clustered in arrays across the sampling area. Note that if traps are not clustered, the \code{dim_y} can only be 2 or 3, while having traps clustered in an array requires that \code{dim_y} be only 3 or 4.}
+\item{trapsClusters}{a logical value indicating if traps are clustered in arrays across the sampling area.}
 }
 \value{
 a \code{nimbleCode} object from the \code{nimble} package.

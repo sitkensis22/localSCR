@@ -284,12 +284,12 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter, en
 #'
 #' Creates a \code{nimbleCode} object from the \code{nimble} package.
 #'
-#' @param dim_y an integer of either 2 (the default), 3, or 4 that defines what dimensional format the encounter history data are in.
+#' @param dim_y an integer of either 2 (the default) or that defines what dimensional format the encounter history data are in.
 #' @param enc_dist either \code{"binomial"} or \code{"poisson"}. Default is
 #' \code{"binomial"}.
 #' @param sex_sigma a logical value indicating whether the scaling parameter ('sigma') is sex-specific
 #' @param hab_mask a logical value indicating whether a habitat mask will be used. Default is \code{FALSE}.
-#' @param trapsClusters a logical value indicating if traps are clustered in arrays across the sampling area. Note that if traps are not clustered, the \code{dim_y} can only be 2 or 3, while having traps clustered in an array requires that \code{dim_y} be only 3 or 4.
+#' @param trapsClusters a logical value indicating if traps are clustered in arrays across the sampling area.
 #' @return a \code{nimbleCode} object from the \code{nimble} package.
 #' @details This function provides templates that could be copied and easily modified to include further model
 #'  complexity such as covariates explaining detection probability. The models include different encounter probability distributions, sex-specific scaling parameters, and habitat masking.
@@ -305,17 +305,11 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter, en
 get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask = FALSE,trapsClustered = FALSE){
     M <- J <- s <- X <- p0 <- sigma <- n0 <- z <- A <- lam0 <- K <- sex <- nSites <-
     site <- pixelWidth <- psi <- prop.habitat <- NULL
-  if(dim_y !=2 & dim_y!=3 & dim_y !=4){
-    stop("dim_y must be either 2, 3, or 4")
+  if(dim_y !=2 & dim_y!=3){
+    stop("dim_y must be either 2 or 3")
   }
   if(enc_dist != "poisson" & enc_dist != "binomial"){
     stop("Encounter distribution has to be either binomial or poisson")
-  }
-  if(trapsClustered & dim_y == 2){
-    stop("Encounter data dimensions can only be 3 or 4 when traps are clustered")
-  }
-  if(trapsClustered==FALSE & dim_y == 4){
-    stop("Encounter data dimensions can only be 2 or 3 when traps are not clustered")
   }
  if(trapsClustered == FALSE){    
   if(isFALSE(hab_mask)){ # determine if hab_mask is included
@@ -829,7 +823,7 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
   }else # trapsClustered 
  if(trapsClustered){
   if(isFALSE(hab_mask)){ # determine if hab_mask is included
-      if(dim_y == 3){
+      if(dim_y == 2){
         if(enc_dist == "binomial" & sex_sigma  == FALSE){
           scrcode <- nimble::nimbleCode({
            for(g in 1:nSites){  
@@ -845,16 +839,14 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
               p[i,1:J] <- p0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma^2))
             } # i individuals
             # use zeros trick for individuals to speed up the computation
-           for(g in 1:nSites){  
-            for(i in 1:n0[g]){
+            for(i in 1:n0){
               for(j in 1:J){
-                  y[i,j,g] ~ dbin(p[i,j],K)
+                  y[i,j] ~ dbin(p[i,j],K)
               } # j traps
             } # i individuals
-            for(i in (n0[g]+1):M){
+            for(i in (n0+1):M){
               zeros[i] ~ dbern((1 - prod(1 - p[i,1:J])^K)*z[i])
             } # i individuals
-           } # g sites
             N <- sum(z[1:M])
             D <- N/A
           })
@@ -874,16 +866,14 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                 lam[i,1:J] <- lam0[site[i]]*K*exp(-dist[i,1:J]^2/(2*sigma^2))
               } # i individuals
               # use zeros trick for individuals to speed up the computation
-             for(g in 1:nSites){
-              for(i in 1:n0[g]){
+              for(i in 1:n0){
                 for(j in 1:J){
-                    y[i,j,g] ~ dpois(lam[i,j])
+                    y[i,j] ~ dpois(lam[i,j])
                 } # j traps
               } # i individuals
-              for(i in (n0[g]+1):M){
+              for(i in (n0+1):M){
                 zeros[i] ~ dpois(sum(lam[i,1:J])*z[i])
               } # individuals
-           } # g sites
               N <- sum(z[1:M])
               D <- N/A
             })
@@ -907,16 +897,14 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                   p[i,1:J] <- p0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
                 } # i individuals
                 # use zeros trick for individuals to speed up the computation
-              for(g in 1:nSites){  
-                for(i in 1:n0[g]){
+                for(i in 1:n0){
                   for(j in 1:J){
-                      y[i,j,g] ~ dbin(p[i,j],K)
+                      y[i,j] ~ dbin(p[i,j],K)
                   } # j traps
                 } # i individuals
-                for(i in (n0[g]+1):M){
+                for(i in (n0+1):M){
                     zeros[i] ~ dbern((1 - prod(1 - p[i,1:J])^K)*z[i])
                 } # i individuals
-               } # g sites
                 N <- sum(z[1:M])
                 D <- N/A
               })
@@ -940,23 +928,21 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                     lam[i,1:J,k] <- lam0[sites[i]]*K*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
                   } # i marked individuals
                   # use zeros trick for marked individuals to speed up the computation
-                  for(g in 1:nSites){ 
-                   for(i in 1:n0[g]){
+                   for(i in 1:n0){
                     for(j in 1:J){
-                        y[i,j,g] ~ dpois(lam[i,j])
+                        y[i,j] ~ dpois(lam[i,j])
                     } # j traps
                   } # i individuals
-                  for(i in (n0[g]+1):M){
+                  for(i in (n0+1):M){
                     zeros[i] ~ dpois(sum(lam[i,1:J])*z[i])
                   } # individuals
-                  } # g sites    
                   N <- sum(z[1:M])
                   D <- N/A
                 })
               }
         return(scrcode)
-      } else  # End 3D models
-        if(dim_y == 4){
+      } else  # End 2D models
+        if(dim_y == 3){
           if(enc_dist == "binomial" & sex_sigma  == FALSE){
             scrcode <- nimble::nimbleCode({
               sigma ~ dunif(0, sigma_upper) # scaling parameter
@@ -974,18 +960,16 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                 }
               } # i individuals
               # use zeros trick for marked individuals to speed up the computation
-              for(g in 1:nSites){
-                for(i in 1:n0[g]){
+                for(i in 1:n0){
                   for(j in 1:J){
                     for(k in 1:K){
-                      y[i,j,k,g] ~ dbin(p[i,j,k],1)
+                      y[i,j,k] ~ dbin(p[i,j,k],1)
                     } # k occasions
                   } # j traps
                 } # i individuals
-               for(i in (n0[g]+1):M){
+               for(i in (n0+1):M){
                 zeros[i] ~ dbern((1 - prod(1 - p[i,1:J,1:K]))*z[i])
                } # i individuals
-              } # g sites 
               N <- sum(z[1:M])
               D <- N/A
             })
@@ -1007,18 +991,16 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                   } # k occasions
                 } # i individuals
                 # use zeros trick for marked individuals to speed up the computation
-                for(g in 1:nSites){
-                  for(i in 1:n0[g]){
+                  for(i in 1:n0){
                     for(j in 1:J){
                       for(k in 1:K){
-                        y[i,j,k,g] ~ dpois(lam[i,j,k])
+                        y[i,j,k] ~ dpois(lam[i,j,k])
                       } # occasions
                     } # j traps
                   } # i individuals
-                 for(i in (n0[g]+1):M){
+                 for(i in (n0+1):M){
                   zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
                  } # i individuals
-                } # g sites  
                 N <- sum(z[1:M])
                 D <- N/A
               })
@@ -1044,18 +1026,16 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                     } # k occasions
                   } # i marked individuals
                   # use zeros trick for marked individuals to speed up the computation
-                  for(g in 1:nSites){
-                    for(i in 1:n0[g]){
+                    for(i in 1:n0){
                       for(j in 1:J){
                         for(k in 1:K){
-                          y[i,j,k,g] ~ dbin(p[i,j,k],1)
+                          y[i,j,k] ~ dbin(p[i,j,k],1)
                         } # k occasions
                       } # j traps
                     } # i individuals
-                   for(i in (n0[g]+1):M){
+                   for(i in (n0+1):M){
                     zeros[i] ~ dbern((1 - prod(1 - p[i,1:J,1:K]))*z[i])
                    } # i individuals
-                  } # g sites
                   N <- sum(z[1:M])
                   D <- N/A
                 })
@@ -1081,27 +1061,25 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                       } # k occasions
                     } # i individuals
                     # use zeros trick for marked individuals to speed up the computation
-                    for(g in 1:nSites){
-                      for(i in 1:n0[g]){
+                      for(i in 1:n0){
                         for(j in 1:J){
                           for(k in 1:K){
-                            y[i,j,k,g] ~ dpois(lam[i,j,k])
+                            y[i,j,k] ~ dpois(lam[i,j,k])
                           } # occasions
                         } # j traps
                       } # i individuals
-                     for(i in (n0[g]+1):M){
+                     for(i in (n0+1):M){
                       zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
                      } # i individuals
-                    } # g sites
                     N <- sum(z[1:M])
                     D <- N/A
                   })
                 }
           return(scrcode)
-        } # end 4D model
+        } # end 3D model
     } else
     if(hab_mask==TRUE){
-      if(dim_y == 3){
+      if(dim_y == 2){
         if(enc_dist == "binomial" & sex_sigma  == FALSE){
           scrcode <- nimble::nimbleCode({
            for(g in 1:nSites){  
@@ -1120,16 +1098,14 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
               p[i,1:J] <- p0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma^2))
             } # i individuals
             # use zeros trick for individuals to speed up the computation
-           for(g in 1:nSites){  
-            for(i in 1:n0[g]){
+            for(i in 1:n0){
               for(j in 1:J){
-                  y[i,j,g] ~ dbin(p[i,j],K)
+                  y[i,j] ~ dbin(p[i,j],K)
               } # j traps
             } # i individuals
-            for(i in (n0[g]+1):M){
+            for(i in (n0+1):M){
               zeros[i] ~ dbern((1 - prod(1 - p[i,1:J])^K)*z[i])
             } # i individuals
-           } # g sites
             N <- sum(z[1:M])
             D <- N/A
           })
@@ -1152,16 +1128,14 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                 lam[i,1:J] <- lam0[site[i]]*K*exp(-dist[i,1:J]^2/(2*sigma^2))
               } # i individuals
               # use zeros trick for individuals to speed up the computation
-             for(g in 1:nSites){
-              for(i in 1:n0[g]){
+              for(i in 1:n0){
                 for(j in 1:J){
-                    y[i,j,g] ~ dpois(lam[i,j])
+                    y[i,j] ~ dpois(lam[i,j])
                 } # j traps
               } # i individuals
-              for(i in (n0[g]+1):M){
+              for(i in (n0+1):M){
                 zeros[i] ~ dpois(sum(lam[i,1:J])*z[i])
               } # individuals
-           } # g sites
               N <- sum(z[1:M])
               D <- N/A
             })
@@ -1188,16 +1162,14 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                   p[i,1:J] <- p0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
                 } # i individuals
                 # use zeros trick for individuals to speed up the computation
-              for(g in 1:nSites){  
-                for(i in 1:n0[g]){
+                for(i in 1:n0){
                   for(j in 1:J){
-                      y[i,j,g] ~ dbin(p[i,j],K)
+                      y[i,j] ~ dbin(p[i,j],K)
                   } # j traps
                 } # i individuals
-                for(i in (n0[g]+1):M){
+                for(i in (n0+1):M){
                     zeros[i] ~ dbern((1 - prod(1 - p[i,1:J])^K)*z[i])
                 } # i individuals
-               } # g sites
                 N <- sum(z[1:M])
                 D <- N/A
               })
@@ -1224,23 +1196,21 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                     lam[i,1:J,k] <- lam0[site[i]]*K*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
                   } # i marked individuals
                   # use zeros trick for marked individuals to speed up the computation
-                  for(g in 1:nSites){ 
-                   for(i in 1:n0[g]){
+                   for(i in 1:n0){
                     for(j in 1:J){
-                        y[i,j,g] ~ dpois(lam[i,j])
+                        y[i,j] ~ dpois(lam[i,j])
                     } # j traps
                   } # i individuals
-                  for(i in (n0[g]+1):M){
+                  for(i in (n0+1):M){
                     zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
                   } # individuals
-                  } # g sites    
                   N <- sum(z[1:M])
                   D <- N/A
                 })
               }
         return(scrcode)
-      } else  # End 3D models
-          if(dim_y == 4){
+      } else  # End 2D models
+          if(dim_y == 3){
             if(enc_dist == "binomial" & sex_sigma  == FALSE){
               scrcode <- nimble::nimbleCode({
                 sigma ~ dunif(0, sigma_upper) # scaling parameter
@@ -1262,18 +1232,16 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                   }
                 } # i individuals
                 # use zeros trick for marked individuals to speed up the computation
-                for(g in 1:nSites){
-                  for(i in 1:n0[g]){
+                  for(i in 1:n0){
                     for(j in 1:J){
                       for(k in 1:K){
-                        y[i,j,k,g] ~ dbin(p[i,j,k],1)
+                        y[i,j,k] ~ dbin(p[i,j,k],1)
                       } # k occasions
                     } # j traps
                   } # i individuals
-                 for(i in (n0[g]+1):M){
+                 for(i in (n0+1):M){
                   zeros[i] ~ dbern((1 - prod(1 - p[i,1:J,1:K]))*z[i])
                  } # i individuals
-                } # g sites
                 N <- sum(z[1:M])
                 D <- N/A
               })
@@ -1299,18 +1267,16 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                     } # k occasions
                   } # i individuals
                   # use zeros trick for marked individuals to speed up the computation
-                  for(g in 1:nSites){
-                    for(i in 1:n0[g]){
+                    for(i in 1:n0){
                       for(j in 1:J){
                         for(k in 1:K){
-                          y[i,j,k,g] ~ dpois(lam[i,j,k])
+                          y[i,j,k] ~ dpois(lam[i,j,k])
                         } # occasions
                       } # j traps
                     } # i individuals
-                   for(i in (n0[g]+1):M){
+                   for(i in (n0+1):M){
                     zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
                    }
-                  } # g sites
                   N <- sum(z[1:M])
                   D <- N/A
                 })
@@ -1341,18 +1307,16 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                       } # k occasions
                     } # i marked individuals
                    # use zeros trick for marked individuals to speed up the computation
-                   for(g in 1:nSites){
-                     for(i in 1:n0[g]){
+                     for(i in 1:n0){
                        for(j in 1:J){
                          for(k in 1:K){
-                           y[i,j,k,g] ~ dbin(p[i,j,k],1)
+                           y[i,j,k] ~ dbin(p[i,j,k],1)
                          } # k occasions
                        } # j traps
                      } # i individuals
-                    for(i in (n0[g]+1):M){
+                    for(i in (n0+1):M){
                      zeros[i] ~ dbern((1 - prod(1 - p[i,1:J,1:K]))*z[i])
                     } # i individuals
-                   } # g sites
                     N <- sum(z[1:M])
                     D <- N/A
                   })
@@ -1383,28 +1347,24 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                         } # k occasions
                       } # i individuals
                       # use zeros trick for marked individuals to speed up the computation
-                      for(g in 1:nSites){
-                        for(i in 1:n0[g]){
+                        for(i in 1:n0){
                           for(j in 1:J){
                             for(k in 1:K){
-                              y[i,j,k,g] ~ dpois(lam[i,j,k])
+                              y[i,j,k] ~ dpois(lam[i,j,k])
                             } # occasions
                           } # j traps
                         } # i individuals
-                      for(i in (n0[g]+1):M){
+                      for(i in (n0+1):M){
                         zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
                       }
-                      } # g sites
                       N <- sum(z[1:M])
                       D <- N/A
                     })
                   }
             return(scrcode)
-          } # end 4D model
+          } # end 3D model
     } # end models with hab_mask
   } # end trapsClustered
-    
-    
 } # End function 'get_classic"
 
 
