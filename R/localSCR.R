@@ -1955,6 +1955,7 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
 #' @import nimble
 #' @author Daniel Eacker
 #' @examples
+#'\dontrun{
 #' # simulate a single trap array with random positional noise
 #' x <- seq(-800, 800, length.out = 5)
 #' y <- seq(-800, 800, length.out = 5)
@@ -2036,6 +2037,7 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
 #'
 #' # not run
 #' #nimSummary(out)
+#'}
 #' @export
 run_classic <- function(model, data, constants, inits, params,
                         niter = 1000, nburnin=100, thin=1, nchains=1, parallel=FALSE, RNGseed){
@@ -2113,6 +2115,7 @@ run_classic <- function(model, data, constants, inits, params,
 #' @importFrom stats na.omit sd quantile
 #' @importFrom crayon red
 #' @examples
+#'\dontrun{
 #' # simulate a single trap array with random positional noise
 #' x <- seq(-800, 800, length.out = 5)
 #' y <- seq(-800, 800, length.out = 5)
@@ -2173,6 +2176,7 @@ run_classic <- function(model, data, constants, inits, params,
 #'
 #' # summarize output
 #' nimSummary(out, trace=TRUE, plot_all=TRUE)
+#'}
 #' @export
 nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude.params = NULL, digits=3){
   if(is.null(exclude.params)==FALSE){
@@ -2262,5 +2266,168 @@ nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude.params = NULL, di
   return(round(tmp.frame, digits=digits))
 } # End function 'nimSummary'
 
+
+
+#' Function to generate realized density surface from MCMC output
+#'
+#' Streamlined construction of realized density surface from posterior
+#' samples of latent indicator variable (\code{z}) and activity center
+#' coordinates (\code{s})
+#'
+#' @param samples either a matrix (for a single MCMC chain) or list of posterior samples from multiple chains from MCMC sampling; possibly returned from \code{\link{run_classic}}.
+#' @param grid a matrix or array object of the the state-space grid. This is returned from \code{\link{grid_classic}}.
+#' @param crs_ the UTM coordinate reference system (EPSG code) used for your
+#' location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).
+#' @param site site indentifier variable included for detected and augmented individuals used as a constant in model runs. 
+#' @param hab_mask either \code{FALSE} (the default) or a matrix or arrary output from \code{\link{mask_polygon}}
+#' or \code{\link{mask_raster}} functions.
+#' @param s_alias a character value used to identify the latent activity center coordinates used in the model. Default is \code{"s"}.
+#' @param z_alias a character value used to identify the latent inclusion indicator used in the model. Default is \code{"z"}.
+#' @importFrom sp SpatialPoints
+#' @importFrom raster cellFromXY
+#' @author Daniel Eacker
+#' @return a \code{raster} object or a list of \code{raster} objects if state-space grid is an array. 
+#' @details This function automates the construction of realized density surfaces from MCMC samples.
+#' @examples
+#' \dontrun{
+#' # simulate a single trap array with random positional noise
+#' x <- seq(-800, 800, length.out = 5)
+#' y <- seq(-800, 800, length.out = 5)
+#' traps <- as.matrix(expand.grid(x = x, y = y))
+#' traps <- traps + runif(prod(dim(traps)),-20,20) # add some random noise to locations
+#' 
+#' mysigma = 300 # simulate sigma of 300 m
+#' mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
+#' pixelWidth = 100 # store pixelWidth
+#' 
+#' # create grid and extent
+#' Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = pixelWidth)
+#' 
+#' # simulate encounter data
+#' data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma = mysigma, prop_sex = 1, N = 200, K = 4, base_encounter = 0.15, enc_dist = "binomial", hab_mask = FALSE, setSeed = 200)
+#' 
+#' # prepare data
+#' data = list(y=data3d$y)
+#' data$y = data$y[which(apply(data$y, 1, sum)!=0),,] # remove augmented records
+#' data$y = apply(data$y, c(1,2), sum) # covert to 2d by summing over occasions
+#' data$X = traps # rescale to kilometers
+#' ext = as.vector(Grid$ext) # recale to kilometers
+#' 
+#' # prepare constants
+#' constants = list(M = 500,n0 = nrow(data$y),J=dim(data$y)[2], K=dim(data3d$y)[3],
+#'                  x_lower = ext[1], x_upper = ext[2], y_lower = ext[3], y_upper = ext[4],
+#'                  sigma_upper = 1000, A = prod(ext[2]-ext[1],ext[4]-ext[3]))
+#' 
+#' # add z and zeros vector data for latent inclusion indicator
+#' data$z = c(rep(1,constants$n0),rep(NA,constants$M - constants$n0))
+#' data$zeros =  c(rep(NA,constants$n0),rep(0,constants$M - constants$n0))
+#' 
+#' # get initial activity center starting values
+#' s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, buff = 3*mysigma, hab_mask=FALSE)
+#' 
+#' # define all initial values
+#' inits = list(sigma = runif(1, 250, 350), s = s.st3d,psi=runif(1,0.2,0.3), p0 = runif(1, 0.05, 0.15),
+#'              z=c(rep(NA,constants$n0),rep(0,constants$M-constants$n0)))
+#' 
+#' # parameters to monitor
+#' params = c("sigma","psi","p0","N","D","s","z")
+#' 
+#' # get model
+#' scr_model = get_classic(dim_y = 2, enc_dist = "binomial",sex_sigma = FALSE,trapsClustered = FALSE)
+#' 
+#' # run model
+#' tic() # track time elapsed
+#' out = run_classic(model = scr_model, data=data, constants=constants, inits=inits, params = params,
+#'                   niter = 5000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
+#' toc()
+#' 
+#' # summarize output (exclude lengthy parameters "s" and "z")
+#' nimSummary(out, exclude.params = c("s","z"), trace = TRUE)
+#' 
+#' library(tictoc)       
+#' tic() # track time
+#' r = realized_density(samples = out, grid = Grid$grid, crs_ = mycrs, site = NULL, hab_mask = hab_mask)       
+#' toc()      
+#' 
+#' # load virdiis color pallete library      
+#' library(viridis)
+#'
+#' # make simple raster plot
+#' plot(r, col=viridis(100),main=expression("Realized density (activity centers/100 m"^2*")"))
+#'}
+realized_density <- function(samples, grid, crs_, site=NULL, hab_mask=FALSE, s_alias = "s", z_alias = "z"){
+     if(length(samples) > 1){
+      samples <- do.call(rbind, samples) # rbind mcmc samples
+     }
+     n.iter <- dim(samples)[1] # store total number of iterations
+     # need to determine if state-space grid is 2 or 3 dimensional (stop if not)
+     if(length(dim(grid))!=2 & length(dim(grid))!=3){
+       stop("State-space grid must be only 2 or 3 dimensions")
+     } 
+     if(length(dim(grid))==2){
+         # process z indicator variable and sx and sy acticity center coordinates as vectors for speed
+         z <- samples[,grep(paste0(z_alias,"\\["), colnames(samples))] # indicator variable
+         z_vec <- as.vector(z)
+         sx <- samples[,grep(paste0(s_alias,"\\["), colnames(samples))][,1:dim(z)[2]] # x-coordinate
+         sx_vec <- as.vector(sx)[z_vec==1]
+         sy <- samples[,grep(paste0(s_alias,"\\["), colnames(samples))][,(dim(z)[2]+1):(dim(z)[2]*2)] # y-coordinates
+         sy_vec <- as.vector(sy)[z_vec==1]
+       if(isFALSE(hab_mask)){
+           ac_pts <- sp::SpatialPoints(cbind(sx_vec, sy_vec),proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
+           r <- raster::rasterFromXYZ(grid,crs = crs_)
+           tab <- table(raster::cellFromXY(r, ac_pts))
+           r[as.numeric(names(tab))] <- tab/n.iter
+       } else 
+       if(isFALSE(hab_mask)==FALSE){
+           r <- raster::rasterFromXYZ(grid,crs = crs_)
+           rescale.sx <- scales::rescale(sx_vec, to = extent(r)[1:2], from=c(0,dim(hab_mask)[2]))
+           rescale.sy <- scales::rescale(sy_vec, to = extent(r)[3:4], from=c(0,dim(hab_mask)[1]))
+           ac_pts <- sp::SpatialPoints(cbind(rescale.sx, rescale.sy),proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
+           tab <- table(raster::cellFromXY(r, ac_pts))
+           r[as.numeric(names(tab))] <- tab/n.iter
+       } # end habitat mask
+     } else # end 2D grid 
+     if(length(dim(grid))==3){
+       if(isFALSE(hab_mask)){
+           r <- apply(grid,3,function(x) raster::rasterFromXYZ(x,crs = crs_))
+           for(g in 1:dim(grid)[3]){
+             # process z indicator variable and sx and sy acticity center coordinates as vectors for speed
+             z <- samples[,grep(paste0(z_alias,"\\["), colnames(samples))] # indicator variable
+             z_site <- z[,site==g]
+             z_vec <- as.vector(z_site)
+             sx <- samples[,grep(paste0(s_alias,"\\["), colnames(samples))][,1:dim(z)[2]] # x-coordinate
+             sx_site <- sx[,site==g]
+             sx_vec <- as.vector(sx_site)[z_vec==1]
+             sy <- samples[,grep(paste0(s_alias,"\\["), colnames(samples))][,(dim(z)[2]+1):(dim(z)[2]*2)] # y-coordinates
+             sy_site <- sy[,site==g]             
+             sy_vec <- as.vector(sy_site)[z_vec==1]
+             ac_pts <- sp::SpatialPoints(cbind(sx_vec, sy_vec),proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
+             tab <- table(raster::cellFromXY(r[[g]], ac_pts))
+             r[[g]][as.numeric(names(tab))] <- tab/n.iter 
+           } # end g loop   
+       } else
+       if(isFALSE(hab_mask)==FALSE){  
+           r <- apply(grid,3,function(x) raster::rasterFromXYZ(x,crs = crs_))
+           for(g in 1:dim(grid)[3]){
+             # process z indicator variable and sx and sy acticity center coordinates as vectors for speed
+             z <- samples[,grep(paste0(z_alias,"\\["), colnames(samples))] # indicator variable
+             z_site <- z[,site==g]
+             z_vec <- as.vector(z_site)
+             sx <- samples[,grep(paste0(s_alias,"\\["), colnames(samples))][,1:dim(z)[2]] # x-coordinate
+             sx_site <- sx[,site==g]
+             sx_vec <- as.vector(sx_site)[z_vec==1]
+             sy <- samples[,grep(paste0(s_alias,"\\["), colnames(samples))][,(dim(z)[2]+1):(dim(z)[2]*2)] # y-coordinates
+             sy_site <- sy[,site==g]             
+             sy_vec <- as.vector(sy_site)[z_vec==1]
+             rescale.sx <- scales::rescale(sx_vec, to = extent(r[[g]])[1:2], from=c(0,dim(hab_mask)[2]))
+             rescale.sy <- scales::rescale(sy_vec, to = extent(r[[g]])[3:4], from=c(0,dim(hab_mask)[1]))
+             ac_pts <- sp::SpatialPoints(cbind(rescale.sx, rescale.sy),proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
+             tab <- table(raster::cellFromXY(r[[g]], ac_pts))
+             r[[g]][as.numeric(names(tab))] <- tab/n.iter 
+           } # end g loop       
+       } # end habitat mask    
+     }
+     return(r)
+} # End function 'realized_density'
 
 
