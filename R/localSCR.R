@@ -1630,6 +1630,9 @@ rescale_classic <- function(X, ext, s.st, site, hab_mask){
         rescale_list$X[,2,g] <- scales::rescale(X[,2,g], to = c(0,dim(hab_mask)[1]), from=ext[[g]][3:4])
         rescale_list$s.st[which(site==g),1] <- scales::rescale(s.st[which(site==g),1], to = c(0,dim(hab_mask)[2]), from=ext[[g]][1:2])
         rescale_list$s.st[which(site==g),2] <- scales::rescale(s.st[which(site==g),2], to = c(0,dim(hab_mask)[1]), from=ext[[g]][3:4])
+        # check that starting coordinates are still in bounds
+        rescale_list$s.st[which(site==g),1] <- ifelse(rescale_list$s.st[which(site==g),1]>=dim(hab_mask)[2],rescale_list$s.st[which(site==g),1]-1,rescale_list$s.st[which(site==g),1])
+        rescale_list$s.st[which(site==g),2] <- ifelse(rescale_list$s.st[which(site==g),2]>=dim(hab_mask)[1],rescale_list$s.st[which(site==g),2]-1,rescale_list$s.st[which(site==g),2])
         rescale_list$ext[[g]][1:2] <- scales::rescale(ext[[g]][1:2], to = c(0,dim(hab_mask)[2]), from=ext[[g]][1:2])
         rescale_list$ext[[g]][3:4] <- scales::rescale(ext[[g]][3:4], to = c(0,dim(hab_mask)[1]), from=ext[[g]][3:4])
       }
