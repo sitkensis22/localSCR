@@ -1417,9 +1417,6 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask){
   if(length(dim(X))!=2 & length(dim(X))!=3){
     stop("Trapping grid must be only 2 or 3 dimensions")
   }
-  if(length(dim(X))==3 & length(site)!=M){
-    stop("Augment 'site' variable to length M first")
-  }
   # for dim of length 2
   if(length(dim(X))==2){
     n0 <- length(which(apply(y,1,sum)!=0))
@@ -1485,6 +1482,9 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask){
     } # augmented individuals
   }  else
     if(length(dim(X))==3){
+        if(length(dim(X))==3 & length(site)!=M){
+        stop("Include 'site' variable with length M")
+        }
         n0 <- length(which(apply(y,1,sum)!=0))
         s.st <- matrix(NA, nrow=M, ncol=2)
         for(i in 1:n0){
