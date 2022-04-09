@@ -215,7 +215,7 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter, en
       smat <- array(NA, dim=c(N,2,dim(X)[3]))
       xlim <-sapply(ext, function(x) x[1:2]) # create x limits for state-space
       ylim <- sapply(ext, function(x) x[3:4]) # create y limits for state-space
-      Y4d <- array(NA, dim=c(N,dim(X)[1],K,dim(X)[3]))
+      Y4d <- list()
       for(g in 1:dim(X)[3]){ # now loop over trap dimensions
         sex[,g] <- rbinom(N, 1, prop_sex) # set propsex to 1 if you only want to simulate for one sex
         sex_ <- sex + 1 # indicator for sigma
@@ -262,18 +262,19 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter, en
         sex[1:N,g] <- sex[c(which(apply(Y,1,sum)!=0),which(apply(Y,1,sum)==0)),g] # organize sex
         sex[which(apply(Y,1,sum)==0),g] <- NA
         site[,g] <- g
-        Y4d[,,,g] <- Y[c(which(apply(Y,1,sum)!=0),which(apply(Y,1,sum)==0)),,] # organize encountered and then 0's (augmented)
+        Y4d[[g]] <- Y[which(apply(Y,1,sum)!=0),,] # include only encountered
       }
     }
   if(length(dim(X))==2){
     dataList <- list(y=Y3d,sex=sex,s=s)
   }else
     if(length(dim(X))==3){
+      # organize data elements site, sex, and y
       site <- as.vector(site)
       site <- site[c(which(is.na(sex)==FALSE),which(is.na(sex)))]
       sex <- as.vector(sex)
       sex <- sex[c(which(is.na(sex)==FALSE),which(is.na(sex)))]
-      dataList <- list(y=Y4d,sex=sex,site=site,s=smat)
+      dataList <- list(y=do.call(rbind,Y4d),sex=sex,site=site,s=smat)
     }
   return(dataList)
 } # end 'sim_encounter' function
