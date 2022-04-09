@@ -1417,6 +1417,9 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask){
   if(length(dim(X))!=2 & length(dim(X))!=3){
     stop("Trapping grid must be only 2 or 3 dimensions")
   }
+  if(length(dim(X))==3 & length(site)!=M){
+    stop("Augment 'site' variable to length M first")
+  }
   # for dim of length 2
   if(length(dim(X))==2){
     n0 <- length(which(apply(y,1,sum)!=0))
@@ -1482,59 +1485,53 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask){
     } # augmented individuals
   }  else
     if(length(dim(X))==3){
-      n0 <- apply(y, 4, function(x) length(which(apply(x,1,sum)!=0)))
-      n0.all <- sum(n0)
-      s.st.array <- array(NA, dim=c(M,2,dim(X)[3]))
-      for(g in 1:dim(X)[3]){
-        xlim <- c(min(X[,1,g] - max(buff)), max(X[,1,g] + max(buff))) # create x limits for state-space
-        ylim <- c(min(X[,2,g] - max(buff)), max(X[,2,g] + max(buff))) # create y limits for state-space
-        for(i in 1:n0[g]){
-          temp.y <- y[i,,,g]
-          temp.X <- X[which(apply(temp.y,1,sum)!=0),,g]
+        n0 <- length(which(apply(y,1,sum)!=0))
+        s.st <- matrix(NA, nrow=M, ncol=2)
+        for(i in 1:n0){
+          xlim <- c(min(X[,1,site[i]] - max(buff)), max(X[,1,site[i]] + max(buff))) # create x limits for state-space
+          ylim <- c(min(X[,2,site[i]] - max(buff)), max(X[,2,site[i]] + max(buff))) # create y limits for state-space
+          temp.y <- y[i,,]
+          temp.X <- X[which(apply(temp.y,1,sum)!=0),,site[i]]
           ntimes <- apply(temp.y,1,sum)[which(apply(temp.y,1,sum)!=0)]
           df <- data.frame(temp.X,ntimes)
           temp.X2 = df[rep(seq_len(nrow(df)), df$ntimes),1:2]
           if(isFALSE(hab_mask)){ # if no habitat mask used
             if(length(ntimes)==1){
-              s.st.array[i,1,g]<-temp.X[1]
-              s.st.array[i,2,g]<-temp.X[2]
+              s.st[i,1]<-temp.X[1]
+              s.st[i,2]<-temp.X[2]
             }else
               if(length(ntimes)>1){
-                s.st.array[i,1,g]<-mean(temp.X2[,1])
-                s.st.array[i,2,g]<-mean(temp.X2[,2])
+                s.st[i,1]<-mean(temp.X2[,1])
+                s.st[i,2]<-mean(temp.X2[,2])
               }
           }else
             if(isFALSE(hab_mask)==FALSE){ # if habitat mask used
               if(length(ntimes)==1){
-                s.st.array[i,1,g]<-temp.X[1]
-                s.st.array[i,2,g]<-temp.X[2]
+                s.st[i,1]<-temp.X[1]
+                s.st[i,2]<-temp.X[2]
               }else
                 if(length(ntimes)>1){
-                  s.st.array[i,1,g]<-mean(temp.X2[,1])
-                  s.st.array[i,2,g]<-mean(temp.X2[,2])
+                  s.st[i,1]<-mean(temp.X2[,1])
+                  s.st[i,2]<-mean(temp.X2[,2])
                 }
-              sx.rescale <- scales::rescale(s.st.array[i,1,g], to = c(0,dim(hab_mask)[2]), from=xlim)
-              sy.rescale <- scales::rescale(s.st.array[i,2,g], to = c(0,dim(hab_mask)[1]), from=ylim)
+              sx.rescale <- scales::rescale(s.st[i,1], to = c(0,dim(hab_mask)[2]), from=xlim)
+              sy.rescale <- scales::rescale(s.st[i,2], to = c(0,dim(hab_mask)[1]), from=ylim)
               pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1),g]
               while(pOK==0){ # if their mean acitivity center is not in suitable habitat, then randomly sample
-                s.st.array[i,1,g]<-runif(1,xlim[1],xlim[2])
-                s.st.array[i,2,g]<-runif(1,ylim[1],ylim[2])
-                sx.rescale <- scales::rescale(s.st.array[i,1,g], to = c(0,dim(hab_mask)[2]), from=xlim)
-                sy.rescale <- scales::rescale(s.st.array[i,2,g], to = c(0,dim(hab_mask)[1]), from=ylim)
+                s.st[i,1]<-runif(1,xlim[1],xlim[2])
+                s.st[i,2]<-runif(1,ylim[1],ylim[2])
+                sx.rescale <- scales::rescale(s.st[i,1], to = c(0,dim(hab_mask)[2]), from=xlim)
+                sy.rescale <- scales::rescale(s.st[i,2], to = c(0,dim(hab_mask)[1]), from=ylim)
                 pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1),g]
               }
             } # end habitat check
         } # end detected individuals
-      } # close g loop
-        s.st <- matrix(NA, nrow=M,ncol=2)
-        s.st[1:n0.all,] <-  na.omit(apply(s.st.array, 2, rbind))
-
-        for(i in (n0.all+1):M){
-            xlim <- c(min(X[,1,site[i]] - max(buff)), max(X[,1,site[i]] + max(buff))) # create x limits for state-space
-            ylim <- c(min(X[,2,site[i]] - max(buff)), max(X[,2,site[i]] + max(buff))) # create y limits for state-space
+        for(i in (n0+1):M){
+              xlim <- c(min(X[,1,site[i]] - max(buff)), max(X[,1,site[i]] + max(buff))) # create x limits for state-space
+              ylim <- c(min(X[,2,site[i]] - max(buff)), max(X[,2,site[i]] + max(buff))) # create y limits for state-space
           if(isFALSE(hab_mask)){ # check for habitat mask for augmented individuals
-            s.st[i,1]<-runif(1,xlim[1],xlim[2])
-            s.st[i,2]<-runif(1,ylim[1],ylim[2])
+              s.st[i,1]<-runif(1,xlim[1],xlim[2])
+              s.st[i,2]<-runif(1,ylim[1],ylim[2])
           } else
             if(isFALSE(hab_mask)==FALSE){
               s.st[i,1] <-runif(1,xlim[1],xlim[2])
