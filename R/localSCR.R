@@ -2355,6 +2355,7 @@ nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude.params = NULL, di
 #' # make simple raster plot
 #' plot(r, col=viridis(100),main=expression("Realized density (activity centers/100 m"^2*")"))
 #'}
+#'@export
 realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s", z_alias = "z"){
      if(length(samples) > 1){
       samples <- do.call(rbind, samples) # rbind mcmc samples
@@ -2380,8 +2381,8 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
        } else 
        if(isFALSE(hab_mask)==FALSE){
            r <- raster::rasterFromXYZ(grid,crs = crs_)
-           rescale.sx <- scales::rescale(sx_vec, to = extent(r)[1:2], from=c(0,dim(hab_mask)[2]))
-           rescale.sy <- scales::rescale(sy_vec, to = extent(r)[3:4], from=c(0,dim(hab_mask)[1]))
+           rescale.sx <- scales::rescale(sx_vec, to = raster::extent(r)[1:2], from=c(0,dim(hab_mask)[2]))
+           rescale.sy <- scales::rescale(sy_vec, to = raster::extent(r)[3:4], from=c(0,dim(hab_mask)[1]))
            ac_pts <- sp::SpatialPoints(cbind(rescale.sx, rescale.sy),proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
            tab <- table(raster::cellFromXY(r, ac_pts))
            r[as.numeric(names(tab))] <- tab/n.iter
@@ -2419,8 +2420,8 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
              sy <- samples[,grep(paste0(s_alias,"\\["), colnames(samples))][,(dim(z)[2]+1):(dim(z)[2]*2)] # y-coordinates
              sy_site <- sy[,site==g]             
              sy_vec <- as.vector(sy_site)[z_vec==1]
-             rescale.sx <- scales::rescale(sx_vec, to = extent(r[[g]])[1:2], from=c(0,dim(hab_mask)[2]))
-             rescale.sy <- scales::rescale(sy_vec, to = extent(r[[g]])[3:4], from=c(0,dim(hab_mask)[1]))
+             rescale.sx <- scales::rescale(sx_vec, to = raster::extent(r[[g]])[1:2], from=c(0,dim(hab_mask)[2]))
+             rescale.sy <- scales::rescale(sy_vec, to = raster::extent(r[[g]])[3:4], from=c(0,dim(hab_mask)[1]))
              ac_pts <- sp::SpatialPoints(cbind(rescale.sx, rescale.sy),proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
              tab <- table(raster::cellFromXY(r[[g]], ac_pts))
              r[[g]][as.numeric(names(tab))] <- tab/n.iter 
