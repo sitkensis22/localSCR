@@ -262,7 +262,6 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter, en
         sex[1:N,g] <- sex[c(which(apply(Y,1,sum)!=0),which(apply(Y,1,sum)==0)),g] # organize sex
         sex[which(apply(Y,1,sum)==0),g] <- NA
         site[,g] <- g
-        site[which(apply(Y,1,sum)==0),g] <- NA
         Y4d[,,,g] <- Y[c(which(apply(Y,1,sum)!=0),which(apply(Y,1,sum)==0)),,] # organize encountered and then 0's (augmented)
       }
     }
@@ -270,10 +269,10 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter, en
     dataList <- list(y=Y3d,sex=sex,s=s)
   }else
     if(length(dim(X))==3){
-      sex <- as.vector(sex)
-      sex <- sex[c(which(is.na(sex)==FALSE),which(is.na(sex)))]
       site <- as.vector(site)
       site <- site[c(which(is.na(sex)==FALSE),which(is.na(sex)))]
+      sex <- as.vector(sex)
+      sex <- sex[c(which(is.na(sex)==FALSE),which(is.na(sex)))]
       dataList <- list(y=Y4d,sex=sex,site=site,s=smat)
     }
   return(dataList)
@@ -1415,12 +1414,11 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
 #' Generate a matrix of intial starting locations, possibly accounting for habitat mask.
 #'
 #' @param y either a matrix or array of encounter history data, possiblity from \code{sim_classic()}.
-#' @param M an integer of the total augmented population size (i.e., detected and augmented individuals). Note
-#' that if traps are an array (i.e., clustered), then M is the augmented size per trap array.
-#' @param X either a matrix or array representing the coordinates of traps in
+#' @param M an integer of the total augmented population size (i.e., detected and augmented individuals). 
 #' UTMs. An array is used when traps are clustered over a survey area.
 #' @param buff the distance (m or km) that the traps should be
 #' buffered by as an integer. This is typically 3 times the sigma parameter.
+#' @param site Either \code{NULL} (if a 2D trap array is used) or a vector of integers denoting which trap array an individual (either detected or augmented) belongs to. Note that \code{site} is provided from \code{\link{sim_classic}} when a 3D trap array is used. However, this \code{site} variable must be correctly augmented based on the total augmented population size (i.e., \code{M}).
 #' @param hab_mask either \code{FALSE} (the default) or a matrix or arrary output from \code{\link{mask_polygon}}
 #' or \code{\link{mask_raster}} functions.
 #' @return a matrix of initial activity center coordinates with \code{M} rows and 2 columns.
@@ -1451,7 +1449,7 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
 #' points(traps, col="blue",pch=20)
 #' points(s.st3d, col="red",pch=20)
 #' @export
-initialize_classic <- function(y, M, X, buff, hab_mask = FALSE){
+initialize_classic <- function(y, M, X, buff, site, hab_mask){
   if(length(dim(X))!=2 & length(dim(X))!=3){
     stop("Trapping grid must be only 2 or 3 dimensions")
   }
@@ -1522,7 +1520,6 @@ initialize_classic <- function(y, M, X, buff, hab_mask = FALSE){
     if(length(dim(X))==3){
       n0 <- apply(y, 4, function(x) length(which(apply(x,1,sum)!=0)))
       n0.all <- sum(n0)
-      s.st <- matrix(NA, nrow=M*dim(X)[3], ncol=2)
       s.st.array <- array(NA, dim=c(M,2,dim(X)[3]))
       for(g in 1:dim(X)[3]){
         xlim <- c(min(X[,1,g] - max(buff)), max(X[,1,g] + max(buff))) # create x limits for state-space
@@ -1565,33 +1562,31 @@ initialize_classic <- function(y, M, X, buff, hab_mask = FALSE){
             } # end habitat check
         } # end detected individuals
       } # close g loop
-      s.st[1:n0.all,1:2] <-  na.omit(apply(s.st.array, 2, rbind))
-      s.st.array <- array(NA, dim=c(M,2,dim(X)[3]))
-      for(g in 1:dim(X)[3]){
-        xlim <- c(min(X[,1,g] - max(buff)), max(X[,1,g] + max(buff))) # create x limits for state-space
-        ylim <- c(min(X[,2,g] - max(buff)), max(X[,2,g] + max(buff))) # create y limits for state-space
-        for(i in (n0[g]+1):M){
+        s.st <- matrix(NA, nrow=M,ncol=2)
+        s.st[1:n0.all,] <-  na.omit(apply(s.st.array, 2, rbind))
+
+        for(i in (n0.all+1):M){
+            xlim <- c(min(X[,1,site[i]] - max(buff)), max(X[,1,site[i]] + max(buff))) # create x limits for state-space
+            ylim <- c(min(X[,2,site[i]] - max(buff)), max(X[,2,site[i]] + max(buff))) # create y limits for state-space
           if(isFALSE(hab_mask)){ # check for habitat mask for augmented individuals
-            s.st.array[i,1,g]<-runif(1,xlim[1],xlim[2])
-            s.st.array[i,2,g]<-runif(1,ylim[1],ylim[2])
+            s.st[i,1]<-runif(1,xlim[1],xlim[2])
+            s.st[i,2]<-runif(1,ylim[1],ylim[2])
           } else
             if(isFALSE(hab_mask)==FALSE){
-              s.st.array[i,1,g]<-runif(1,xlim[1],xlim[2])
-              s.st.array[i,2,g]<-runif(1,ylim[1],ylim[2])
-              sx.rescale <- scales::rescale(s.st.array[i,1,g], to = c(0,dim(hab_mask)[2]), from=xlim)
-              sy.rescale <- scales::rescale(s.st.array[i,2,g], to = c(0,dim(hab_mask)[1]), from=ylim)
-              pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1),g]
+              s.st[i,1] <-runif(1,xlim[1],xlim[2])
+              s.st[i,2] <-runif(1,ylim[1],ylim[2])
+              sx.rescale <- scales::rescale(s.st[i,1], to = c(0,dim(hab_mask)[2]), from=xlim)
+              sy.rescale <- scales::rescale(s.st[i,2], to = c(0,dim(hab_mask)[1]), from=ylim)
+              pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1),site[i]]
               while(pOK==0){
-                s.st.array[i,1,g]=runif(1,xlim[1],xlim[2])
-                s.st.array[i,2,g]=runif(1,ylim[1],ylim[2])
-                sx.rescale <- scales::rescale(s.st.array[i,1,g], to = c(0,dim(hab_mask)[2]), from=xlim)
-                sy.rescale <- scales::rescale(s.st.array[i,2,g], to = c(0,dim(hab_mask)[1]), from=ylim)
-                pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1),g]
+              s.st[i,1] <-runif(1,xlim[1],xlim[2])
+              s.st[i,2] <-runif(1,ylim[1],ylim[2])
+              sx.rescale <- scales::rescale(s.st[i,1], to = c(0,dim(hab_mask)[2]), from=xlim)
+              sy.rescale <- scales::rescale(s.st[i,2], to = c(0,dim(hab_mask)[1]), from=ylim)
+              pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1),site[i]]
               }
             } # end habitat check
         } # end augmented individuals
-      } # end trap array loop g
-      s.st[(n0.all+1):(M*dim(X)[3]),1:2] <-  na.omit(apply(s.st.array, 2, rbind))
     } # end 3D initialize
   return(s.st)
 } # end function 'initialize_classic'
