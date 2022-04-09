@@ -2355,7 +2355,7 @@ nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude.params = NULL, di
 #' # make simple raster plot
 #' plot(r, col=viridis(100),main=expression("Realized density (activity centers/100 m"^2*")"))
 #'}
-realized_density <- function(samples, grid, crs_, site=NULL, hab_mask=FALSE, s_alias = "s", z_alias = "z"){
+realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s", z_alias = "z"){
      if(length(samples) > 1){
       samples <- do.call(rbind, samples) # rbind mcmc samples
      }

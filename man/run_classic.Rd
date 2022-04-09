@@ -51,6 +51,7 @@ A wrapper function to conduct Markov Chain Monte Carlo (MCMC) sampling using nim
 This function provides a wrapper to easily run Bayesian SCR models using \code{nimble}.
 }
 \examples{
+\dontrun{
 # simulate a single trap array with random positional noise
 x <- seq(-800, 800, length.out = 5)
 y <- seq(-800, 800, length.out = 5)
@@ -131,6 +132,7 @@ abline(v=200, col="red") # add line for simulated abundance
 
 # not run
 #nimSummary(out)
+}
 }
 \author{
 Daniel Eacker

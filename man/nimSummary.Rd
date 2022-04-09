@@ -34,6 +34,7 @@ Summarizes lists of MCMC chain output from nimble
 This function summarizes Bayesian SCR models run using \code{nimble} including mean and quantiles of samples, as well as effective sample size and Rhat statistics. Note that \code{f0} is the proportion of samples that are greater than zero. Also, at least 2 chains must be run to use this function.
 }
 \examples{
+\dontrun{
 # simulate a single trap array with random positional noise
 x <- seq(-800, 800, length.out = 5)
 y <- seq(-800, 800, length.out = 5)
@@ -94,6 +95,7 @@ abline(v=200, col="red") # add line for simulated abundance
 
 # summarize output
 nimSummary(out, trace=TRUE, plot_all=TRUE)
+}
 }
 \author{
 Daniel Eacker
