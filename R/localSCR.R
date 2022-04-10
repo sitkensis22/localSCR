@@ -2176,7 +2176,8 @@ nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude.params = NULL, di
       n.eff <- coda::effectiveSize(coda::mcmc.list(lapply(d2, coda::as.mcmc)))
       Rhat <- round(coda::gelman.diag(coda::mcmc.list(lapply(d2, coda::as.mcmc)), multivariate = FALSE)[[1]][,1],3)
     }
-  if(trace  & (length(attributes(d[[1]])$dimnames[[2]])-length(d.remove[[1]])>1)){
+ if(trace){
+  if((length(attributes(d[[1]])$dimnames[[2]])-length(d.remove[[1]])>1)){
      par(mfrow=c(3,2))
      g <- 1 # set g index
      if(plot_all){
@@ -2211,9 +2212,9 @@ nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude.params = NULL, di
           }
         }
       } # interactive?
-      on.exit(par(mfrow=c(1,1))) # reset graphical margin
+      #on.exit(par(mfrow=c(1,1))) # reset graphical margin - CHECK THIS
   }else
-    if(trace & (length(attributes(d[[1]])$dimnames[[2]])-length(d.remove[[1]])==1)){
+    if((length(attributes(d[[1]])$dimnames[[2]])-length(d.remove[[1]])==1)){
       par(mfrow=c(1,2))
       plot(1:length(d2[[1]]),d2[[1]],xlab="iteration",ylab=colnames(d3)[i],type="l",ylim=range(d3[,1]))
       for(j in 2:length(d2)){
@@ -2221,7 +2222,8 @@ nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude.params = NULL, di
       }
       hist(d3[,1],main="",xlab=attributes(d[[1]])$dimnames[[2]][-d.remove[[1]]])
       on.exit(par(mfrow=c(1,1))) # reset graphical margin
-      }
+    }
+  } # end if trace
   tmp.frame = data.frame(post.mean=Means,post.sd=SDs,q2.5=q2.5,q50=q50,q97.5=q97.5,f0=over.zero,n.eff=n.eff,Rhat=Rhat)
   if(nrow(tmp.frame)==1){
     row.names(tmp.frame) = attributes(d[[1]])$dimnames[[2]][-d.remove[[1]]]
