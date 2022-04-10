@@ -1516,13 +1516,13 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask){
                 }
               sx.rescale <- scales::rescale(s.st[i,1], to = c(0,dim(hab_mask)[2]), from=xlim)
               sy.rescale <- scales::rescale(s.st[i,2], to = c(0,dim(hab_mask)[1]), from=ylim)
-              pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1),g]
+              pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1),site[i]]
               while(pOK==0){ # if their mean acitivity center is not in suitable habitat, then randomly sample
                 s.st[i,1]<-runif(1,xlim[1],xlim[2])
                 s.st[i,2]<-runif(1,ylim[1],ylim[2])
                 sx.rescale <- scales::rescale(s.st[i,1], to = c(0,dim(hab_mask)[2]), from=xlim)
                 sy.rescale <- scales::rescale(s.st[i,2], to = c(0,dim(hab_mask)[1]), from=ylim)
-                pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1),g]
+                pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1),site[i]]
               }
             } # end habitat check
         } # end detected individuals
@@ -2211,8 +2211,7 @@ nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude.params = NULL, di
           break
           }
         }
-      } # interactive?
-      #on.exit(par(mfrow=c(1,1))) # reset graphical margin - CHECK THIS
+      } # is interactive
   }else
     if((length(attributes(d[[1]])$dimnames[[2]])-length(d.remove[[1]])==1)){
       par(mfrow=c(1,2))
@@ -2221,8 +2220,8 @@ nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude.params = NULL, di
         lines(1:length(d2[[j]]),d2[[j]],xlab="iteration",ylab=colnames(d3)[i],type="l",col="red")
       }
       hist(d3[,1],main="",xlab=attributes(d[[1]])$dimnames[[2]][-d.remove[[1]]])
-      on.exit(par(mfrow=c(1,1))) # reset graphical margin
     }
+     on.exit(par(mfrow=c(1,1))) # reset graphical frame
   } # end if trace
   tmp.frame = data.frame(post.mean=Means,post.sd=SDs,q2.5=q2.5,q50=q50,q97.5=q97.5,f0=over.zero,n.eff=n.eff,Rhat=Rhat)
   if(nrow(tmp.frame)==1){
