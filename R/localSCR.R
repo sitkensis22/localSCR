@@ -158,29 +158,29 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter, en
     xlim <- ext[1:2] # create x limits for state-space
     ylim <- ext[3:4] # create y limits for state-space
     if(isFALSE(hab_mask)){
-      sx <- runif(N,xlim[1],xlim[2])
-      sy <- runif(N,ylim[1],ylim[2])
+      sx <- stats::runif(N,xlim[1],xlim[2])
+      sy <- stats::runif(N,ylim[1],ylim[2])
       s <- cbind(sx,sy)
     } else
       if(isFALSE(hab_mask)==FALSE){
-        sx <- runif(N,xlim[1],xlim[2])
+        sx <- stats::runif(N,xlim[1],xlim[2])
         sx.rescale <- scales::rescale(sx, to = c(0,dim(hab_mask)[2]), from=xlim)
-        sy <- runif(N,ylim[1],ylim[2])
+        sy <- stats::runif(N,ylim[1],ylim[2])
         sy.rescale <- scales::rescale(sy, to = c(0,dim(hab_mask)[1]), from=ylim)
         pOK <- numeric(N)
         for(i in 1:N){
           pOK[i] <- hab_mask[(trunc(sy.rescale[i])+1),(trunc(sx.rescale[i])+1)]
           while(pOK[i]==0){
-            sx[i] <- runif(1,xlim[1],xlim[2])
+            sx[i] <- stats::runif(1,xlim[1],xlim[2])
             sx.rescale[i] <- scales::rescale(sx[i], to = c(0,dim(hab_mask)[2]), from=xlim)
-            sy[i] <- runif(1,ylim[1],ylim[2])
+            sy[i] <- stats::runif(1,ylim[1],ylim[2])
             sy.rescale[i] <- scales::rescale(sy[i], to = c(0,dim(hab_mask)[1]), from=ylim)
             pOK[i] <- hab_mask[(trunc(sy.rescale[i])+1),(trunc(sx.rescale[i])+1)]
           }
         }
         s <- cbind(sx,sy)
       }
-    sex <- rbinom(N, 1, prop_sex) # set propsex to 1 if you only want to simulate for one sex
+    sex <- stats::rbinom(N, 1, prop_sex) # set propsex to 1 if you only want to simulate for one sex
     sex_ <- sex + 1 # sex indicator for sigma
     if(length(sigma_) == 1){ # make sigma length 2 if only 1 given
       sigma_ <- c(sigma_,sigma_)
@@ -192,13 +192,13 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter, en
     if(enc_dist == "binomial"){
       for(i in 1:N){
         for(j in 1:nrow(X)){
-          Y3d[i,j,1:K] <- rbinom(K,1,prob[i,j])
+          Y3d[i,j,1:K] <- stats::rbinom(K,1,prob[i,j])
         }}
     }else
       if(enc_dist == "poisson"){
         for(i in 1:N){
           for(j in 1:nrow(X)){
-            Y3d[i,j,1:K] <- rpois(K,prob[i,j])
+            Y3d[i,j,1:K] <- stats::rpois(K,prob[i,j])
           }}
       }
     Y3d <- Y3d[c(which(apply(Y3d,1,sum)!=0),which(apply(Y3d,1,sum)==0)),,] # organize encountered indivdiuals and then 0's (augmented)
@@ -210,74 +210,69 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter, en
       if(length(sigma_) == 1){ # make sigma length 2 if only 1 given
         sigma_ <- c(sigma_,sigma_)
       }
-      sex <- matrix(NA, nrow=N, ncol=dim(X)[3])
-      site <- matrix(NA, nrow=N, ncol=dim(X)[3])
-      smat <- matrix(NA, nrow=N*dim(X)[3],ncol=2)
+      site <- sort(rep(1:dim(X)[3],N/dim(X)[3]))
+      if(length(site) < N){ # check if site variable too short
+        N <- length(site)
+      }  
+      sex <- stats::rbinom(N, 1, prop_sex)  # set propsex to 1 if you only want to simulate for one sex
+      sex_ <- sex + 1 # indicator for sigma
       xlim <-sapply(ext, function(x) x[1:2]) # create x limits for state-space
       ylim <- sapply(ext, function(x) x[3:4]) # create y limits for state-space
-      Y4d <- array(NA, dim=c(N*dim(X)[3],dim(X)[1],K)) # encounter data
-      for(g in 1:dim(X)[3]){ # now loop over trap dimensions
-        sex[,g] <- rbinom(N, 1, prop_sex) # set propsex to 1 if you only want to simulate for one sex
-        sex_ <- sex + 1 # indicator for sigma
         if(isFALSE(hab_mask)){
-          sx <- runif(N,xlim[1,g],xlim[2,g])
-          sy <- runif(N,ylim[1,g],ylim[2,g])
+          sx <- stats::runif(N,xlim[1,site],xlim[2,site])
+          sy <- stats::runif(N,ylim[1,site],ylim[2,site])
           s <- cbind(sx,sy)
         } else
           if(isFALSE(hab_mask)==FALSE){
-            sx <- runif(N,xlim[1,g],xlim[2,g])
-            sx.rescale <- scales::rescale(sx, to = c(0,dim(hab_mask)[2]), from=xlim[,g])
-            sy <- runif(N,ylim[1,g],ylim[2,g])
-            sy.rescale <- scales::rescale(sy, to = c(0,dim(hab_mask)[1]), from=ylim[,g])
-            pOK <- numeric(N)
+              pOK <- numeric(N)
+              s <- matrix(NA, nrow=N, ncol=2)
             for(i in 1:N){
-              pOK[i] <- hab_mask[(trunc(sy.rescale[i])+1),(trunc(sx.rescale[i])+1),g]
+               s[i,1] <- runif(1,xlim[1,site[i]],xlim[2,site[i]])
+               sx.rescale <- scales::rescale(s[i,1], to = c(0,dim(hab_mask)[2]), from=xlim[,site[i]])
+               s[i,2] <- runif(1,ylim[1,site[i]],ylim[2,site[i]])
+               sy.rescale <- scales::rescale(s[i,2], to = c(0,dim(hab_mask)[1]), from=ylim[,site[i]])
+               pOK[i] <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1),site[i]]
               while(pOK[i]==0){
-                sx[i] <- runif(1,xlim[1,g],xlim[2,g])
-                sx.rescale[i] <- scales::rescale(sx[i], to = c(0,dim(hab_mask)[2]), from=xlim[,g])
-                sy[i] <- runif(1,ylim[1,g],ylim[2,g])
-                sy.rescale[i] <- scales::rescale(sy[i], to = c(0,dim(hab_mask)[1]), from=ylim[,g])
-                pOK[i] <- hab_mask[(trunc(sy.rescale[i])+1),(trunc(sx.rescale[i])+1),g]
+               s[i,1] <- runif(1,xlim[1,site[i]],xlim[2,site[i]])
+               sx.rescale <- scales::rescale(s[i,1], to = c(0,dim(hab_mask)[2]), from=xlim[,site[i]])
+               s[i,2] <- runif(1,ylim[1,site[i]],ylim[2,site[i]])
+               sy.rescale <- scales::rescale(s[i,2], to = c(0,dim(hab_mask)[1]), from=ylim[,site[i]])
+               pOK[i] <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1),site[i]]
               }
             }
-            s <- cbind(sx,sy)
           }
-        Dmat <- st_distance(st_cast(st_sfc(st_multipoint(s), crs =  crs_),"POINT"),st_cast(st_sfc(st_multipoint(X[,,g]), crs =  crs_),"POINT"))  # compute distance matrix for traps
-        Dmat <- matrix(as.numeric(Dmat), nrow=nrow(Dmat), ncol=ncol(Dmat)) # convert manually to matrix
-        prob <- base_encounter*exp(-Dmat^2/(2*sigma_[sex_[,g]]^2)) # get detection prob matrix
-        Y <- array(NA, dim=c(N,dim(X)[1],K)) # encounter data
+            Y4d <- array(NA, dim=c(N,dim(X)[1],K)) # encounter data
+            prob <- list()
+          for(g in 1:dim(X)[3]){ # estimate probability matrices by site to save run time
+            Dmat <- sf::st_distance(sf::st_cast(sf::st_sfc(sf::st_multipoint(s[site==g,]), crs = crs_),"POINT"),sf::st_cast(sf::st_sfc(sf::st_multipoint(X[,,g]), crs =  crs_),"POINT"))  # compute distance matrix for traps
+            Dmat <- matrix(as.numeric(Dmat), nrow=nrow(Dmat), ncol=ncol(Dmat)) # convert manually to matrix      
+            prob[[g]] <- base_encounter*exp(-Dmat^2/(2*sigma_[sex_[site==g]]^2)) # get detection prob matrix
+          }
+            prob = do.call(rbind, prob)
+      for(i in 1:N){
         if(enc_dist == "binomial"){
-          for(i in 1:N){
             for(j in 1:dim(X)[1]){
-              Y[i,j,1:K] <- rbinom(K,1,prob[i,j])
-            }}
+              Y4d[i,j,1:K] <- stats::rbinom(K,1,prob[i,j])
+            }
         }else
           if(enc_dist == "poisson"){
-            for(i in 1:N){
               for(j in 1:dim(X)[1]){
-                Y[i,j,1:K] <- rpois(K,prob[i,j])
-              }}
+                Y4d[i,j,1:K] <- stats::rpois(K,prob[i,j])
+              }
           }
-        row_start1 <- which(is.na(smat[,1]))[1] # find first NA position
-        smat[row_start1:(N*g),1:2] <- s[c(which(apply(Y,1,sum)!=0),which(apply(Y,1,sum)==0)),] # organize activity centers
-        sex[1:length(which(apply(Y,1,sum)!=0)),g] <- sex[which(apply(Y,1,sum)!=0),g] # organize sex
-        sex[(length(which(apply(Y,1,sum)!=0))+1):N,g] <- NA
-        site[,g] <- g
-        row_start2 <- which(is.na(Y4d[,1,1]))[1] # find first NA position
-        Y4d[row_start2:((length(which(apply(Y,1,sum)!=0)))+row_start2-1),,] <- Y[which(apply(Y,1,sum)!=0),,]
-      }
-    }
+        }
+     } # end 3D loop
   if(length(dim(X))==2){
     dataList <- list(y=Y3d,sex=sex,s=s)
   }else
     if(length(dim(X))==3){
       # organize data elements s, site, sex, and y
-      sex <- as.vector(sex)
-      site <- as.vector(site)
-      site <- site[c(which(is.na(sex)==FALSE),which(is.na(sex)))]
-      smat <- smat[c(which(is.na(sex)==FALSE),which(is.na(sex))),1:2]
-      sex <- sex[c(which(is.na(sex)==FALSE),which(is.na(sex)))]
-      dataList <- list(y=Y4d,sex=sex,site=site,s=smat)
+      site <- site[c(which(apply(Y4d,1,sum)!=0),which(apply(Y4d,1,sum)==0))]
+      sex <- sex[c(which(apply(Y4d,1,sum)!=0),which(apply(Y4d,1,sum)==0))]
+      sex[(length(which(apply(Y4d,1,sum)!=0))+1):N] <- NA
+      s <- s[c(which(apply(Y4d,1,sum)!=0),which(apply(Y4d,1,sum)==0)),1:2]
+      Y4d <- Y4d[c(which(apply(Y4d,1,sum)!=0),which(apply(Y4d,1,sum)==0)),,] 
+      dataList <- list(y=Y4d,sex=sex,site=site,s=s)
     }
   return(dataList)
 } # end 'sim_encounter' function
