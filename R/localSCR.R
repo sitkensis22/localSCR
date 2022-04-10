@@ -212,6 +212,7 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter, en
       site <- sort(rep(1:dim(X)[3],N/dim(X)[3]))
       if(length(site) < N){ # check if site variable too short
         N <- length(site)
+        warning("N was reduced from requested number of simulated individuals")
       }  
       sex <- stats::rbinom(N, 1, prop_sex)  # set propsex to 1 if you only want to simulate for one sex
       sex_ <- sex + 1 # indicator for sigma
