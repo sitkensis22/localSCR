@@ -96,7 +96,7 @@ out = run_classic(model = scr_model, data=data, constants=constants, inits=inits
 toc()
 
 # summarize output (exclude lengthy parameters "s" and "z")
-nimSummary(out, exclude.params = c("s","z"), trace = TRUE)
+nimSummary(out, exclude_params = c("s","z"), trace = TRUE)
 
 library(tictoc)       
 tic() # track time
