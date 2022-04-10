@@ -15,12 +15,14 @@ for a given 2-dimensional or 3-dimensional trap array (i.e., when traps
 are clustered in space), 2) simulate data under different encounter
 distributions and other parameters, 3) create habitat masks from either
 raster data or spatial polygons, 4) provide template SECR models that
-are easily customizable, and 4) fit and summarize SECR models using
-‘nimble’ (de Valpine et a. 2022) with options for parallel processing.
-Future functionality will include creating realized density surfaces
-from MCMC output and implementing localized approaches as in Milleret et
-al. (2019) and Woodruff et al. (2020). The package also uses block
-updating of x-and y- activity center coordinates to decrease run time.
+are easily customizable, 5) fit and summarize SECR models using ‘nimble’
+(de Valpine et a. 2022) with options for parallel processing, and 6)
+create realized density surfaces from MCMC output. Future functionality
+will include discrete state-space models and implementing localized
+approaches as in Milleret et al. (2019) and Woodruff et al. (2020). The
+package also uses block updating of x and y activity center coordinates,
+vectorization of traps in derivations, and separating the data
+augmentation process (see Chandler 2018) to decrease run time.
 
 Another useful package is ‘nimbleSCR’ (Bischof et al. 2021) that
 implements custom sampling distributions to increase sampling speed and
@@ -42,7 +44,7 @@ You can install the development version of ‘localSCR’ like so:
 ``` r
 library(remotes)
 install_github("sitkensis22/localSCR")
-#> Skipping install of 'localSCR' from a github remote, the SHA1 (e079639f) has not changed since last install.
+#> Skipping install of 'localSCR' from a github remote, the SHA1 (6d097125) has not changed since last install.
 #>   Use `force = TRUE` to force installation
 ```
 
@@ -97,7 +99,7 @@ str(data3d)
 #> List of 3
 #>  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...
 #>  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...
-#>  $ s  : num [1:200, 1:2] 717.4 -214.8 -1032.1 918 44.8 ...
+#>  $ s  : num [1:200, 1:2] 717.6 -212.7 -1028.3 917.8 46.4 ...
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : NULL
 #>   .. ..$ : chr [1:2] "sx" "sy"
@@ -143,8 +145,11 @@ hab_mask = mask_polygon(poly = poly, grid = Grid$grid, crs_ = mycrs, prev_mask =
 data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = mysigma, prop_sex = 0.7,
 N = 200, K = 4, base_encounter = 0.15, enc_dist = "binomial",hab_mask = hab_mask, setSeed = 50)
 
+# total augmented population size 
+M = 400
+
 # get initial activity center starting values
-s.st3d = initialize_classic(y=data3d$y, M=400, X=traps, buff = 3*max(mysigma), hab_mask = hab_mask)
+s.st3d = initialize_classic(y=data3d$y, M=M, X=traps, buff = 3*max(mysigma), hab_mask = hab_mask)
 
 # make simple plot
 par(mfrow=c(1,1))
@@ -172,10 +177,10 @@ data$y = apply(data$y, c(1,2), sum) # covert to 2d by summing over occasions
 # add rescaled traps
 data$X = rescale_list$X
 
-# prepare constants (note get density in km2 rather than m2)
-constants = list(M = 400,n0 = nrow(data$y),J=dim(data$y)[2], K=dim(data3d$y)[3],
+# prepare constants (note get density in activity center/100 m2 rather than activity centers/m2)
+constants = list(M = M,n0 = nrow(data$y),J=dim(data$y)[2], K=dim(data3d$y)[3],
 x_lower = ext[1], x_upper = ext[2], y_lower = ext[3], y_upper = ext[4],
-sigma_upper = 1000, A = (sum(hab_mask)*(pixelWidth/1000)^2),pixelWidth=pixelWidth)
+sigma_upper = 1000, A = (sum(hab_mask)*(pixelWidth/100)^2),pixelWidth=pixelWidth)
 
 # augment sex
 data$sex = c(data3d$sex,rep(NA,constants$M-length(data3d$sex)))
@@ -196,18 +201,18 @@ inits = list(sigma = runif(2, 250, 350), s = s.st3d,psi=runif(1,0.2,0.3),
 p0 = runif(1, 0.05, 0.15),pOK=data$OK,z=c(rep(NA,constants$n0),rep(0,constants$M-constants$n0)))
 
 # parameters to monitor
-params = c("sigma","psi","p0","N","D","psi_sex")
+params = c("sigma","psi","p0","N","D","psi_sex","s","z")
 
 # get model
-scr_model = get_classic(dim_y = 2, enc_dist = "binomial",sex_sigma = TRUE,hab_mask=TRUE)
+scr_model = get_classic(dim_y = 2, enc_dist = "binomial",sex_sigma = TRUE,hab_mask=TRUE,trapsClustered=FALSE)
 
 # run model
 library(tictoc)
 tic() # track time elapsed
 out = run_classic(model = scr_model, data=data, constants=constants,
-inits=inits, params = params,niter = 8000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
+inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
 toc()
-#> 121.5 sec elapsed
+#> 140.31 sec elapsed
 
 # summarize output
 samples = do.call(rbind, out)
@@ -220,17 +225,180 @@ abline(v=200, col="red") # add line for simulated abundance
 
 ``` r
 
-# summarize MCMC samples
-nimSummary(out)
+# summarize MCMC samples (exclude parameters and don't plot); density 
+nimSummary(out, exclude.params = c("s","z"), trace=FALSE)
 #>          post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat
-#> D           17.589   2.090  14.125  17.399  22.173  1 418.686 1.094
-#> N          188.025  22.345 151.000 186.000 237.025  1 418.686 1.094
-#> p0           0.163   0.028   0.113   0.161   0.226  1 378.397 1.005
-#> psi          0.470   0.061   0.368   0.464   0.604  1 418.875 1.097
-#> psi_sex      0.656   0.067   0.510   0.660   0.779  1 291.554 1.047
-#> sigma[1]   240.303  28.402 190.739 238.009 303.667  1 369.615 1.038
-#> sigma[2]   289.768  26.314 247.440 286.715 349.694  1 234.498 1.003
+#> D            0.176   0.021   0.140   0.174   0.222  1 528.137 1.054
+#> N          187.648  22.117 150.000 186.000 237.000  1 528.137 1.054
+#> p0           0.163   0.029   0.113   0.161   0.226  1 473.142 1.003
+#> psi          0.469   0.060   0.367   0.464   0.601  1 433.830 1.057
+#> psi_sex      0.660   0.068   0.513   0.665   0.782  1 371.001 1.029
+#> sigma[1]   242.149  30.309 191.889 239.089 311.141  1 410.051 1.036
+#> sigma[2]   289.258  26.584 246.359 286.377 349.280  1 307.972 1.031
+
+# make realized density plot 
+r = realized_density(samples = out, grid = Grid$grid, crs_ = mycrs, site = NULL, hab_mask = hab_mask)       
+      
+# load virdiis color palette and raster libraries      
+library(viridis)
+#> Loading required package: viridisLite
+library(raster)
+#> Loading required package: sp
+
+# make simple raster plot
+plot(r, col=viridis(100),main=expression("Realized density (activity centers/100 m"^2*")"),
+     ylab="Northing",xlab="Easting")
 ```
+
+<img src="man/figures/README-unnamed-chunk-5-3.png" style="display: block; margin: auto;" />
+
+### (4) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask using a 3D trap array or clustered traps.
+
+``` r
+
+# simulate a single trap array with random positional noise
+x <- seq(-800, 800, length.out = 5)
+y <- seq(-800, 800, length.out = 5)
+traps <- as.matrix(expand.grid(x = x, y = y))
+traps <- traps + runif(prod(dim(traps)),-20,20) # add some random noise to locations
+
+mysigma = c(220, 300) # simulate sex-specific
+mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
+pixelWidth = 100 # store pixelWidth
+
+# create an array of traps, as an approach where individuals will only be detected 
+# at one of the trap arrays (e.g., Furnas et al. 2018)
+Xarray = array(NA, dim=c(nrow(traps),2,2))
+Xarray[,,1]=traps
+Xarray[,,2]=traps+4000 # shift trapping grid to new locations
+
+# create grid and extent for 3D trap array
+GridX = grid_classic(X = Xarray, crs_ = mycrs, buff = 3*max(mysigma), res = 100)
+
+# make simple plot
+par(mfrow=c(1,1))
+plot(GridX$grid[,,1],xlim=c(-1600,6000),ylim=c(-1600,6000),col="darkgrey",
+pch=20,ylab="Northing",xlab="Easting")
+points(Xarray[,,1],col="blue",pch=20)
+points(GridX$grid[,,2],pch=20,col="darkgrey")
+points(Xarray[,,2],col="blue",pch=20)
+
+# create polygon to use as a mask
+library(sf)
+poly = st_sfc(st_polygon(x=list(matrix(c(-1660,-1900,5730,-1050,5470,
+5650,0,6050,-1800,5700,-1660,-1900),ncol=2, byrow=TRUE))), crs =  mycrs)
+
+# add polygon to plot
+plot(poly, add=TRUE)
+```
+
+<img src="man/figures/README-unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
+
+``` r
+
+# get 3D habitat mask array for 3D grid
+hab_mask = mask_polygon(poly = poly, grid = GridX$grid, crs_ = mycrs, prev_mask = NULL)
+
+# simulate data for uniform state-space and habitat mask (N is simulated abundance per site)
+data4d = sim_classic(X = Xarray, ext = GridX$ext, crs_ = mycrs, sigma_ = mysigma, prop_sex = 0.7,
+N = 200, K = 4, base_encounter = 0.15, enc_dist = "binomial",hab_mask = hab_mask, setSeed = 500)
+
+# total augmented population size 
+M = 400
+
+# augment site identifier
+site = c(data4d$site,c(rep(1,((M-length(data4d$site))/2)),rep(2,((M-length(data4d$site))/2))))
+
+# get initial activity center starting values 
+s.st4d = initialize_classic(y=data4d$y, M=M, X=Xarray, buff = 3*max(mysigma), site = site, hab_mask = hab_mask)
+
+# rescale inputs
+rescale_list = rescale_classic(X = Xarray, ext = GridX$ext, s.st = s.st4d, site = site, hab_mask = hab_mask)
+
+# store rescaled extent and convert to matrix
+ext = do.call(rbind, lapply(rescale_list$ext, as.vector))
+
+# prepare constants (note get density in activity center/100 m2 rather than activity centers/m2)
+constants = list(M = M,n0 =  length(which(apply(data4d$y,1,sum)!=0)),
+J=dim(data4d$y)[2], K=dim(data4d$y)[3], sigma_upper = 1000, A = (sum(hab_mask)*(pixelWidth/100)^2),
+pixelWidth=pixelWidth,nSites=dim(Xarray)[3],site = site)
+
+# prepare data
+data = list(X = rescale_list$X,sex = c(data4d$sex,rep(NA,M-length(data4d$sex))),
+x_lower = ext[,1],x_upper = ext[,2],y_lower = ext[,3],y_upper = ext[,4])
+
+# store and format encounter history data
+data$y = data4d$y[which(apply(data4d$y, 1, sum)!=0),,] # remove augmented records 
+data$y = apply(data$y, c(1,2), sum) # covert to 2d by summing over occasions
+
+# add z and zeros vector data for latent inclusion indicator
+data$z = c(rep(1,constants$n0),rep(NA,constants$M - constants$n0))
+data$zeros =  c(rep(NA,constants$n0),rep(0,constants$M - constants$n0))
+
+# add hab_mask, proportion of available habitat, and OK for habitat check
+data$hab_mask = hab_mask
+data$prop.habitat=apply(hab_mask,3,mean) # need to adjust proportion of habitat available
+data$OK = rep(1,constants$M)
+
+# get initial activity center starting values
+s.st = rescale_list$s.st
+
+# define all initial values
+inits = list(sigma = runif(2, 250, 350), s = s.st,psi=runif(1,0.2,0.3),
+p0 = runif(dim(data$X)[3], 0.1, 0.2),sex=ifelse(is.na(data$sex),rbinom(constants$M-constants$n0,1,0.5),NA),
+pOK=data$OK,z=c(rep(NA,constants$n0),rep(0,constants$M-constants$n0)),
+psi_sex=runif(1,0.4,0.6))
+
+# parameters to monitor
+params = c("sigma","psi","p0","N","D","psi_sex","s","z")
+
+# get model
+scr_model = get_classic(dim_y = 2, enc_dist = "binomial",sex_sigma = TRUE,hab_mask=TRUE,trapsClustered = TRUE)
+
+# run model
+library(tictoc)
+tic() # track time elapsed
+out = run_classic(model = scr_model, data=data, constants=constants,
+inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, 
+parallel=TRUE, RNGseed = 500)
+toc()
+#> 150 sec elapsed
+
+# summary table of MCMC output (exclude "s" and "z" parameters)
+nimSummary(out, exclude.params = c("s","z"), trace = TRUE, plot_all = FALSE)
+```
+
+<img src="man/figures/README-unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
+
+    #>          post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat
+    #> D            0.104   0.017   0.076   0.102   0.143  1 173.373 1.012
+    #> N          232.925  38.702 170.000 228.000 321.000  1 173.373 1.012
+    #> p0[1]        0.112   0.027   0.067   0.110   0.175  1 434.862 1.004
+    #> p0[2]        0.106   0.023   0.068   0.104   0.157  1 545.243 1.023
+    #> psi          0.592   0.100   0.425   0.582   0.815  1 179.821 1.010
+    #> psi_sex      0.509   0.080   0.354   0.509   0.664  1 266.020 1.001
+    #> sigma[1]   234.625  34.141 177.724 231.260 311.807  1 274.116 1.004
+    #> sigma[2]   344.204  38.158 282.668 339.885 430.743  1 263.555 1.027
+
+``` r
+
+# generate realized density surface
+r = realized_density(samples=out, grid=GridX$grid, crs_=mycrs,
+                      site=constants$site, hab_mask=hab_mask)
+
+# load viridis color palette library      
+library(viridis)
+ 
+# make simple raster plot
+par(mfrow=c(2,1))
+library(raster)
+plot(r[[1]], col=viridis(100),main=expression("Realized density (activity centers/100 m"^2*")"),
+ylab="Northing",xlab="Easting")
+plot(r[[2]], col=viridis(100),main=expression("Realized density (activity centers/100 m"^2*")"),
+ylab="Northing",xlab="Easting")
+```
+
+<img src="man/figures/README-unnamed-chunk-8-1.png" style="display: block; margin: auto;" />
 
 ## Literature Cited
 
@@ -238,6 +406,9 @@ Bischof R., D. Turek, C. Milleret, T. Ergon, P. Dupont, S. Dey, W. Zhang
 and P. de Valpine. 2021. nimbleSCR: Spatial Capture-Recapture (SCR)
 Methods Using ‘nimble’. R package version 0.1.3.
 <https://CRAN.R-project.org/package=nimbleSCR>.
+
+Chandler, R. B. 2018. Speeding up data augmentation in BUGS.
+<https://groups.google.com/forum/#!topic/hmecology/o6cWDqHHgOE>.
 
 de Valpine P, C. Paciorek, D. Turek, N. Michaud, C. Anderson-Bergman, F.
 Obermeyer, C. C. Wehrhahn, A. Rodrìguez, L. D. Temple, and S. Paganin.
