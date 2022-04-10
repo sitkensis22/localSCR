@@ -2067,8 +2067,8 @@ run_classic <- function(model, data, constants, inits, params,
 #' @param d a list of MCMC samples from each chain returned from \code{\link{run_classic}}.
 #' @param trace a logical value indicating whether or not traces of MCMC samples should be plotted. Default is \code{FALSE}.
 #' @param plot_all a logical value indicating whether or not all parameters should be included in plots. This assumes that some parameters
-#' are excluded in the summary table (i.e., \code{exclude.params != NULL}). Default is \code{FALSE}.
-#' @param exclude.params either \code{NULL} or a scalar or vector containing parameter(s) to exclude from summary. Note that high dimensional parameters (e.g., \code{s[1, 1, 1]}) can be excluded by calling \code{exclude.params = "s"}. Default is \code{NULL}.
+#' are excluded in the summary table (i.e., \code{exclude_params != NULL}). Default is \code{FALSE}.
+#' @param exclude_params either \code{NULL} or a scalar or vector containing parameter(s) to exclude from summary. Note that high dimensional parameters (e.g., \code{s[1, 1, 1]}) can be excluded by calling \code{exclude_params = "s"}. Default is \code{NULL}.
 #' @param digits an integer value indicating how many digits the output should be rounded to.
 #' @return a dataframe of summary statistics for MCMC samples.
 #' @details This function summarizes Bayesian SCR models run using \code{nimble} including mean and quantiles of samples, as well as effective sample size and Rhat statistics. Note that \code{f0} is the proportion of samples that are greater than zero. Also, at least 2 chains must be run to use this function.
@@ -2141,13 +2141,13 @@ run_classic <- function(model, data, constants, inits, params,
 #' nimSummary(out, trace=TRUE, plot_all=TRUE)
 #'}
 #' @export
-nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude.params = NULL, digits=3){
-  if(is.null(exclude.params)==FALSE){
+nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude_params = NULL, digits=3){
+  if(is.null(exclude_params)==FALSE){
     tmp1 <- ifelse(is.na(as.numeric(stringr::str_extract(attributes(d[[1]])$dimnames[[2]],"[1-9]+"))),attributes(d[[1]])$dimnames[[2]],substr(attributes(d[[1]])$dimnames[[2]],1,as.numeric(stringr::str_locate(attributes(d[[1]])$dimnames[[2]], "\\[")[, 1])-1))
-    d.remove <- lapply(d, function(x) which(tmp1 %in% exclude.params))
+    d.remove <- lapply(d, function(x) which(tmp1 %in% exclude_params))
     d2 <- lapply(d, function(x) x[,-d.remove[[1]]])
   }else
-    if(is.null(exclude.params)){
+    if(is.null(exclude_params)){
       if(dim(d[[1]])[2]>100){
        param_length_check <- readline(cat(crayon::red(paste("Do you really want to build a summary table for",ncol(d3),"parameters? (1 = Yes or 0 = No); note that this will take forever! "))))
        if(param_length_check=="0"){stop("Exiting function...",call. = FALSE)}
@@ -2307,7 +2307,7 @@ nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude.params = NULL, di
 #' toc()
 #' 
 #' # summarize output (exclude lengthy parameters "s" and "z")
-#' nimSummary(out, exclude.params = c("s","z"), trace = TRUE)
+#' nimSummary(out, exclude_params = c("s","z"), trace = TRUE)
 #' 
 #' library(tictoc)       
 #' tic() # track time
