@@ -44,8 +44,15 @@ You can install the development version of ‘localSCR’ like so:
 ``` r
 library(remotes)
 install_github("sitkensis22/localSCR")
-#> Skipping install of 'localSCR' from a github remote, the SHA1 (d6adb1e2) has not changed since last install.
-#>   Use `force = TRUE` to force installation
+#> Downloading GitHub repo sitkensis22/localSCR@HEAD
+#> 
+#> * checking for file 'C:\Users\dreacker\AppData\Local\Temp\Rtmp0skmFQ\remotes50c8320e24d4\sitkensis22-localSCR-cc98a09/DESCRIPTION' ... OK
+#> * preparing 'localSCR':
+#> * checking DESCRIPTION meta-information ... OK
+#> * checking for LF line-endings in source and make files and shell scripts
+#> * checking for empty or unneeded directories
+#> * building 'localSCR_0.1.0.tar.gz'
+#> 
 ```
 
 Be sure to see important information about using ‘nimble’ on your
@@ -99,7 +106,7 @@ str(data3d)
 #> List of 3
 #>  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...
 #>  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...
-#>  $ s  : num [1:200, 1:2] 712.7 -214.8 -1028.1 912.4 43.5 ...
+#>  $ s  : num [1:200, 1:2] 708.9 -217 -1028.8 908.2 40.9 ...
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : NULL
 #>   .. ..$ : chr [1:2] "sx" "sy"
@@ -212,7 +219,7 @@ tic() # track time elapsed
 out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
 toc()
-#> 127.69 sec elapsed
+#> 127.43 sec elapsed
 
 # summarize output
 samples = do.call(rbind, out)
@@ -362,7 +369,7 @@ out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, 
 parallel=TRUE, RNGseed = 500)
 toc()
-#> 131.48 sec elapsed
+#> 131.51 sec elapsed
 
 # summary table of MCMC output (exclude "s" and "z" parameters)
 nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)
@@ -398,7 +405,7 @@ plot(r[[2]], col=viridis(100),main=expression("Realized density (activity center
 ylab="Northing",xlab="Easting")
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="90%" height="90%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
 
 ## Literature Cited
 
