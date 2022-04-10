@@ -44,7 +44,7 @@ You can install the development version of ‘localSCR’ like so:
 ``` r
 library(remotes)
 install_github("sitkensis22/localSCR")
-#> Skipping install of 'localSCR' from a github remote, the SHA1 (6d097125) has not changed since last install.
+#> Skipping install of 'localSCR' from a github remote, the SHA1 (d6adb1e2) has not changed since last install.
 #>   Use `force = TRUE` to force installation
 ```
 
@@ -99,7 +99,7 @@ str(data3d)
 #> List of 3
 #>  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...
 #>  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...
-#>  $ s  : num [1:200, 1:2] 717.6 -212.7 -1028.3 917.8 46.4 ...
+#>  $ s  : num [1:200, 1:2] 712.7 -214.8 -1028.1 912.4 43.5 ...
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : NULL
 #>   .. ..$ : chr [1:2] "sx" "sy"
@@ -212,7 +212,7 @@ tic() # track time elapsed
 out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
 toc()
-#> 140.31 sec elapsed
+#> 127.69 sec elapsed
 
 # summarize output
 samples = do.call(rbind, out)
@@ -226,7 +226,7 @@ abline(v=200, col="red") # add line for simulated abundance
 ``` r
 
 # summarize MCMC samples (exclude parameters and don't plot); density 
-nimSummary(out, exclude.params = c("s","z"), trace=FALSE)
+nimSummary(out, exclude_params = c("s","z"), trace=FALSE)
 #>          post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat
 #> D            0.176   0.021   0.140   0.174   0.222  1 528.137 1.054
 #> N          187.648  22.117 150.000 186.000 237.000  1 528.137 1.054
@@ -362,10 +362,10 @@ out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, 
 parallel=TRUE, RNGseed = 500)
 toc()
-#> 150 sec elapsed
+#> 131.48 sec elapsed
 
 # summary table of MCMC output (exclude "s" and "z" parameters)
-nimSummary(out, exclude.params = c("s","z"), trace = TRUE, plot_all = FALSE)
+nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
@@ -390,7 +390,7 @@ r = realized_density(samples=out, grid=GridX$grid, crs_=mycrs,
 library(viridis)
  
 # make simple raster plot
-par(mfrow=c(2,1))
+par(mfrow=c(1,2))
 library(raster)
 plot(r[[1]], col=viridis(100),main=expression("Realized density (activity centers/100 m"^2*")"),
 ylab="Northing",xlab="Easting")
@@ -398,7 +398,7 @@ plot(r[[2]], col=viridis(100),main=expression("Realized density (activity center
 ylab="Northing",xlab="Easting")
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="90%" height="90%" style="display: block; margin: auto;" />
 
 ## Literature Cited
 

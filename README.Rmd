@@ -191,7 +191,7 @@ hist(samples[,which(dimnames(out[[1]])[[2]]=="N")], xlab = "Abundance", xlim = c
 abline(v=200, col="red") # add line for simulated abundance
 
 # summarize MCMC samples (exclude parameters and don't plot); density 
-nimSummary(out, exclude.params = c("s","z"), trace=FALSE)
+nimSummary(out, exclude_params = c("s","z"), trace=FALSE)
 
 # make realized density plot 
 r = realized_density(samples = out, grid = Grid$grid, crs_ = mycrs, site = NULL, hab_mask = hab_mask)       
@@ -319,13 +319,13 @@ parallel=TRUE, RNGseed = 500)
 toc()
 
 # summary table of MCMC output (exclude "s" and "z" parameters)
-nimSummary(out, exclude.params = c("s","z"), trace = TRUE, plot_all = FALSE)
+nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)
 
 ```
 
 
 
-```{r, fig.align = "center", fig.width = 6, fig.height=12}
+```{r, fig.align = "center", fig.width = 12, fig.height=6, out.width = '90%', out.height = '90%'}
 
 # generate realized density surface
 r = realized_density(samples=out, grid=GridX$grid, crs_=mycrs,
@@ -335,7 +335,7 @@ r = realized_density(samples=out, grid=GridX$grid, crs_=mycrs,
 library(viridis)
  
 # make simple raster plot
-par(mfrow=c(2,1))
+par(mfrow=c(1,2))
 library(raster)
 plot(r[[1]], col=viridis(100),main=expression("Realized density (activity centers/100 m"^2*")"),
 ylab="Northing",xlab="Easting")
