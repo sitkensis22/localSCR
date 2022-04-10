@@ -1084,6 +1084,7 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
             p0[g] ~ dunif(0,1) # baseline encounter probability
            } # g sites
             sigma ~ dunif(0, sigma_upper) # scaling parameter
+            sigma.pixel <- sigma / pixelWidth # scaled for habitat mask
             psi ~ dunif(0, 1) # inclusion prob
             for(i in 1:M){
               z[i]~dbern(psim[i])
@@ -1093,7 +1094,7 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
               pOK[i] <- hab_mask[(trunc(s[i,2])+1),(trunc(s[i,1])+1),site[i]] # habitat check
               OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
               dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
-              p[i,1:J] <- p0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma^2))
+              p[i,1:J] <- p0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))
             } # i individuals
             # use zeros trick for individuals to speed up the computation
             for(i in 1:n0){
@@ -1114,6 +1115,7 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
               }
               sigma ~ dunif(0, sigma_upper) # scaling parameter
+              sigma.pixel <- sigma / pixelWidth # scaled for habitat mask
               psi ~ dunif(0, 1) # inclusion prob
               for(i in 1:M){
                 z[i]~dbern(psim[i])
@@ -1123,7 +1125,7 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                 pOK[i] <- hab_mask[(trunc(s[i,2])+1),(trunc(s[i,1])+1),site[i]] # habitat check
                 OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
                 dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
-                lam[i,1:J] <- lam0[site[i]]*K*exp(-dist[i,1:J]^2/(2*sigma^2))
+                lam[i,1:J] <- lam0[site[i]]*K*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))
               } # i individuals
               # use zeros trick for individuals to speed up the computation
               for(i in 1:n0){
@@ -1146,6 +1148,8 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                 psi_sex ~ dunif(0,1) # probability sex = 1
                 sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
                 sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+                sigma.pixel[1] <- sigma[1] / pixelWidth # scaled for habitat mask 
+                sigma.pixel[2] <- sigma[2] / pixelWidth # scaled for habitat mask              
                 psi ~ dunif(0, 1) # inclusion prob
                 for(i in 1:M){
                   sex[i] ~ dbern(psi_sex)
@@ -1157,7 +1161,7 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                   pOK[i] <- hab_mask[(trunc(s[i,2])+1),(trunc(s[i,1])+1),site[i]] # habitat check
                   OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
                   dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
-                  p[i,1:J] <- p0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
+                  p[i,1:J] <- p0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma.pixel[sx[i]]^2))
                 } # i individuals
                 # use zeros trick for individuals to speed up the computation
                 for(i in 1:n0){
@@ -1180,6 +1184,8 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                   psi_sex ~ dunif(0,1) # probability sex = 1
                   sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
                   sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+                  sigma.pixel[1] <- sigma[1] / pixelWidth # scaled for habitat mask 
+                  sigma.pixel[2] <- sigma[2] / pixelWidth # scaled for habitat mask   
                   psi ~ dunif(0, 1) # inclusion prob
                   for(i in 1:M){
                     sex[i] ~ dbern(psi_sex)
@@ -1191,7 +1197,7 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                     pOK[i] <- hab_mask[(trunc(s[i,2])+1),(trunc(s[i,1])+1),site[i]] # habitat check
                     OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
                     dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
-                    lam[i,1:J,k] <- lam0[site[i]]*K*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
+                    lam[i,1:J,k] <- lam0[site[i]]*K*exp(-dist[i,1:J]^2/(2*sigma.pixel[sx[i]]^2))
                   } # i marked individuals
                   # use zeros trick for marked individuals to speed up the computation
                    for(i in 1:n0){
