@@ -324,7 +324,7 @@ nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)
 
 
 
-```{r, fig.align = "center", fig.width = 12, fig.height = 6, out.width = '100%'}
+```{r, fig.align = "center", fig.width = 12, fig.height = 7, out.width = '100%'}
 
 # generate realized density surface
 r = realized_density(samples=out, grid=GridX$grid, crs_=mycrs,
