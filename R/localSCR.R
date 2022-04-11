@@ -288,7 +288,7 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter, en
 #' \code{"binomial"}.
 #' @param sex_sigma a logical value indicating whether the scaling parameter ('sigma') is sex-specific
 #' @param hab_mask a logical value indicating whether a habitat mask will be used. Default is \code{FALSE}.
-#' @param trapsClusters a logical value indicating if traps are clustered in arrays across the sampling area.
+#' @param trapsClustered a logical value indicating if traps are clustered in arrays across the sampling area.
 #' @return a \code{nimbleCode} object from the \code{nimble} package.
 #' @details This function provides templates that could be copied and easily modified to include further model
 #'  complexity such as covariates explaining detection probability. The models include different encounter probability distributions, sex-specific scaling parameters, and habitat masking.

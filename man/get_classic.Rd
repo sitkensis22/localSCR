@@ -22,7 +22,7 @@ get_classic(
 
 \item{hab_mask}{a logical value indicating whether a habitat mask will be used. Default is \code{FALSE}.}
 
-\item{trapsClusters}{a logical value indicating if traps are clustered in arrays across the sampling area.}
+\item{trapsClustered}{a logical value indicating if traps are clustered in arrays across the sampling area.}
 }
 \value{
 a \code{nimbleCode} object from the \code{nimble} package.
