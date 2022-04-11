@@ -15,7 +15,8 @@ run_classic(
   thin = 1,
   nchains = 1,
   parallel = FALSE,
-  RNGseed
+  RNGseed = NULL,
+  s_alias = "s"
 )
 }
 \arguments{
@@ -39,7 +40,10 @@ run_classic(
 
 \item{parallel}{a logical value indicating whether MCMC chains shoud be run in parallel processing. Default is \code{FALSE}.}
 
-\item{RNGseed}{an integer value specifying the random number generating seed using in parallel processing. This ensures that the MCMC samples will be the same during each run using the same data, etc.}
+\item{RNGseed}{an integer value specifying the random number generating seed using in parallel processing. 
+This ensures that the MCMC samples will be the same during each run using the same data, etc. Default is \code{NULL}.}
+
+\item{s_alias}{a character value used to identify the latent activity center coordinates used in the model. Default is \code{"s"}}
 }
 \value{
 a list of MCMC samples for each parameter traced with length equal to the number of chains run.

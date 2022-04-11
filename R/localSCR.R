@@ -1909,7 +1909,9 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
 #' @param thin an integer value of the amount of thinning of the chain. For example, \code{thin=2} would retain every other MCMC sample.
 #' @param nchains an integer value for the number of MCMC chains to run
 #' @param parallel a logical value indicating whether MCMC chains shoud be run in parallel processing. Default is \code{FALSE}.
-#' @param RNGseed an integer value specifying the random number generating seed using in parallel processing. This ensures that the MCMC samples will be the same during each run using the same data, etc.
+#' @param RNGseed an integer value specifying the random number generating seed using in parallel processing. 
+#' This ensures that the MCMC samples will be the same during each run using the same data, etc. Default is \code{NULL}.
+#' @param s_alias a character value used to identify the latent activity center coordinates used in the model. Default is \code{"s"}
 #' @return a list of MCMC samples for each parameter traced with length equal to the number of chains run.
 #' @details This function provides a wrapper to easily run Bayesian SCR models using \code{nimble}.
 #' @importFrom tictoc tic toc
@@ -2003,7 +2005,8 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
 #'}
 #' @export
 run_classic <- function(model, data, constants, inits, params,
-                        niter = 1000, nburnin=100, thin=1, nchains=1, parallel=FALSE, RNGseed){
+                        niter = 1000, nburnin=100, thin=1, nchains=1, 
+                        parallel=FALSE, RNGseed=NULL,s_alias="s"){
   # for parallel processing
   if(parallel == FALSE){
     SCRmodelR <- nimble::nimbleModel(code=model,data=data,constants=constants,inits=inits,check=FALSE,calculate=TRUE)
@@ -2014,7 +2017,7 @@ run_classic <- function(model, data, constants, inits, params,
     # block updating for marked individual activity centers
     mcmcspec$removeSamplers("s", print = FALSE)
     for(i in 1:constants$M){
-      snew = paste("s[",i,","," 1:2","]",sep="")
+      snew = paste(s_alias,"[",i,","," 1:2","]",sep="")
       mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
     }
     scrMCMC <- nimble::buildMCMC(mcmcspec)
