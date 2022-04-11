@@ -13,16 +13,20 @@ get_classic(
 )
 }
 \arguments{
-\item{dim_y}{an integer of either 2 (the default) or that defines what dimensional format the encounter history data are in.}
+\item{dim_y}{an integer of either 2 (the default) or that defines what 
+dimensional format the encounter history data are in.}
 
 \item{enc_dist}{either \code{"binomial"} or \code{"poisson"}. Default is
 \code{"binomial"}.}
 
-\item{sex_sigma}{a logical value indicating whether the scaling parameter ('sigma') is sex-specific}
+\item{sex_sigma}{a logical value indicating whether the scaling parameter 
+('sigma') is sex-specific}
 
-\item{hab_mask}{a logical value indicating whether a habitat mask will be used. Default is \code{FALSE}.}
+\item{hab_mask}{a logical value indicating whether a habitat mask will be 
+used. Default is \code{FALSE}.}
 
-\item{trapsClustered}{a logical value indicating if traps are clustered in arrays across the sampling area.}
+\item{trapsClustered}{a logical value indicating if traps are clustered in 
+arrays across the sampling area.}
 }
 \value{
 a \code{nimbleCode} object from the \code{nimble} package.
@@ -31,12 +35,16 @@ a \code{nimbleCode} object from the \code{nimble} package.
 Creates a \code{nimbleCode} object from the \code{nimble} package.
 }
 \details{
-This function provides templates that could be copied and easily modified to include further model
- complexity such as covariates explaining detection probability. The models include different encounter probability distributions, sex-specific scaling parameters, and habitat masking.
+This function provides templates that could be copied and easily 
+modified to include further model complexity such as covariates explaining 
+detection probability. The models include different encounter probability 
+distributions, sex-specific scaling parameters, and habitat masking.
 }
 \examples{
-# get model for 2D encounter data, binomial encounter distribution, non-sex-specific scaling parameter, and no habitat mask
-scr_model = get_classic(dim_y = 2,enc_dist = "binomial",sex_sigma = FALSE,hab_mask = FALSE)
+# get model for 2D encounter data, binomial encounter distribution, 
+# non-sex-specific scaling parameter, and no habitat mask
+scr_model = get_classic(dim_y = 2,enc_dist = "binomial",sex_sigma = FALSE,
+hab_mask = FALSE)
 
 # inspect model
 scr_model

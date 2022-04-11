@@ -7,10 +7,12 @@
 initialize_classic(y, M, X, buff, site, hab_mask)
 }
 \arguments{
-\item{y}{either a matrix or array of encounter history data, possiblity from \code{sim_classic()}.}
+\item{y}{either a matrix or array of encounter history data, possiblity 
+from \code{sim_classic()}.}
 
-\item{M}{an integer of the total augmented population size (i.e., detected and augmented individuals). 
-UTMs. An array is used when traps are clustered over a survey area.}
+\item{M}{an integer of the total augmented population size (i.e., detected 
+and augmented individuals). UTMs. An array is used when traps are clustered 
+over a survey area.}
 
 \item{X}{either a matrix or array representing the coordinates of traps in
 UTMs. An array is used when traps are clustered over a survey area.}
@@ -18,26 +20,40 @@ UTMs. An array is used when traps are clustered over a survey area.}
 \item{buff}{the distance (m or km) that the traps should be
 buffered by as an integer. This is typically 3 times the sigma parameter.}
 
-\item{site}{Either \code{NULL} (if a 2D trap array is used) or a vector of integers denoting which trap array an individual (either detected or augmented) belongs to. Note that \code{site} is provided from \code{\link{sim_classic}} when a 3D trap array is used. However, this \code{site} variable must be correctly augmented based on the total augmented population size (i.e., \code{M}).}
+\item{site}{Either \code{NULL} (if a 2D trap array is used) or a vector of 
+integers denoting which trap array an individual (either detected or 
+augmented) belongs to. Note that \code{site} is provided from 
+\code{\link{sim_classic}} when a 3D trap array is used. However, this
+ \code{site} variable must be correctly augmented based on the total 
+ augmented population size (i.e., \code{M}).}
 
-\item{hab_mask}{either \code{FALSE} (the default) or a matrix or arrary output from \code{\link{mask_polygon}}
-or \code{\link{mask_raster}} functions.}
+\item{hab_mask}{either \code{FALSE} (the default) or a matrix or array output
+from \code{\link{mask_polygon}} or \code{\link{mask_raster}} functions.}
 }
 \value{
-a matrix of initial activity center coordinates with \code{M} rows and 2 columns.
+a matrix of initial activity center coordinates with \code{M} rows 
+and 2 columns.
 }
 \description{
-Generate a matrix of intial starting locations, possibly accounting for habitat mask.
+Generate a matrix of intial starting locations, possibly accounting 
+for habitat mask.
 }
 \details{
-This function generates initial activity center locations based on encounter histories, augmented population size, state-space buffer, and potentially a habitat mask. Note that mean trap detection locations are used for detected individuals while intial values are randomly drawn for augemented individuals. Also, a habitat check will be conducted for all locations when a habitat mask is included.
+This function generates initial activity center locations based 
+on encounter histories, augmented population size, state-space buffer, 
+and potentially a habitat mask. Note that mean trap detection locations 
+are used for detected individuals while intial values are randomly drawn 
+for augemented individuals. Also, a habitat check will be conducted for 
+all locations when a habitat mask is included.
 }
 \examples{
 # simulate a single trap array with random positional noise
 x <- seq(-800, 800, length.out = 5)
 y <- seq(-800, 800, length.out = 5)
 traps <- as.matrix(expand.grid(x = x, y = y))
-traps <- traps + runif(prod(dim(traps)),-20,20) # add some random noise to locations
+
+# add some random noise to locations
+traps <- traps + runif(prod(dim(traps)),-20,20) 
 
 mysigma = 300 # simulate sigma of 300 m
 mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
@@ -46,10 +62,14 @@ mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
 Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = 100)
 
 # simulate SCR data
-data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = mysigma, prop_sex = 1, N = 200, K = 4, base_encounter = 0.25, enc_dist = "binomial", hab_mask = FALSE, setSeed = 50)
+data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, 
+sigma_ = mysigma, prop_sex = 1, N = 200, K = 4, base_encounter = 0.25, 
+enc_dist = "binomial", hab_mask = FALSE, setSeed = 50)
 
-# generate initial activity center coordinates for 2D trap array without habitat mask
-s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, buff = 3*mysigma, hab_mask = FALSE)
+# generate initial activity center coordinates for 2D trap array without 
+# habitat mask
+s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, buff = 3*mysigma, 
+hab_mask = FALSE)
 
 # make simple plot
 par(mfrow=c(1,1))

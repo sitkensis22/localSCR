@@ -22,7 +22,8 @@ sim_classic(
 \item{X}{either a matrix or array object representing the coordinates of traps in
 UTMs. An array is used when traps are clustered over a survey area.}
 
-\item{ext}{an \code{Extent} object from the \code{raster} package. This is returned from \code{\link{grid_classic}}.}
+\item{ext}{an \code{Extent} object from the \code{raster} package. This is 
+returned from \code{\link{grid_classic}}.}
 
 \item{crs_}{the UTM coordinate reference system (EPSG code) used for your
 location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).}
@@ -35,7 +36,8 @@ in meters or kilometers as an integer.}
 \item{prop_sex}{the portion of females or males as a numeric value. This
 will depend upon the indicator coding scheme used (e.g., females = 1 and
 males = 0; then proportion of females in the simulation). Must be a numeric
-value between 0 and 1. Note that 0 or 1 can be used if a non-sex-specific sigma is desired.}
+value between 0 and 1. Note that 0 or 1 can be used if a non-sex-specific 
+sigma is desired.}
 
 \item{K}{the number of sampling occasions desired as an integer.}
 
@@ -63,16 +65,19 @@ Returns a list of simulated data including the encounter
 history, binary sex indicator, activity centers, and site identifier.
 }
 \details{
-This function supports spatial capture-recapture (SCR) analysis by allowing for
-easy simulation of data components used by nimble in Baysian SCR models. Note that the
-output for the encounter histories \code{y} will be sorted by detected and not detected individuals.
+This function supports spatial capture-recapture (SCR) analysis by 
+allowing for easy simulation of data components used by nimble in Baysian 
+SCR models. Note that the output for the encounter histories \code{y} will be
+sorted by detected and not detected individuals.
 }
 \examples{
 # simulate a single trap array with random positional noise
 x <- seq(-800, 800, length.out = 5)
 y <- seq(-800, 800, length.out = 5)
 traps <- as.matrix(expand.grid(x = x, y = y))
-traps <- traps + runif(prod(dim(traps)),-20,20) # add some random noise to locations
+
+# add some random noise to locations
+traps <- traps + runif(prod(dim(traps)),-20,20) 
 
 mysigma = 300 # simulate sigma of 300 m
 mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
@@ -81,7 +86,9 @@ mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
 Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = 100)
 
 # simulate SCR data
-data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = c(300), prop_sex = 1, N = 200, K = 4, base_encounter = 0.25, enc_dist = "binomial", hab_mask = FALSE, setSeed = 50)
+data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = c(300), 
+prop_sex = 1, N = 200, K = 4, base_encounter = 0.25, enc_dist = "binomial", 
+hab_mask = FALSE, setSeed = 50)
 
 # make simple plot
 par(mfrow=c(1,1))

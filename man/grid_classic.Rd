@@ -21,18 +21,20 @@ buffered by as an integer. This is typically 3 times the sigma parameter.}
 }
 \value{
 a list of a matrix or array of grid coordinates \code{grid} and an
-extent object \code{ext}. Note that a matrix object is returned if the coordinates
-of the traps are a matrix (i.e., 2D), otherwise an array object is returned when trap
-coordinates are in a 3D array.
+extent object \code{ext}. Note that a matrix object is returned if the 
+coordinates of the traps are a matrix (i.e., 2D), otherwise an array object
+is returned when trap coordinates are in a 3D array.
 }
 \description{
 Returns a list of a matrix or array object of grid
-coordinates and an Extent object from the \code{raster} package as a state-space.
+coordinates and an Extent object from the \code{raster} package as a 
+state-space.
 }
 \details{
 This function supports spatial capture-recapture analysis by
-creating two outputs that are used to define the state-space. If a habitat mask is
-not used, then only the \code{Extent} object from the \code{raster} package is needed under a uniform state-space.
+creating two outputs that are used to define the state-space. If a habitat 
+mask is not used, then only the \code{Extent} object from the \code{raster}
+package is needed under a uniform state-space.
 The matrix or array object can be used to develop a habitat mask in a uniform
 state-space or as a discretized state-space.
 }
@@ -41,8 +43,8 @@ state-space or as a discretized state-space.
 x <- seq(-800, 800, length.out = 5)
 y <- seq(-800, 800, length.out = 5)
 traps <- as.matrix(expand.grid(x = x, y = y))
-traps <- traps + runif(prod(dim(traps)),-20,20) # add some random noise to locations
-
+# add some random noise to locations
+traps <- traps + runif(prod(dim(traps)),-20,20) 
 mysigma = 300 # simulate sigma of 300 m
 mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
 
