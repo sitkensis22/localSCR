@@ -924,7 +924,7 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
                     s[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
                     s[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
                     dist[i,1:J] <- sqrt((s[i,1]-X[1:J,1,site[i]])^2 + (s[i,2]-X[1:J,2,site[i]])^2)
-                    lam[i,1:J,k] <- lam0[sites[i]]*K*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
+                    lam[i,1:J,k] <- lam0[site[i]]*K*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
                   } # i marked individuals
                   # use zeros trick for marked individuals to speed up the computation
                    for(i in 1:n0){
