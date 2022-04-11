@@ -9,6 +9,7 @@ Depends:
     R (>= 4.0)
 Imports:
     coda,
+    crayon,
     methods,
     nimble,
     raster,
