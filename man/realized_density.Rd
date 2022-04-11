@@ -126,6 +126,7 @@ toc()
 
 # load virdiis color pallete library      
 library(viridis)
+library(raster)
 
 # make simple raster plot
 plot(r, col=viridis(100),main=expression("Realized density (activity centers
