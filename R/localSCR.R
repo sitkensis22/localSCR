@@ -2627,8 +2627,8 @@ if(is.null(exclude_params)){
 #' library(raster)
 #'
 #' # make simple raster plot
-#' plot(r, col=viridis(100),main=expression("Realized density (activity centers
-#' /100 m"^2*")"))
+#' label = expression("Realized density (activity centers/100 m"^2*")")
+#' plot(r, col=viridis(100),main=label)
 #'}
 #'@export
 realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s", 

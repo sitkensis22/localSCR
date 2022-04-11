@@ -129,8 +129,8 @@ library(viridis)
 library(raster)
 
 # make simple raster plot
-plot(r, col=viridis(100),main=expression("Realized density (activity centers
-/100 m"^2*")"))
+label = expression("Realized density (activity centers/100 m"^2*")")
+plot(r, col=viridis(100),main=label)
 }
 }
 \author{
