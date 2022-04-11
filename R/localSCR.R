@@ -22,7 +22,7 @@
 #' state-space or as a discretized state-space.
 #' @author Daniel Eacker
 #' @seealso \code{\link[raster:extent]{raster::extent}}
-#' @importFrom raster extent coordinates raster rasterFromXYZ ncell
+#' @importFrom raster extent coordinates raster rasterFromXYZ ncell proj4string
 #' @importFrom sf st_crs 
 #' @examples
 #' # simulate a single trap array with random positional noise
