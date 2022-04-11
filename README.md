@@ -44,8 +44,15 @@ You can install the development version of ‘localSCR’ like so:
 ``` r
 library(remotes)
 install_github("sitkensis22/localSCR")
-#> Skipping install of 'localSCR' from a github remote, the SHA1 (32012673) has not changed since last install.
-#>   Use `force = TRUE` to force installation
+#> Downloading GitHub repo sitkensis22/localSCR@HEAD
+#> 
+#> * checking for file 'C:\Users\dreacker\AppData\Local\Temp\RtmpKs8UeC\remotes3d405b4c3cea\sitkensis22-localSCR-f61091a/DESCRIPTION' ... OK
+#> * preparing 'localSCR':
+#> * checking DESCRIPTION meta-information ... OK
+#> * checking for LF line-endings in source and make files and shell scripts
+#> * checking for empty or unneeded directories
+#> * building 'localSCR_0.1.0.tar.gz'
+#> 
 ```
 
 Be sure to see important information about using ‘nimble’ on your
@@ -100,7 +107,7 @@ str(data3d)
 #> List of 3
 #>  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...
 #>  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...
-#>  $ s  : num [1:200, 1:2] 709.8 -219.3 -1034 909.8 39.5 ...
+#>  $ s  : num [1:200, 1:2] 718.5 -210 -1024 918.3 48.6 ...
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : NULL
 #>   .. ..$ : chr [1:2] "sx" "sy"
@@ -212,7 +219,7 @@ tic() # track time elapsed
 out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
 toc()
-#> 128.75 sec elapsed
+#> 129.03 sec elapsed
 
 # summarize output
 samples = do.call(rbind, out)
@@ -362,7 +369,7 @@ out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, 
 parallel=TRUE, RNGseed = 500)
 toc()
-#> 131.22 sec elapsed
+#> 135.43 sec elapsed
 
 # summary table of MCMC output (exclude "s" and "z" parameters)
 nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)
@@ -419,7 +426,7 @@ p2<-gplot(r[[2]]) + geom_raster(aes(fill = value)) +
           xlab("") + ylab("") + theme_classic() + 
           scale_x_continuous(expand=c(0, 0)) + 
           scale_y_continuous(expand=c(0, 0)) + 
-          theme(text = element_text(size=18))
+          theme(axis.text = element_text(size=18))
 
 # arrange the two plots in a single row
 prow <- plot_grid(p1 + theme(legend.position="none"),
