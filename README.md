@@ -44,15 +44,8 @@ You can install the development version of ‘localSCR’ like so:
 ``` r
 library(remotes)
 install_github("sitkensis22/localSCR")
-#> Downloading GitHub repo sitkensis22/localSCR@HEAD
-#> 
-#> * checking for file 'C:\Users\dreacker\AppData\Local\Temp\Rtmp0skmFQ\remotes50c8320e24d4\sitkensis22-localSCR-cc98a09/DESCRIPTION' ... OK
-#> * preparing 'localSCR':
-#> * checking DESCRIPTION meta-information ... OK
-#> * checking for LF line-endings in source and make files and shell scripts
-#> * checking for empty or unneeded directories
-#> * building 'localSCR_0.1.0.tar.gz'
-#> 
+#> Skipping install of 'localSCR' from a github remote, the SHA1 (72637fa0) has not changed since last install.
+#>   Use `force = TRUE` to force installation
 ```
 
 Be sure to see important information about using ‘nimble’ on your
@@ -60,8 +53,9 @@ computer (including installing rtools): <https://r-nimble.org/download>
 
 ## Example
 
-This is a basic example which shows you a workflow for a uniform
-state-space with a habitat mask:
+This example includes constructing the state-space, simulating SECR (or
+SCR) data, and the entire workflows under a uniform state-space
+assumption with a habitat mask for 2- and 3-dimensional trap arrays:
 
 ``` r
 
@@ -87,8 +81,8 @@ Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = 100)
 
 # make plot of grid and trap locations
 par(mfrow=c(1,1))
-plot(Grid$grid, pch=19)
-points(traps, col="blue",pch=20)
+plot(Grid$grid, pch=20)
+points(traps, col="blue",pch=19)
 ```
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
@@ -106,11 +100,10 @@ str(data3d)
 #> List of 3
 #>  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...
 #>  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...
-#>  $ s  : num [1:200, 1:2] 708.9 -217 -1028.8 908.2 40.9 ...
+#>  $ s  : num [1:200, 1:2] 716.9 -211.4 -1025.2 916.7 47.2 ...
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : NULL
 #>   .. ..$ : chr [1:2] "sx" "sy"
-
 
 # make simple plot
 par(mfrow=c(1,1))
@@ -161,7 +154,7 @@ s.st3d = initialize_classic(y=data3d$y, M=M, X=traps, buff = 3*max(mysigma), hab
 # make simple plot
 par(mfrow=c(1,1))
 plot(Grid$grid, pch=20, xlim=c(-2000,2000),ylim=c(-2000,2000))
-points(traps, col="blue",pch=20)
+points(traps, col="blue",pch=19)
 plot(poly, add=TRUE)
 points(s.st3d,col="red",pch=20) # all initalized activity centers
 ```
@@ -219,7 +212,7 @@ tic() # track time elapsed
 out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
 toc()
-#> 127.43 sec elapsed
+#> 155.18 sec elapsed
 
 # summarize output
 samples = do.call(rbind, out)
@@ -369,7 +362,7 @@ out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, 
 parallel=TRUE, RNGseed = 500)
 toc()
-#> 131.51 sec elapsed
+#> 137.73 sec elapsed
 
 # summary table of MCMC output (exclude "s" and "z" parameters)
 nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)
@@ -393,19 +386,69 @@ nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)
 r = realized_density(samples=out, grid=GridX$grid, crs_=mycrs,
                       site=constants$site, hab_mask=hab_mask)
 
-# load viridis color palette library      
-library(viridis)
- 
-# make simple raster plot
-par(mfrow=c(1,2))
-library(raster)
-plot(r[[1]], col=viridis(100),main=expression("Realized density (activity centers/100 m"^2*")"),
-ylab="Northing",xlab="Easting")
-plot(r[[2]], col=viridis(100),main=expression("Realized density (activity centers/100 m"^2*")"),
-ylab="Northing",xlab="Easting")
+# load needed packages for multiplot
+library(viridis) 
+library(grid)
+library(cowplot)
+library(ggpubr) 
+#> Loading required package: ggplot2
+#> 
+#> Attaching package: 'ggpubr'
+#> The following object is masked from 'package:cowplot':
+#> 
+#>     get_legend
+#> The following object is masked from 'package:raster':
+#> 
+#>     rotate
+library(rasterVis)
+#> Loading required package: lattice
+
+# plot raster from site 1
+p1<-gplot(r[[1]]) + geom_raster(aes(fill = value)) +
+          scale_fill_viridis(na.value = NA, name="Density",
+          limits=c(0,0.3),breaks=seq(0,0.3,by=0.1)) +
+          xlab("") + ylab("") + theme_classic() +
+          scale_x_continuous(expand=c(0, 0)) + 
+          scale_y_continuous(expand=c(0, 0)) + 
+           theme(axis.text = element_text(size=18))
+
+# plot raster from site 2
+p2<-gplot(r[[2]]) + geom_raster(aes(fill = value)) +
+          scale_fill_viridis(na.value = NA, name="Density",
+          limits=c(0,0.3),breaks=seq(0,0.3,by=0.1)) +
+          xlab("") + ylab("") + theme_classic() + 
+          scale_x_continuous(expand=c(0, 0)) + 
+          scale_y_continuous(expand=c(0, 0)) + 
+          theme(text = element_text(size=18))
+
+# arrange the two plots in a single row
+prow <- plot_grid(p1 + theme(legend.position="none"),
+           p2 + theme(legend.position="none"),
+           align = 'vh',
+           labels = NULL,
+           hjust = -1,
+           nrow = 1
+           )
+#> Warning: Removed 13 rows containing missing values (geom_raster).
+#> Warning: Removed 54 rows containing missing values (geom_raster).
+
+# extract the legend from one of the plots
+legend_t <- get_legend(p1 + theme(legend.position = "top",legend.direction = "horizontal",legend.text = element_text(size=14),legend.title = element_text(size=16)))
+#> Warning: Removed 13 rows containing missing values (geom_raster).
+
+# add the legend above the row we made earlier. Give it 20% of the height
+# of one plot (via rel_heights).
+p <- plot_grid(legend_t, prow, ncol = 1, rel_heights = c(.2, 1))
+
+# add x and y axis labels
+p2 <-annotate_figure(p, bottom = textGrob("Easting", gp=gpar(fontsize=18),
+                                          vjust = -1, hjust = 0),
+                left = textGrob("Northing", rot=90, gp=gpar(fontsize=18),
+                                          vjust = 1, hjust = 0))
+p2
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" height="100%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" />
 
 ## Literature Cited
 
@@ -423,6 +466,10 @@ Obermeyer, C. C. Wehrhahn, A. Rodrìguez, L. D. Temple, and S. Paganin.
 Modeling*. doi: 10.5281/zenodo.1211190 (URL:
 <https://doi.org/10.5281/zenodo.1211190>), R package version 0.12.2,
 URL:<https://cran.r-project.org/package=nimble>.
+
+Furnas, B. J., R. H. Landers, S. Hill, S. S. Itoga, and B. N. Sacks.
+2018. Integrated modeling to estimate population size and composition of
+mule deer. Journal of Wildlife Management 82:1429–1441.
 
 Kellner, K. 2018. jagsUI: a wrapper around ‘rjags’ to streamline ‘JAGS’
 analyses. R package version 1.5.0.

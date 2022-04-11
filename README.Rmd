@@ -36,7 +36,7 @@ Be sure to see important information about using 'nimble' on your computer (incl
 
 ## Example
 
-This is a basic example which shows you a workflow for a uniform state-space with a habitat mask:
+This example includes constructing the state-space, simulating SECR (or SCR) data, and the entire workflows under a uniform state-space assumption with a habitat mask for 2- and 3-dimensional trap arrays:
 
 ```{r example}
 
@@ -63,8 +63,8 @@ Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = 100)
 
 # make plot of grid and trap locations
 par(mfrow=c(1,1))
-plot(Grid$grid, pch=19)
-points(traps, col="blue",pch=20)
+plot(Grid$grid, pch=20)
+points(traps, col="blue",pch=19)
 
 ```
 
@@ -79,7 +79,6 @@ N = 200, K = 4, base_encounter = 0.25, enc_dist = "binomial", hab_mask = FALSE, 
 
 # inspect simulated data
 str(data3d)
-
 
 # make simple plot
 par(mfrow=c(1,1))
@@ -130,7 +129,7 @@ s.st3d = initialize_classic(y=data3d$y, M=M, X=traps, buff = 3*max(mysigma), hab
 # make simple plot
 par(mfrow=c(1,1))
 plot(Grid$grid, pch=20, xlim=c(-2000,2000),ylim=c(-2000,2000))
-points(traps, col="blue",pch=20)
+points(traps, col="blue",pch=19)
 plot(poly, add=TRUE)
 points(s.st3d,col="red",pch=20) # all initalized activity centers
 
@@ -325,22 +324,60 @@ nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)
 
 
 
-```{r, fig.align = "center", fig.width = 12, fig.height=6, out.width = '100%', out.height = '100%'}
+```{r, fig.align = "center", fig.width = 12, fig.height = 6, out.width = '100%'}
 
 # generate realized density surface
 r = realized_density(samples=out, grid=GridX$grid, crs_=mycrs,
                       site=constants$site, hab_mask=hab_mask)
 
-# load viridis color palette library      
-library(viridis)
- 
-# make simple raster plot
-par(mfrow=c(1,2))
-library(raster)
-plot(r[[1]], col=viridis(100),main=expression("Realized density (activity centers/100 m"^2*")"),
-ylab="Northing",xlab="Easting")
-plot(r[[2]], col=viridis(100),main=expression("Realized density (activity centers/100 m"^2*")"),
-ylab="Northing",xlab="Easting")
+# load needed packages for multiplot
+library(viridis) 
+library(grid)
+library(cowplot)
+library(ggpubr) 
+library(rasterVis)
+
+# plot raster from site 1
+p1<-gplot(r[[1]]) + geom_raster(aes(fill = value)) +
+          scale_fill_viridis(na.value = NA, name="Density",
+          limits=c(0,0.3),breaks=seq(0,0.3,by=0.1)) +
+          xlab("") + ylab("") + theme_classic() +
+          scale_x_continuous(expand=c(0, 0)) + 
+          scale_y_continuous(expand=c(0, 0)) + 
+           theme(axis.text = element_text(size=18))
+
+# plot raster from site 2
+p2<-gplot(r[[2]]) + geom_raster(aes(fill = value)) +
+          scale_fill_viridis(na.value = NA, name="Density",
+          limits=c(0,0.3),breaks=seq(0,0.3,by=0.1)) +
+          xlab("") + ylab("") + theme_classic() + 
+          scale_x_continuous(expand=c(0, 0)) + 
+          scale_y_continuous(expand=c(0, 0)) + 
+          theme(text = element_text(size=18))
+
+# arrange the two plots in a single row
+prow <- plot_grid(p1 + theme(legend.position="none"),
+           p2 + theme(legend.position="none"),
+           align = 'vh',
+           labels = NULL,
+           hjust = -1,
+           nrow = 1
+           )
+
+# extract the legend from one of the plots
+legend_t <- get_legend(p1 + theme(legend.position = "top",legend.direction = "horizontal",legend.text = element_text(size=14),legend.title = element_text(size=16)))
+
+# add the legend above the row we made earlier. Give it 20% of the height
+# of one plot (via rel_heights).
+p <- plot_grid(legend_t, prow, ncol = 1, rel_heights = c(.2, 1))
+
+# add x and y axis labels
+p2 <-annotate_figure(p, bottom = textGrob("Easting", gp=gpar(fontsize=18),
+                                          vjust = -1, hjust = 0),
+                left = textGrob("Northing", rot=90, gp=gpar(fontsize=18),
+                                          vjust = 1, hjust = 0))
+p2
+
 
 ```
 
@@ -356,6 +393,8 @@ Chandler, R. B. 2018. Speeding up data augmentation in BUGS.
 de Valpine P, C. Paciorek, D. Turek, N. Michaud, C. Anderson-Bergman, F. Obermeyer, C. C. Wehrhahn, A. Rodrìguez, L. D. Temple, and S. Paganin. 2022. _NIMBLE: MCMC, Particle
 Filtering, and Programmable Hierarchical Modeling_. doi: 10.5281/zenodo.1211190 (URL:
 <https://doi.org/10.5281/zenodo.1211190>), R package version 0.12.2, URL:<https://cran.r-project.org/package=nimble>.
+
+Furnas, B. J., R. H. Landers, S. Hill, S. S. Itoga, and B. N. Sacks. 2018. Integrated modeling to estimate population size and composition of mule deer. Journal of Wildlife Management 82:1429–1441. 
 
 Kellner, K. 2018. jagsUI: a wrapper around ‘rjags’ to streamline
 ‘JAGS’ analyses. R package version 1.5.0. <https://CRAN.R-project.org/package=jagsUI>.
