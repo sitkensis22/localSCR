@@ -1806,7 +1806,8 @@ if(length(dim(X))==3){
 #' @return a matrix or array of 0's and 1's denoting unsuitable and suitable 
 #' habitat respectively.
 #' @details This function creates a habitat matrix or array depending upon 
-#' whether a 2D (former) or 3D (latter) trap array is used. This matrix can be directly included as data in Bayesian SCR models run using \code{nimble}.
+#' whether a 2D (former) or 3D (latter) trap array is used. This matrix can be 
+#' directly included as data in Bayesian SCR models run using \code{nimble}.
 #' @author Daniel Eacker
 #' @seealso \code{\link{mask_raster}}
 #' @examples
@@ -2639,7 +2640,8 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
      stop("State-space grid must be only 2 or 3 dimensions")
    } 
    if(length(dim(grid))==2){
-# process z indicator variable and sx and sy activity center coordinates as vectors for speed
+# process z indicator variable and sx and sy activity center coordinates as 
+     # vectors for speed
        z <- samples[,grep(paste0(z_alias,"\\["), colnames(samples))]
        z_vec <- as.vector(z)
        sx <- samples[,grep(paste0(s_alias,"\\["), 
