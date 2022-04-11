@@ -1963,7 +1963,7 @@ return(habitat_mask)
 #' whether a 2D (former) or 3D (latter) trap array is used. This matrix can be 
 #' directly included as data in Bayesian SCR models run using \code{nimble}.
 #' @author Daniel Eacker
-#' @importFrom sp CRS
+#' @importFrom sp CRS proj4string
 #' @importFrom sf st_intersects
 #' @importFrom raster proj4string extract
 #' @importFrom methods as
