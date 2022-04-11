@@ -46,7 +46,7 @@ library(remotes)
 install_github("sitkensis22/localSCR")
 #> Downloading GitHub repo sitkensis22/localSCR@HEAD
 #> 
-#> * checking for file 'C:\Users\dreacker\AppData\Local\Temp\Rtmp8SGp2n\remotes27ac21771a1f\sitkensis22-localSCR-c4c66e6/DESCRIPTION' ... OK
+#> * checking for file 'C:\Users\dreacker\AppData\Local\Temp\Rtmp6DJgE3\remotes2f5c297a539b\sitkensis22-localSCR-d67152e/DESCRIPTION' ... OK
 #> * preparing 'localSCR':
 #> * checking DESCRIPTION meta-information ... OK
 #> * checking for LF line-endings in source and make files and shell scripts
@@ -107,7 +107,7 @@ str(data3d)
 #> List of 3
 #>  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...
 #>  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...
-#>  $ s  : num [1:200, 1:2] 712.7 -217.5 -1033 912.8 41.6 ...
+#>  $ s  : num [1:200, 1:2] 704.3 -222.6 -1035.2 903.8 35.6 ...
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : NULL
 #>   .. ..$ : chr [1:2] "sx" "sy"
@@ -219,7 +219,7 @@ tic() # track time elapsed
 out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
 toc()
-#> 136.19 sec elapsed
+#> 136.03 sec elapsed
 
 # summarize output
 samples = do.call(rbind, out)
@@ -232,7 +232,7 @@ abline(v=200, col="red") # add line for simulated abundance
 
 ``` r
 
-# summarize MCMC samples (exclude parameters and don't plot); density 
+# summarize MCMC samples (exclude parameters and don't plot)
 nimSummary(out, exclude_params = c("s","z"), trace=FALSE)
 #>          post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat
 #> D            0.176   0.021   0.140   0.174   0.222  1 528.137 1.054
@@ -369,7 +369,7 @@ out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, 
 parallel=TRUE, RNGseed = 500)
 toc()
-#> 140.32 sec elapsed
+#> 138.14 sec elapsed
 
 # summary table of MCMC output (exclude "s" and "z" parameters)
 nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)

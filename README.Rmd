@@ -189,7 +189,7 @@ par(mfrow=c(1,1))
 hist(samples[,which(dimnames(out[[1]])[[2]]=="N")], xlab = "Abundance", xlim = c(0,500), main="")
 abline(v=200, col="red") # add line for simulated abundance
 
-# summarize MCMC samples (exclude parameters and don't plot); density 
+# summarize MCMC samples (exclude parameters and don't plot)
 nimSummary(out, exclude_params = c("s","z"), trace=FALSE)
 
 # make realized density plot 
