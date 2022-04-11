@@ -46,7 +46,7 @@ library(remotes)
 install_github("sitkensis22/localSCR")
 #> Downloading GitHub repo sitkensis22/localSCR@HEAD
 #> 
-#> * checking for file 'C:\Users\dreacker\AppData\Local\Temp\RtmpKs8UeC\remotes3d405b4c3cea\sitkensis22-localSCR-f61091a/DESCRIPTION' ... OK
+#> * checking for file 'C:\Users\dreacker\AppData\Local\Temp\Rtmp8SGp2n\remotes27ac21771a1f\sitkensis22-localSCR-c4c66e6/DESCRIPTION' ... OK
 #> * preparing 'localSCR':
 #> * checking DESCRIPTION meta-information ... OK
 #> * checking for LF line-endings in source and make files and shell scripts
@@ -107,7 +107,7 @@ str(data3d)
 #> List of 3
 #>  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...
 #>  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...
-#>  $ s  : num [1:200, 1:2] 718.5 -210 -1024 918.3 48.6 ...
+#>  $ s  : num [1:200, 1:2] 712.7 -217.5 -1033 912.8 41.6 ...
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : NULL
 #>   .. ..$ : chr [1:2] "sx" "sy"
@@ -219,7 +219,7 @@ tic() # track time elapsed
 out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
 toc()
-#> 129.03 sec elapsed
+#> 136.19 sec elapsed
 
 # summarize output
 samples = do.call(rbind, out)
@@ -369,7 +369,7 @@ out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, 
 parallel=TRUE, RNGseed = 500)
 toc()
-#> 135.43 sec elapsed
+#> 140.32 sec elapsed
 
 # summary table of MCMC output (exclude "s" and "z" parameters)
 nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)
@@ -445,14 +445,13 @@ legend_t <- get_legend(p1 + theme(legend.position = "top",legend.direction = "ho
 
 # add the legend above the row we made earlier. Give it 20% of the height
 # of one plot (via rel_heights).
-p <- plot_grid(legend_t, prow, ncol = 1, rel_heights = c(.2, 1))
+pcomb <- plot_grid(legend_t, prow, ncol = 1, rel_heights = c(.2, 1))
 
 # add x and y axis labels
-p2 <-annotate_figure(p, bottom = textGrob("Easting", gp=gpar(fontsize=18),
-                                          vjust = -1, hjust = 0),
-                left = textGrob("Northing", rot=90, gp=gpar(fontsize=18),
-                                          vjust = 1, hjust = 0))
-p2
+pcomb <-annotate_figure(pcomb, bottom = textGrob("Easting", gp=gpar(fontsize=18), vjust = -1, hjust = 0),
+    left = textGrob("Northing", rot=90, gp=gpar(fontsize=18),
+         vjust = 1, hjust = 0.5))
+pcomb
 ```
 
 <img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" />
