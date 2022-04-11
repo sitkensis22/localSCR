@@ -1381,6 +1381,8 @@ get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,hab_mask 
 #' @param y either a matrix or array of encounter history data, possiblity from \code{sim_classic()}.
 #' @param M an integer of the total augmented population size (i.e., detected and augmented individuals). 
 #' UTMs. An array is used when traps are clustered over a survey area.
+#' @param X either a matrix or array representing the coordinates of traps in
+#' UTMs. An array is used when traps are clustered over a survey area.
 #' @param buff the distance (m or km) that the traps should be
 #' buffered by as an integer. This is typically 3 times the sigma parameter.
 #' @param site Either \code{NULL} (if a 2D trap array is used) or a vector of integers denoting which trap array an individual (either detected or augmented) belongs to. Note that \code{site} is provided from \code{\link{sim_classic}} when a 3D trap array is used. However, this \code{site} variable must be correctly augmented based on the total augmented population size (i.e., \code{M}).

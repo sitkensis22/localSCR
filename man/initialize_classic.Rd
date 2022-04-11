@@ -12,6 +12,9 @@ initialize_classic(y, M, X, buff, site, hab_mask)
 \item{M}{an integer of the total augmented population size (i.e., detected and augmented individuals). 
 UTMs. An array is used when traps are clustered over a survey area.}
 
+\item{X}{either a matrix or array representing the coordinates of traps in
+UTMs. An array is used when traps are clustered over a survey area.}
+
 \item{buff}{the distance (m or km) that the traps should be
 buffered by as an integer. This is typically 3 times the sigma parameter.}
 
