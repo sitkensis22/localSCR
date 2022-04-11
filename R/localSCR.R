@@ -2619,7 +2619,7 @@ if(is.null(exclude_params)){
 #' library(tictoc)       
 #' tic() # track time
 #' r = realized_density(samples = out, grid = Grid$grid, crs_ = mycrs, 
-#' site = NULL, hab_mask = hab_mask)       
+#' site = NULL, hab_mask = FALSE)       
 #' toc()      
 #' 
 #' # load virdiis color pallete library      
