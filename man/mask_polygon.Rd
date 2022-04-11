@@ -31,7 +31,8 @@ habitat
 }
 \details{
 This function creates a habitat matrix or array depending upon 
-whether a 2D (former) or 3D (latter) trap array is used. This matrix can be directly included as data in Bayesian SCR models run using \code{nimble}.
+whether a 2D (former) or 3D (latter) trap array is used. This matrix can be 
+directly included as data in Bayesian SCR models run using \code{nimble}.
 }
 \examples{
 # simulate a single trap array with random positional noise

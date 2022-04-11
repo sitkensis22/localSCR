@@ -2606,6 +2606,7 @@ if(is.null(exclude_params)){
 #' trapsClustered = FALSE)
 #' 
 #' # run model
+#' library(tictoc())
 #' tic() # track time elapsed
 #' out = run_classic(model = scr_model, data=data, constants=constants, 
 #'          inits=inits, params = params, niter = 5000, nburnin=1000, 
