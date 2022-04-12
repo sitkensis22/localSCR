@@ -44,6 +44,7 @@
 #' par(mfrow=c(1,1))
 #' plot(Grid$grid, pch=19)
 #' points(traps, col="blue",pch=20)
+#' @name grid_classic
 #' @export
 grid_classic <- function(X, crs_, buff, res){
   # need to determine if X is 2 or 3 dimensional (stop if not)
@@ -155,6 +156,7 @@ grid_classic <- function(X, crs_, buff, res){
 #' points(traps, col="blue",pch=20)
 #' points(data3d$s,col="red",pch = 20)
 #' points(data3d$s[which(apply(data3d$y,1,sum)!=0),],col="green",pch = 20)
+#' @name sim_classic
 #' @export
 sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter, 
                 enc_dist = "binomial", hab_mask = FALSE, setSeed = 500){
@@ -349,6 +351,7 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter,
 #'
 #' # inspect model
 #' scr_model
+#' @name get_classic
 #' @export
 get_classic <- function(dim_y, enc_dist = "binomial",sex_sigma = FALSE,
                         hab_mask = FALSE,trapsClustered = FALSE){
@@ -1493,6 +1496,7 @@ return(scrcode)
 #' plot(Grid$grid, pch=20,ylab="Northing",xlab="Easting")
 #' points(traps, col="blue",pch=20)
 #' points(s.st3d, col="red",pch=20)
+#' @name initialize_classic
 #' @export
 initialize_classic <- function(y, M, X, buff, site, hab_mask){
   if(length(dim(X))!=2 & length(dim(X))!=3){
@@ -1735,6 +1739,7 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask){
 #' constList = rescale_classic(X = traps, ext = Grid$ext, s.st = s.st3d, 
 #' site = NULL, hab_mask = hab_mask)
 #' str(constList)
+#' @name rescale_classic
 #' @export
 rescale_classic <- function(X, ext, s.st, site, hab_mask){
   if(length(dim(X))!=2 & length(dim(X))!=3){
@@ -1889,6 +1894,7 @@ if(length(dim(X))==3){
 #' # make simple plot
 #' par(mfrow=c(1,2))
 #' apply(hab_mask,3,function(x) plot(raster(apply(x,2,rev))))
+#' @name mask_polygon
 #' @export
 mask_polygon <- function(poly, grid, crs_, prev_mask){
 # need to determine if X is 2 or 3 dimensional (stop if not)
@@ -2042,6 +2048,7 @@ return(habitat_mask)
 #  #make plot
 #' par(mfrow=c(1,2))
 #' apply(hab_mask,3,function(x) plot(raster(apply(x,2,rev))))
+#' @name mask_raster
 #' @export
 mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
   # need to determine if X is 2 or 3 dimensional (stop if not)
@@ -2235,6 +2242,7 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
 #' # not run
 #' #nimSummary(out)
 #'}
+#' @name run_classic
 #' @export
 run_classic <- function(model, data, constants, inits, params,
                         niter = 1000, nburnin=100, thin=1, nchains=1, 
@@ -2405,6 +2413,7 @@ run_classic <- function(model, data, constants, inits, params,
 #' # summarize output
 #' nimSummary(out, trace=TRUE, plot_all=TRUE)
 #'}
+#' @name nimSummary
 #' @export
 nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude_params = NULL, 
                        digits=3){
@@ -2632,7 +2641,8 @@ if(is.null(exclude_params)){
 #' label = expression("Realized density (activity centers/100 m"^2*")")
 #' plot(r, col=viridis(100),main=label)
 #'}
-#'@export
+#' @name realized_density
+#' @export
 realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s", 
                              z_alias = "z"){
    if(length(samples) > 1){
