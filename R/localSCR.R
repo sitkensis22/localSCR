@@ -2836,7 +2836,7 @@ update_model <- function(model,line_remove = NULL,append_code = NULL,
   }
   
   if(write){
-    local.path <- paste(getwd(),"/new_model.txt")
+    local.path <- paste0(getwd(),"/new_model.txt")
     writeLines(temp_model,local.path,useBytes = FALSE) 
   }
   on.exit(unlink(txtPath1))
