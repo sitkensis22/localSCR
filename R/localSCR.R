@@ -2748,8 +2748,8 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
 #' @param model \code{nimbleCode()} used to define model in \code{nimble} package,
 #' possibly generated from \code{\link{get_classic}}.
 #' @param line_remove either \code{NULL} or a integer value defining which lines
-#' of code to remove from model. Set to \code{NULL} when only appending code to
-#' previous model file
+#' of code to remove from model. Set to \code{NULL} when only appending to and
+#' not replacing code in prevous model file.
 #' @param append_code either \code{NULL} or model code produced from 
 #' \code{nimbleCode} function or \code{\link{get_classic}}. Note that if
 #' \code{line_remove = NULL}, then code will be appended just after existing
