@@ -4,7 +4,13 @@
 \alias{update_model}
 \title{Function to efficiently edit rows of model code generated from nimble}
 \usage{
-update_model(model, line_remove = NULL, append_code = NULL, write = FALSE)
+update_model(
+  model,
+  line_remove = NULL,
+  append_code = NULL,
+  line_append = NULL,
+  write = FALSE
+)
 }
 \arguments{
 \item{model}{\code{nimbleCode()} used to define model in \code{nimble} package,
@@ -20,14 +26,14 @@ appending to and not replacing code in previous model file.}
 code; otherwise specify the lines to insert new code into by setting 
 \code{line_append}.}
 
-\item{write}{logical. If \code{TRUE}, then a text file is written to the 
-working directory called "new_model.txt". Otherwise, model is written to temp
-file and then deleted. Default is \code{FALSE}.}
-
 \item{line_append}{either \code{NULL} or an integer value as a scalar or vector
 defining which positions to insert new lines of code in the model. Note that
 line removal will occur first if \code{line_remove} is set, and then new
 lines of code will be inserted at the desired indexing positions.}
+
+\item{write}{logical. If \code{TRUE}, then a text file is written to the 
+working directory called "new_model.txt". Otherwise, model is written to temp
+file and then deleted. Default is \code{FALSE}.}
 }
 \value{
 a model description that can be run in \code{nimble} or using 
@@ -49,7 +55,7 @@ p0_prior = nimble::nimbleCode({
 
 # replace line 3 of old model code with 'p0_prior' 
 new_model = update_model(model = scr_model, line_remove = 3, 
-                      append_code = p0_prior, write = FALSE)
+               append_code = p0_prior, append_line = 3, write = FALSE)
 
 # inspect new model code
 new_model

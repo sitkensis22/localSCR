@@ -2779,14 +2779,14 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
 #' 
 #' # replace line 3 of old model code with 'p0_prior' 
 #' new_model = update_model(model = scr_model, line_remove = 3, 
-#'                       append_code = p0_prior, write = FALSE)
+#'                append_code = p0_prior, append_line = 3, write = FALSE)
 #' 
 #' # inspect new model code
 #' new_model
 #' @name update_model
 #' @export 
 update_model <- function(model,line_remove = NULL,append_code = NULL, 
-                          write = FALSE){
+                          line_append = NULL, write = FALSE){
   # read in current model file
   txtPath1 <- tempfile(fileext = ".txt")
   sink(txtPath1)
