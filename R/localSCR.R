@@ -2739,3 +2739,97 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
 } # End function 'realized_density'
 
 
+
+
+#' Function to efficiently edit rows of model code generated from nimble
+#'
+#' Allows for efficient editing of model code produced by \code{nimbleCode} function
+#'
+#' @param model \code{nimbleCode} used to define model in \code{nimble} package,
+#' possibly generated from \code{\link{get_classic}}.
+#' @param line_remove either \code{NULL} or a integer value defining which lines
+#' of code to remove from model. Set to \code{NULL} when only appending code to
+#' previous model file
+#' @param append_code either code\{NULL} or model code produced from 
+#' \code{nimbleCode()} function or \code{\link{get_classic}. Note that if
+#' \code{line_remove = NULL}, then code will be appended just after existing
+#' model code; otherwise specify the lines to replace when appending by setting
+#' \code{line_remove}.
+#' @return a model description that can be run in \code{nimble} or using 
+#' \code{\link{run_classic}}. 
+#' @author Daniel Eacker
+#' @examples
+#' # get model
+#' scr_model = get_classic(dim_y = 2, enc_dist = "binomial",sex_sigma = TRUE,
+#' hab_mask=TRUE,trapsClustered = TRUE)
+#' 
+#' # create new nimbleCode to use for replacement in 'scr_model'
+#' p0_prior = nimble::nimbleCode({
+#'    p0[g] ~ dbeta(1,1)
+#' })
+#' 
+#' # replace line 3 of old model code with 'p0_prior' 
+#' new_model = update_model(model = scr_model, line_remove = 3, 
+#'                          append_code = p0_prior)
+#' 
+#' # inspect new model code
+#' new_model
+#' @name update_model
+#' @export 
+update_model <- function(model,line_remove = NULL,append_code = NULL){
+  # read in current model file
+  txtPath1 <- tempfile(fileext = ".txt")
+  sink(txtPath1)
+  print(model)
+  sink()
+  if(isFALSE(is.null(line_remove)) & is.null(append_code)){
+   temp_model <- c("nimble::nimbleCode({",
+          readLines(txtPath1,encoding="UTF-8")[-c(1,line_remove,
+          length(readLines(txtPath1,encoding="UTF-8")))],
+                  "})")
+  sink(txtPath1)
+  temp_model
+  sink()
+  writeLines(temp_model,txtPath1,useBytes = FALSE) 
+  }
+  if(isFALSE(is.null(append_code))){
+    txtPath2 <- tempfile(fileext = ".txt")
+    sink(txtPath2)
+    print(append_code)
+    sink()
+  if(is.null(line_remove)){  # no lines to add, just a straight append
+   temp_model <- c("nimble::nimbleCode({",
+          readLines(txtPath1,encoding="UTF-8")[-c(1,
+          length(readLines(txtPath1,encoding="UTF-8")))],  
+          readLines(txtPath2,encoding="UTF-8")[-c(1,
+          length(readLines(txtPath2,encoding="UTF-8")))],
+                  "})")
+  }else
+  if(isFALSE(is.null(line_remove))){
+   temp_model <- c("nimble::nimbleCode({",
+          readLines(txtPath1,encoding="UTF-8")[-c(1,
+          length(readLines(txtPath1,encoding="UTF-8")))],
+                  "})")
+   add_model <- readLines(txtPath2,encoding="UTF-8")[-c(1,
+         length(readLines(txtPath2,encoding="UTF-8")))]
+   temp_model[line_remove] <- add_model
+  }
+  sink(txtPath1)
+  temp_model
+  sink()
+  base::writeLines(temp_model,txtPath1,useBytes = FALSE) 
+  on.exit(txtPath2)
+  }
+  if(is.null(line_remove) & is.null(append_code)){
+   temp_model <- c("nimble::nimbleCode({",
+                   readLines(txtPath1,encoding="UTF-8")[-c(1,
+                   length(readLines(txtPath1,encoding="UTF-8")))],
+                   "})")
+   sink(txtPath1)
+   temp_model
+   sink()
+   writeLines(temp_model,txtPath1,useBytes = FALSE) 
+  }
+  on.exit(unlink(txtPath1))
+ return(source(txtPath1)$value)
+} # End function 'update_model'
