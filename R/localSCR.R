@@ -2792,6 +2792,7 @@ update_model <- function(model,line_remove = NULL,append_code = NULL,
   sink(txtPath1)
   print(model)
   sink()
+  writeLines(model,txtPath1,useBytes = FALSE)
   # check for removal of lines and do this first
   if(isFALSE(is.null(line_remove))){
    temp_model <- c("nimble::nimbleCode({",
