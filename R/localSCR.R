@@ -2798,6 +2798,7 @@ update_model <- function(model,line_remove = NULL,append_code = NULL,
           readLines(txtPath1,encoding="UTF-8")[-c(1,line_remove,
           length(readLines(txtPath1,encoding="UTF-8")))],
                   "})")
+   writeLines(temp_model,txtPath1,useBytes = FALSE) 
   }
   # just append new code after old code
   if(isFALSE(is.null(append_code)) & is.null(line_append)){ 
@@ -2841,7 +2842,7 @@ update_model <- function(model,line_remove = NULL,append_code = NULL,
         "})")
   }
   sink(txtPath1)
-  temp_model
+  print(temp_model)
   sink()
   writeLines(temp_model,txtPath1,useBytes = FALSE) 
   on.exit(unlink(txtPath1))
