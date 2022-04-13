@@ -2755,7 +2755,7 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
 #' \code{line_remove = NULL}, then code will be appended just after existing
 #' model code; otherwise specify the lines to replace when appending by setting
 #' \code{line_remove}.
-#' @param write logical. If \code{TRUE}, then a text file is writing to the 
+#' @param write logical. If \code{TRUE}, then a text file is written to the 
 #' working directory called "new_model.txt". Otherwise, model is written to temp
 #' file and then deleted. Default is \code{FALSE}.
 #' @return a model description that can be run in \code{nimble} or using 

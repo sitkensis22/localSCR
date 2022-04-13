@@ -20,7 +20,7 @@ not replacing code in previous model file.}
 model code; otherwise specify the lines to replace when appending by setting
 \code{line_remove}.}
 
-\item{write}{logical. If \code{TRUE}, then a text file is writing to the 
+\item{write}{logical. If \code{TRUE}, then a text file is written to the 
 working directory called "new_model.txt". Otherwise, model is written to temp
 file and then deleted. Default is \code{FALSE}.}
 }
