@@ -7,7 +7,7 @@
 update_model(model, line_remove = NULL, append_code = NULL)
 }
 \arguments{
-\item{model}{\code{nimbleCode} used to define model in \code{nimble} package,
+\item{model}{\code{nimbleCode()} used to define model in \code{nimble} package,
 possibly generated from \code{\link{get_classic}}.}
 
 \item{line_remove}{either \code{NULL} or a integer value defining which lines
@@ -25,7 +25,7 @@ a model description that can be run in \code{nimble} or using
 \code{\link{run_classic}}.
 }
 \description{
-Allows for efficient editing of model code produced by /code{nimbleCode} function
+Allows for efficient editing of model code produced by \code{nimbleCode()} function
 }
 \examples{
 # get model
