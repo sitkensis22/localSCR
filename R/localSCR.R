@@ -2749,12 +2749,15 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
 #' possibly generated from \code{\link{get_classic}} function.
 #' @param line_remove either \code{NULL} or a integer value defining which lines
 #' of code to remove from model. Set to \code{NULL} when only appending to and
-#' not replacing code in prevous model file.
+#' not replacing code in previous model file.
 #' @param append_code either \code{NULL} or model code produced from 
 #' \code{nimbleCode()}  or \code{\link{get_classic}} function. Note that if
 #' \code{line_remove = NULL}, then code will be appended just after existing
 #' model code; otherwise specify the lines to replace when appending by setting
 #' \code{line_remove}.
+#' @param write logical. If \code{TRUE}, then a text file is writing to the 
+#' working directory called "new_model.txt". Otherwise, model is written to temp
+#' file and then deleted. Default is \code{FALSE}.
 #' @return a model description that can be run in \code{nimble} or using 
 #' \code{\link{run_classic}}. 
 #' @author Daniel Eacker
@@ -2776,7 +2779,7 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
 #' new_model
 #' @name update_model
 #' @export 
-update_model <- function(model,line_remove = NULL,append_code = NULL){
+update_model <- function(model,line_remove = NULL,append_code = NULL, write = FALSE){
   # read in current model file
   txtPath1 <- tempfile(fileext = ".txt")
   sink(txtPath1)
@@ -2830,6 +2833,11 @@ update_model <- function(model,line_remove = NULL,append_code = NULL){
    sink()
    writeLines(temp_model,txtPath1,useBytes = FALSE) 
   }
+  
+  if(write){
+    local.path <- paste(getwd(),"/new_model.txt")
+    writeLines(temp_model,local.path,useBytes = FALSE) 
+  }
   on.exit(unlink(txtPath1))
- return(source(txtPath1)$value)
+  return(source(txtPath1)$value)
 } # End function 'update_model'

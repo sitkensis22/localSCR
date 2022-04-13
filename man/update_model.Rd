@@ -4,7 +4,7 @@
 \alias{update_model}
 \title{Function to efficiently edit rows of model code generated from nimble}
 \usage{
-update_model(model, line_remove = NULL, append_code = NULL)
+update_model(model, line_remove = NULL, append_code = NULL, write = FALSE)
 }
 \arguments{
 \item{model}{\code{nimbleCode()} used to define model in \code{nimble} package,
@@ -12,13 +12,17 @@ possibly generated from \code{\link{get_classic}} function.}
 
 \item{line_remove}{either \code{NULL} or a integer value defining which lines
 of code to remove from model. Set to \code{NULL} when only appending to and
-not replacing code in prevous model file.}
+not replacing code in previous model file.}
 
 \item{append_code}{either \code{NULL} or model code produced from 
 \code{nimbleCode()}  or \code{\link{get_classic}} function. Note that if
 \code{line_remove = NULL}, then code will be appended just after existing
 model code; otherwise specify the lines to replace when appending by setting
 \code{line_remove}.}
+
+\item{write}{logical. If \code{TRUE}, then a text file is writing to the 
+working directory called "new_model.txt". Otherwise, model is written to temp
+file and then deleted. Default is \code{FALSE}.}
 }
 \value{
 a model description that can be run in \code{nimble} or using 
