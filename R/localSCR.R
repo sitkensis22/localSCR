@@ -2821,7 +2821,7 @@ update_model <- function(model,line_remove = NULL,append_code = NULL,
   sink(txtPath1)
   temp_model
   sink()
-  base::writeLines(temp_model,txtPath1,useBytes = FALSE) 
+  writeLines(temp_model,txtPath1,useBytes = FALSE) 
   on.exit(txtPath2)
   }
   if(is.null(line_remove) & is.null(append_code)){
