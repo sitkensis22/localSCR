@@ -14,8 +14,8 @@ possibly generated from \code{\link{get_classic}}.}
 of code to remove from model. Set to \code{NULL} when only appending code to
 previous model file}
 
-\item{append_code}{either code\{NULL} or model code produced from 
-\code{nimbleCode()} function or \code{\link{get_classic}. Note that if
+\item{append_code}{either \code{NULL} or model code produced from 
+\code{nimbleCode} function or \code{\link{get_classic}}. Note that if
 \code{line_remove = NULL}, then code will be appended just after existing
 model code; otherwise specify the lines to replace when appending by setting
 \code{line_remove}.}
@@ -25,7 +25,7 @@ a model description that can be run in \code{nimble} or using
 \code{\link{run_classic}}.
 }
 \description{
-Allows for efficient editing of model code produced by \code{nimbleCode} function
+Allows for efficient editing of model code produced by /code{nimbleCode} function
 }
 \examples{
 # get model

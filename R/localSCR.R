@@ -2743,15 +2743,15 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
 
 #' Function to efficiently edit rows of model code generated from nimble
 #'
-#' Allows for efficient editing of model code produced by \code{nimbleCode} function
+#' Allows for efficient editing of model code produced by /code{nimbleCode} function
 #'
 #' @param model \code{nimbleCode} used to define model in \code{nimble} package,
 #' possibly generated from \code{\link{get_classic}}.
 #' @param line_remove either \code{NULL} or a integer value defining which lines
 #' of code to remove from model. Set to \code{NULL} when only appending code to
 #' previous model file
-#' @param append_code either code\{NULL} or model code produced from 
-#' \code{nimbleCode()} function or \code{\link{get_classic}. Note that if
+#' @param append_code either \code{NULL} or model code produced from 
+#' \code{nimbleCode} function or \code{\link{get_classic}}. Note that if
 #' \code{line_remove = NULL}, then code will be appended just after existing
 #' model code; otherwise specify the lines to replace when appending by setting
 #' \code{line_remove}.
