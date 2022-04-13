@@ -43,7 +43,7 @@ p0_prior = nimble::nimbleCode({
 
 # replace line 3 of old model code with 'p0_prior' 
 new_model = update_model(model = scr_model, line_remove = 3, 
-                         append_code = p0_prior)
+                      append_code = p0_prior, write = FALSE)
 
 # inspect new model code
 new_model
