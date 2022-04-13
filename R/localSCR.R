@@ -2538,8 +2538,8 @@ if(is.null(exclude_params)){
 #' coordinates (\code{s})
 #'
 #' @param samples either a matrix (for a single MCMC chain) or list of posterior
-#'  samples from multiple chains from MCMC sampling; possibly returned from 
-#'  \code{\link{run_classic}}.
+#' samples from multiple chains from MCMC sampling; possibly returned from 
+#' \code{\link{run_classic}}.
 #' @param grid a matrix or array object of the the state-space grid. This is 
 #' returned from \code{\link{grid_classic}}.
 #' @param crs_ the UTM coordinate reference system (EPSG code) used for your
@@ -2743,23 +2743,29 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
 
 #' Function to efficiently edit rows of model code generated from nimble
 #'
-#' Allows for efficient editing of model code produced by \code{nimbleCode()} function
+#' Allows for efficient editing of model code produced by \code{nimbleCode()} 
+#' function
 #'
 #' @param model \code{nimbleCode()} used to define model in \code{nimble} package,
 #' possibly generated from \code{\link{get_classic}} function.
-#' @param line_remove either \code{NULL} or a integer value defining which lines
-#' of code to remove from model. Set to \code{NULL} when only appending to and
-#' not replacing code in previous model file.
+#' @param line_remove either \code{NULL} or an integer value as a scalar or vector
+#' defining which lines of code to remove from model. Set to \code{NULL} when only 
+#' appending to and not replacing code in previous model file.
 #' @param append_code either \code{NULL} or model code produced from 
 #' \code{nimbleCode()}  or \code{\link{get_classic}} function. Note that if
-#' \code{line_remove = NULL}, then code will be appended just after existing
-#' model code; otherwise specify the lines to replace when appending by setting
-#' \code{line_remove}.
+#' \code{line_remove = NULL}, then code will be appended just after existing model
+#' code; otherwise specify the lines to insert new code into by setting 
+#' \code{line_append}.
+#' @param line_append either \code{NULL} or an integer value as a scalar or vector
+#' defining which positions to insert new lines of code in the model. Note that
+#' line removal will occur first if \code{line_remove} is set, and then new
+#' lines of code will be inserted at the desired indexing positions. 
 #' @param write logical. If \code{TRUE}, then a text file is written to the 
 #' working directory called "new_model.txt". Otherwise, model is written to temp
 #' file and then deleted. Default is \code{FALSE}.
 #' @return a model description that can be run in \code{nimble} or using 
 #' \code{\link{run_classic}}. 
+#' @importFrom R.utils insert
 #' @author Daniel Eacker
 #' @examples
 #' # get model
@@ -2780,13 +2786,14 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
 #' @name update_model
 #' @export 
 update_model <- function(model,line_remove = NULL,append_code = NULL, 
-                         write = FALSE){
+                          write = FALSE){
   # read in current model file
   txtPath1 <- tempfile(fileext = ".txt")
   sink(txtPath1)
   print(model)
   sink()
-  if(isFALSE(is.null(line_remove)) & is.null(append_code)){
+  # check for removal of lines and do this first
+  if(isFALSE(is.null(line_remove))){
    temp_model <- c("nimble::nimbleCode({",
           readLines(txtPath1,encoding="UTF-8")[-c(1,line_remove,
           length(readLines(txtPath1,encoding="UTF-8")))],
@@ -2796,45 +2803,39 @@ update_model <- function(model,line_remove = NULL,append_code = NULL,
   sink()
   writeLines(temp_model,txtPath1,useBytes = FALSE) 
   }
-  if(isFALSE(is.null(append_code))){
+  # just append new code after old code
+  if(isFALSE(is.null(append_code)) & is.null(line_append)){ 
     txtPath2 <- tempfile(fileext = ".txt")
     sink(txtPath2)
     print(append_code)
     sink()
-  if(is.null(line_remove)){  # no lines to add, just a straight append
-   temp_model <- c("nimble::nimbleCode({",
+    temp_model <- c("nimble::nimbleCode({",
           readLines(txtPath1,encoding="UTF-8")[-c(1,
           length(readLines(txtPath1,encoding="UTF-8")))],  
           readLines(txtPath2,encoding="UTF-8")[-c(1,
           length(readLines(txtPath2,encoding="UTF-8")))],
                   "})")
-  }else
-  if(isFALSE(is.null(line_remove))){
-   temp_model <- c("nimble::nimbleCode({",
+  on.exit(unlink(txtPath2))
+  }else # add new code to specific index position in character vector
+  if(isFALSE(is.null(append_code)) & isFALSE(is.null(line_append))){ 
+    txtPath2 <- tempfile(fileext = ".txt")
+    sink(txtPath2)
+    print(append_code)
+    sink()
+    temp_model <- c("nimble::nimbleCode({",
           readLines(txtPath1,encoding="UTF-8")[-c(1,
           length(readLines(txtPath1,encoding="UTF-8")))],
                   "})")
-   add_model <- readLines(txtPath2,encoding="UTF-8")[-c(1,
+    add_model <- readLines(txtPath2,encoding="UTF-8")[-c(1,
          length(readLines(txtPath2,encoding="UTF-8")))]
-   temp_model[line_remove] <- add_model
-  }
+    temp_model <- R.utils::insert(temp_model,ats = line_append,
+                            values = add_model)
   sink(txtPath1)
   temp_model
   sink()
   writeLines(temp_model,txtPath1,useBytes = FALSE) 
-  on.exit(txtPath2)
+  on.exit(unlink(txtPath2))
   }
-  if(is.null(line_remove) & is.null(append_code)){
-   temp_model <- c("nimble::nimbleCode({",
-                   readLines(txtPath1,encoding="UTF-8")[-c(1,
-                   length(readLines(txtPath1,encoding="UTF-8")))],
-                   "})")
-   sink(txtPath1)
-   temp_model
-   sink()
-   writeLines(temp_model,txtPath1,useBytes = FALSE) 
-  }
-  
   if(write){
     local.path <- paste0(getwd(),"/new_model.txt")
     writeLines(temp_model,local.path,useBytes = FALSE) 
@@ -2842,3 +2843,4 @@ update_model <- function(model,line_remove = NULL,append_code = NULL,
   on.exit(unlink(txtPath1))
   return(source(txtPath1)$value)
 } # End function 'update_model'
+
