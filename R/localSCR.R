@@ -2779,7 +2779,8 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
 #' new_model
 #' @name update_model
 #' @export 
-update_model <- function(model,line_remove = NULL,append_code = NULL, write = FALSE){
+update_model <- function(model,line_remove = NULL,append_code = NULL, 
+                         write = FALSE){
   # read in current model file
   txtPath1 <- tempfile(fileext = ".txt")
   sink(txtPath1)
