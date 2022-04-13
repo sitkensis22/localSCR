@@ -2834,7 +2834,7 @@ update_model <- function(model,line_remove = NULL,append_code = NULL,
   }
   # if nothing is done to code, just return original code
   if(is.null(line_remove) & is.null(append_code) & is.null(line_append)){
-    warning("returning same model code as input into function")
+    warning("Returning same model code as input into function")
      temp_model <- c("nimble::nimbleCode({",
         readLines(txtPath1,encoding="UTF-8")[-c(1,
         length(readLines(txtPath1,encoding="UTF-8")))],
