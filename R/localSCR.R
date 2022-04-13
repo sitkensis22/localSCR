@@ -2792,17 +2792,12 @@ update_model <- function(model,line_remove = NULL,append_code = NULL,
   sink(txtPath1)
   print(model)
   sink()
-  writeLines(model,txtPath1,useBytes = FALSE)
   # check for removal of lines and do this first
   if(isFALSE(is.null(line_remove))){
    temp_model <- c("nimble::nimbleCode({",
           readLines(txtPath1,encoding="UTF-8")[-c(1,line_remove,
           length(readLines(txtPath1,encoding="UTF-8")))],
                   "})")
-  sink(txtPath1)
-  temp_model
-  sink()
-  writeLines(temp_model,txtPath1,useBytes = FALSE) 
   }
   # just append new code after old code
   if(isFALSE(is.null(append_code)) & is.null(line_append)){ 
@@ -2831,16 +2826,23 @@ update_model <- function(model,line_remove = NULL,append_code = NULL,
          length(readLines(txtPath2,encoding="UTF-8")))]
     temp_model <- R.utils::insert(temp_model,ats = line_append,
                             values = add_model)
-  sink(txtPath1)
-  temp_model
-  sink()
-  writeLines(temp_model,txtPath1,useBytes = FALSE) 
   on.exit(unlink(txtPath2))
   }
   if(write){
     local.path <- paste0(getwd(),"/new_model.txt")
     writeLines(temp_model,local.path,useBytes = FALSE) 
   }
+  # if nothing is done to code, just return original code
+  if(is.null(line_remove) & is.null(append_code) & is.null(line_append)){
+     temp_model <- c("nimble::nimbleCode({",
+        readLines(txtPath1,encoding="UTF-8")[-c(1,
+        length(readLines(txtPath1,encoding="UTF-8")))],
+        "})")
+  }
+  sink(txtPath1)
+  temp_model
+  sink()
+  writeLines(temp_model,txtPath1,useBytes = FALSE) 
   on.exit(unlink(txtPath1))
   return(source(txtPath1)$value)
 } # End function 'update_model'
