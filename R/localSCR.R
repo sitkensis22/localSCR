@@ -2778,14 +2778,14 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
 #' })
 #' 
 #' # replace line 3 of old model code with 'p0_prior' 
-#' new_model = update_model(model = scr_model, line_remove = 3, 
+#' new_model = customize_model(model = scr_model, line_remove = 3, 
 #'                append_code = p0_prior, line_append = 3, write = FALSE)
 #' 
 #' # inspect new model code
 #' new_model
-#' @name update_model
+#' @name customize_model
 #' @export 
-update_model <- function(model,line_remove = NULL,append_code = NULL, 
+customize_model <- function(model,line_remove = NULL,append_code = NULL, 
                           line_append = NULL, write = FALSE){
   # read in current model file
   txtPath1 <- tempfile(fileext = ".txt")
@@ -2847,5 +2847,5 @@ update_model <- function(model,line_remove = NULL,append_code = NULL,
   writeLines(temp_model,txtPath1,useBytes = FALSE) 
   on.exit(unlink(txtPath1))
   return(source(txtPath1)$value)
-} # End function 'update_model'
+} # End function 'customize_model'
 

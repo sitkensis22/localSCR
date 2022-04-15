@@ -45,8 +45,13 @@ You can install the development version of ‘localSCR’ like so:
 library(remotes)
 install_github("sitkensis22/localSCR")
 #> Downloading GitHub repo sitkensis22/localSCR@HEAD
+#> scales (1.1.1 -> 1.2.0) [CRAN]
+#> Installing 1 packages: scales
+#> package 'scales' successfully unpacked and MD5 sums checked
 #> 
-#> * checking for file 'C:\Users\dreacker\AppData\Local\Temp\Rtmp6DJgE3\remotes2f5c297a539b\sitkensis22-localSCR-d67152e/DESCRIPTION' ... OK
+#> The downloaded binary packages are in
+#>  C:\Users\dreacker\AppData\Local\Temp\Rtmp80Ii1H\downloaded_packages
+#> * checking for file 'C:\Users\dreacker\AppData\Local\Temp\Rtmp80Ii1H\remotes2ccc69e11fd8\sitkensis22-localSCR-ffe645f/DESCRIPTION' ... OK
 #> * preparing 'localSCR':
 #> * checking DESCRIPTION meta-information ... OK
 #> * checking for LF line-endings in source and make files and shell scripts
@@ -92,7 +97,7 @@ plot(Grid$grid, pch=20)
 points(traps, col="blue",pch=19)
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/Fig1.png" align="center" />
 
 ### (2) Simulate SCR data and make a plot of it.
 
@@ -107,7 +112,7 @@ str(data3d)
 #> List of 3
 #>  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...
 #>  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...
-#>  $ s  : num [1:200, 1:2] 704.3 -222.6 -1035.2 903.8 35.6 ...
+#>  $ s  : num [1:200, 1:2] 718.3 -209.3 -1022.5 917.9 49.1 ...
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : NULL
 #>   .. ..$ : chr [1:2] "sx" "sy"
@@ -120,7 +125,7 @@ points(data3d$s,col="red",pch = 20) # all simulated activity centers
 points(data3d$s[which(apply(data3d$y,1,sum)!=0),],col="green",pch = 20) # detected individuals
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/Fig2.png" align="center" />
 
 ### (3) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask
 
@@ -166,10 +171,9 @@ plot(poly, add=TRUE)
 points(s.st3d,col="red",pch=20) # all initalized activity centers
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/Fig3.png" align="center" />
 
 ``` r
-
 # rescale inputs
 rescale_list = rescale_classic(X = traps, ext = Grid$ext, s.st = s.st3d, hab_mask = hab_mask)
 
@@ -219,7 +223,7 @@ tic() # track time elapsed
 out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
 toc()
-#> 136.03 sec elapsed
+#> 156.36 sec elapsed
 
 # summarize output
 samples = do.call(rbind, out)
@@ -228,7 +232,7 @@ hist(samples[,which(dimnames(out[[1]])[[2]]=="N")], xlab = "Abundance", xlim = c
 abline(v=200, col="red") # add line for simulated abundance
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-2.png" style="display: block; margin: auto;" />
+<img src="man/figures/Fig4.png" align="center" />
 
 ``` r
 
@@ -257,7 +261,7 @@ plot(r, col=viridis(100),main=expression("Realized density (activity centers/100
      ylab="Northing",xlab="Easting")
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-3.png" style="display: block; margin: auto;" />
+<img src="man/figures/Fig5.png" align="center" />
 
 ### (4) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask using a 3D trap array or clustered traps.
 
@@ -299,7 +303,7 @@ poly = st_sfc(st_polygon(x=list(matrix(c(-1660,-1900,5730,-1050,5470,
 plot(poly, add=TRUE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/Fig6.png" align="center" />
 
 ``` r
 
@@ -369,23 +373,22 @@ out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, 
 parallel=TRUE, RNGseed = 500)
 toc()
-#> 138.14 sec elapsed
+#> 163.29 sec elapsed
 
 # summary table of MCMC output (exclude "s" and "z" parameters)
 nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)
+#>          post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat
+#> D            0.104   0.017   0.076   0.102   0.143  1 173.373 1.012
+#> N          232.925  38.702 170.000 228.000 321.000  1 173.373 1.012
+#> p0[1]        0.112   0.027   0.067   0.110   0.175  1 434.862 1.004
+#> p0[2]        0.106   0.023   0.068   0.104   0.157  1 545.243 1.023
+#> psi          0.592   0.100   0.425   0.582   0.815  1 179.821 1.010
+#> psi_sex      0.509   0.080   0.354   0.509   0.664  1 266.020 1.001
+#> sigma[1]   234.625  34.141 177.724 231.260 311.807  1 274.116 1.004
+#> sigma[2]   344.204  38.158 282.668 339.885 430.743  1 263.555 1.027
 ```
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
-
-    #>          post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat
-    #> D            0.104   0.017   0.076   0.102   0.143  1 173.373 1.012
-    #> N          232.925  38.702 170.000 228.000 321.000  1 173.373 1.012
-    #> p0[1]        0.112   0.027   0.067   0.110   0.175  1 434.862 1.004
-    #> p0[2]        0.106   0.023   0.068   0.104   0.157  1 545.243 1.023
-    #> psi          0.592   0.100   0.425   0.582   0.815  1 179.821 1.010
-    #> psi_sex      0.509   0.080   0.354   0.509   0.664  1 266.020 1.001
-    #> sigma[1]   234.625  34.141 177.724 231.260 311.807  1 274.116 1.004
-    #> sigma[2]   344.204  38.158 282.668 339.885 430.743  1 263.555 1.027
+<img src="man/figures/Fig7.png" align="center" />
 
 ``` r
 
@@ -454,7 +457,7 @@ pcomb <-annotate_figure(pcomb, bottom = textGrob("Easting", gp=gpar(fontsize=18)
 pcomb
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" style="display: block; margin: auto;" />
+<img src="man/figures/Fig8.png" align="center" />
 
 ## Literature Cited
 

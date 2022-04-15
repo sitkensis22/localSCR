@@ -47,7 +47,7 @@ library(localSCR)
 
 ### (1) Simulate a single trap array with random positional noise and create state-space
 
-```{r, fig.align = "center", fig.width = 6, fig.height=6}
+```{r, fig.show='hide'}
 
 # simulate a single trap array with random positional noise
 x <- seq(-800, 800, length.out = 5)
@@ -68,10 +68,11 @@ points(traps, col="blue",pch=19)
 
 ```
 
+<img src="man/figures/Fig1.png" align="center" />
 
 ### (2) Simulate SCR data and make a plot of it.
 
-```{r, fig.align = "center", fig.width = 6, fig.height=6}
+```{r, fig.show='hide'}
 
 # simulate SCR data
 data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = mysigma, prop_sex = 1,
@@ -89,11 +90,12 @@ points(data3d$s[which(apply(data3d$y,1,sum)!=0),],col="green",pch = 20) # detect
 
 ```
 
+<img src="man/figures/Fig2.png" align="center" />
 
 
 ### (3) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask
 
-```{r, fig.align = "center", fig.width = 6, fig.height=6}
+```{r, fig.show='hide'}
 
 # simulate a single trap array with random positional noise
 x <- seq(-800, 800, length.out = 5)
@@ -133,6 +135,12 @@ points(traps, col="blue",pch=19)
 plot(poly, add=TRUE)
 points(s.st3d,col="red",pch=20) # all initalized activity centers
 
+```
+
+<img src="man/figures/Fig3.png" align="center" />
+
+
+```{r, fig.show='hide'}
 # rescale inputs
 rescale_list = rescale_classic(X = traps, ext = Grid$ext, s.st = s.st3d, hab_mask = hab_mask)
 
@@ -189,6 +197,12 @@ par(mfrow=c(1,1))
 hist(samples[,which(dimnames(out[[1]])[[2]]=="N")], xlab = "Abundance", xlim = c(0,500), main="")
 abline(v=200, col="red") # add line for simulated abundance
 
+```
+
+<img src="man/figures/Fig4.png" align="center" />
+
+```{r, fig.show='hide'}
+
 # summarize MCMC samples (exclude parameters and don't plot)
 nimSummary(out, exclude_params = c("s","z"), trace=FALSE)
 
@@ -205,9 +219,11 @@ plot(r, col=viridis(100),main=expression("Realized density (activity centers/100
 
 ```
 
+<img src="man/figures/Fig5.png" align="center" />
+
 ### (4) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask using a 3D trap array or clustered traps.
 
-```{r, fig.align = "center", fig.width = 6, fig.height=6}
+```{r, fig.show='hide'}
 
 # simulate a single trap array with random positional noise
 x <- seq(-800, 800, length.out = 5)
@@ -246,9 +262,9 @@ plot(poly, add=TRUE)
 
 ```
 
+<img src="man/figures/Fig6.png" align="center" />
 
-
-```{r, fig.align = "center", fig.width = 6, fig.height=10}
+```{r, fig.show='hide'}
 
 # get 3D habitat mask array for 3D grid
 hab_mask = mask_polygon(poly = poly, grid = GridX$grid, crs_ = mycrs, prev_mask = NULL)
@@ -322,9 +338,10 @@ nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)
 
 ```
 
+<img src="man/figures/Fig7.png" align="center" />
 
 
-```{r, fig.align = "center", fig.width = 12, fig.height = 7, out.width = '100%'}
+```{r, fig.show='hide'}
 
 # generate realized density surface
 r = realized_density(samples=out, grid=GridX$grid, crs_=mycrs,
@@ -379,6 +396,8 @@ pcomb
 
 
 ```
+
+<img src="man/figures/Fig8.png" align="center" />
 
 ## Literature Cited
 
