@@ -2491,12 +2491,12 @@ if(is.null(exclude_params)){
           upper_index <- ifelse(plot.seq[g+1] > ncol(d3), ncol(d3), 
                                 plot.seq[g+1])
           for(i in (plot.seq[g]+1):upper_index){
-             plot(1:dim(d2[[1]])[1],d2[[1]][,i],xlab="iteration",
+             plot(1:dim(d2[[1]])[1],d2[[1]][,i],col=cols[1],xlab="iteration",
             ylab=colnames(d3)[i],type="l",ylim=range(do.call(rbind, 
             lapply(d2,function(x) apply(x, 2, range)))[,i]))
               for(j in 2:length(d2)){
               lines(1:dim(d2[[1]])[1],d2[[j]][,i],xlab="iteration",
-            ylab=colnames(d3)[i],type="l",col="red")
+            ylab=colnames(d3)[i],type="l",col=cols[j])
              }
              hist(d3[,i],main="",xlab=colnames(d3)[i])
             } # end i loop
