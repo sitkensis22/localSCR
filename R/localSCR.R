@@ -2340,7 +2340,7 @@ run_classic <- function(model, data, constants, inits, params,
 #' @importFrom coda effectiveSize mcmc.list as.mcmc gelman.diag
 #' @importFrom stats na.omit sd quantile
 #' @importFrom crayon red
-#' @importFrom viridisLite rainbow
+#' @importFrom viridisLite plasma
 #' @examples
 #'\dontrun{
 #' # simulate a single trap array with random positional noise
@@ -2473,7 +2473,7 @@ if(is.null(exclude_params)){
      d3 <- do.call(rbind, d2)
      }
      plot.seq <- seq(3,3000,3)  
-     cols <- viridisLite::rainbow(100)[seq(1,100,length.out=length(d2))]
+     cols <- rev(viridisLite::plasma(100)[seq(1,100,length.out=length(d2))])
      for(i in 1:3){ # plot first 3 variables to start out
       plot(1:dim(d2[[1]])[1],d2[[1]][,i],col=cols[1],xlab="iteration",
            ylab=colnames(d3)[i],type="l",ylim=range(do.call(rbind, 
@@ -2512,7 +2512,7 @@ if(is.null(exclude_params)){
       } # is interactive
   }else
     if((length(attributes(d[[1]])$dimnames[[2]])-length(d.remove[[1]])==1)){
-      cols <- viridisLite::rainbow(100)[seq(1,100,length.out=length(d2))]
+      cols <- rev(viridisLite::plasma(100)[seq(1,100,length.out=length(d2))])
       par(mfrow=c(1,2))
       plot(1:length(d2[[1]]),d2[[1]],xlab="iteration",ylab=colnames(d3)[i],
            type="l",ylim=range(d3[,1]),col=cols[1])
