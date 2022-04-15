@@ -2473,7 +2473,7 @@ if(is.null(exclude_params)){
      d3 <- do.call(rbind, d2)
      }
      plot.seq <- seq(3,3000,3)  
-     cols <- rev(viridisLite::virdis(100)[seq(1,100,length.out=length(d2))])
+     cols <- rev(viridisLite::viridis(100)[seq(1,100,length.out=length(d2))])
      for(i in 1:3){ # plot first 3 variables to start out
       plot(1:dim(d2[[1]])[1],d2[[1]][,i],col=cols[1],xlab="iteration",
            ylab=colnames(d3)[i],type="l",ylim=range(do.call(rbind, 
