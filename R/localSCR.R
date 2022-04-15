@@ -2485,8 +2485,8 @@ if(is.null(exclude_params)){
       hist(d3[,i],main="",xlab=colnames(d3)[i])
      }
       if(interactive() & ncol(d3) > 3){
-        answer <- readline(cat(crayon::red("Plot next set of parameters? 
-                                           (1 = Yes or 0 = No) ")))
+        answer <- readline(cat(crayon::red("Plot next set of parameters?\n 
+ (1 = Yes or 0 = No) ")))
         while(answer == "1"){
           upper_index <- ifelse(plot.seq[g+1] > ncol(d3), ncol(d3), 
                                 plot.seq[g+1])
@@ -2502,8 +2502,8 @@ if(is.null(exclude_params)){
             } # end i loop
           g <- g + 1 
           if(plot.seq[g+1] <= ncol(d3)){
-          answer <- readline(cat(crayon::red("Plot next set of parameters? 
-                                             (1 = Yes or 0 = No) ")))
+        answer <- readline(cat(crayon::red("Plot next set of parameters?\n 
+ (1 = Yes or 0 = No) ")))
           }else
           if(plot.seq[g+1] > ncol(d3)){
           break
