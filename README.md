@@ -44,20 +44,8 @@ You can install the development version of ‘localSCR’ like so:
 ``` r
 library(remotes)
 install_github("sitkensis22/localSCR")
-#> Downloading GitHub repo sitkensis22/localSCR@HEAD
-#> scales (1.1.1 -> 1.2.0) [CRAN]
-#> Installing 1 packages: scales
-#> package 'scales' successfully unpacked and MD5 sums checked
-#> 
-#> The downloaded binary packages are in
-#>  C:\Users\dreacker\AppData\Local\Temp\Rtmp80Ii1H\downloaded_packages
-#> * checking for file 'C:\Users\dreacker\AppData\Local\Temp\Rtmp80Ii1H\remotes2ccc69e11fd8\sitkensis22-localSCR-ffe645f/DESCRIPTION' ... OK
-#> * preparing 'localSCR':
-#> * checking DESCRIPTION meta-information ... OK
-#> * checking for LF line-endings in source and make files and shell scripts
-#> * checking for empty or unneeded directories
-#> * building 'localSCR_0.1.0.tar.gz'
-#> 
+#> Skipping install of 'localSCR' from a github remote, the SHA1 (3499af64) has not changed since last install.
+#>   Use `force = TRUE` to force installation
 ```
 
 Be sure to see important information about using ‘nimble’ on your
@@ -97,7 +85,11 @@ plot(Grid$grid, pch=20)
 points(traps, col="blue",pch=19)
 ```
 
-<img src="man/figures/Fig1.png" align="center" />
+<p align="center">
+
+<img src="man/figures/Fig1.png" />
+
+</p>
 
 ### (2) Simulate SCR data and make a plot of it.
 
@@ -112,7 +104,7 @@ str(data3d)
 #> List of 3
 #>  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...
 #>  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...
-#>  $ s  : num [1:200, 1:2] 718.3 -209.3 -1022.5 917.9 49.1 ...
+#>  $ s  : num [1:200, 1:2] 718.2 -210.1 -1023.9 917.9 48.5 ...
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : NULL
 #>   .. ..$ : chr [1:2] "sx" "sy"
@@ -125,7 +117,11 @@ points(data3d$s,col="red",pch = 20) # all simulated activity centers
 points(data3d$s[which(apply(data3d$y,1,sum)!=0),],col="green",pch = 20) # detected individuals
 ```
 
-<img src="man/figures/Fig2.png" align="center" />
+<p align="center">
+
+<img src="man/figures/Fig2.png" />
+
+</p>
 
 ### (3) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask
 
@@ -171,7 +167,11 @@ plot(poly, add=TRUE)
 points(s.st3d,col="red",pch=20) # all initalized activity centers
 ```
 
-<img src="man/figures/Fig3.png" align="center" />
+<p align="center">
+
+<img src="man/figures/Fig3.png" />
+
+</p>
 
 ``` r
 # rescale inputs
@@ -223,7 +223,7 @@ tic() # track time elapsed
 out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
 toc()
-#> 156.36 sec elapsed
+#> 159.38 sec elapsed
 
 # summarize output
 samples = do.call(rbind, out)
@@ -232,7 +232,11 @@ hist(samples[,which(dimnames(out[[1]])[[2]]=="N")], xlab = "Abundance", xlim = c
 abline(v=200, col="red") # add line for simulated abundance
 ```
 
-<img src="man/figures/Fig4.png" align="center" />
+<p align="center">
+
+<img src="man/figures/Fig4.png" />
+
+</p>
 
 ``` r
 
@@ -261,7 +265,11 @@ plot(r, col=viridis(100),main=expression("Realized density (activity centers/100
      ylab="Northing",xlab="Easting")
 ```
 
-<img src="man/figures/Fig5.png" align="center" />
+<p align="center">
+
+<img src="man/figures/Fig5.png" />
+
+</p>
 
 ### (4) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask using a 3D trap array or clustered traps.
 
@@ -303,7 +311,11 @@ poly = st_sfc(st_polygon(x=list(matrix(c(-1660,-1900,5730,-1050,5470,
 plot(poly, add=TRUE)
 ```
 
-<img src="man/figures/Fig6.png" align="center" />
+<p align="center">
+
+<img src="man/figures/Fig6.png" />
+
+</p>
 
 ``` r
 
@@ -373,7 +385,7 @@ out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, 
 parallel=TRUE, RNGseed = 500)
 toc()
-#> 163.29 sec elapsed
+#> 171.27 sec elapsed
 
 # summary table of MCMC output (exclude "s" and "z" parameters)
 nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)
@@ -388,7 +400,11 @@ nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)
 #> sigma[2]   344.204  38.158 282.668 339.885 430.743  1 263.555 1.027
 ```
 
-<img src="man/figures/Fig7.png" align="center" />
+<p align="center">
+
+<img src="man/figures/Fig7.png" />
+
+</p>
 
 ``` r
 
@@ -457,7 +473,11 @@ pcomb <-annotate_figure(pcomb, bottom = textGrob("Easting", gp=gpar(fontsize=18)
 pcomb
 ```
 
-<img src="man/figures/Fig8.png" align="center" />
+<p align="center">
+
+<img src="man/figures/Fig8.png" />
+
+</p>
 
 ## Literature Cited
 

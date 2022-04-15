@@ -68,7 +68,9 @@ points(traps, col="blue",pch=19)
 
 ```
 
-<img src="man/figures/Fig1.png" align="center" />
+<p align="center">
+  <img src="man/figures/Fig1.png" />
+</p>
 
 ### (2) Simulate SCR data and make a plot of it.
 
@@ -90,8 +92,9 @@ points(data3d$s[which(apply(data3d$y,1,sum)!=0),],col="green",pch = 20) # detect
 
 ```
 
-<img src="man/figures/Fig2.png" align="center" />
-
+<p align="center">
+  <img src="man/figures/Fig2.png" />
+</p>
 
 ### (3) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask
 
@@ -137,8 +140,9 @@ points(s.st3d,col="red",pch=20) # all initalized activity centers
 
 ```
 
-<img src="man/figures/Fig3.png" align="center" />
-
+<p align="center">
+  <img src="man/figures/Fig3.png" />
+</p>
 
 ```{r, fig.show='hide'}
 # rescale inputs
@@ -199,7 +203,9 @@ abline(v=200, col="red") # add line for simulated abundance
 
 ```
 
-<img src="man/figures/Fig4.png" align="center" />
+<p align="center">
+  <img src="man/figures/Fig4.png" />
+</p>
 
 ```{r, fig.show='hide'}
 
@@ -219,7 +225,9 @@ plot(r, col=viridis(100),main=expression("Realized density (activity centers/100
 
 ```
 
-<img src="man/figures/Fig5.png" align="center" />
+<p align="center">
+  <img src="man/figures/Fig5.png" />
+</p>
 
 ### (4) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask using a 3D trap array or clustered traps.
 
@@ -262,7 +270,9 @@ plot(poly, add=TRUE)
 
 ```
 
-<img src="man/figures/Fig6.png" align="center" />
+<p align="center">
+  <img src="man/figures/Fig6.png" />
+</p>
 
 ```{r, fig.show='hide'}
 
@@ -338,7 +348,9 @@ nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)
 
 ```
 
-<img src="man/figures/Fig7.png" align="center" />
+<p align="center">
+  <img src="man/figures/Fig7.png" />
+</p>
 
 
 ```{r, fig.show='hide'}
@@ -397,7 +409,9 @@ pcomb
 
 ```
 
-<img src="man/figures/Fig8.png" align="center" />
+<p align="center">
+  <img src="man/figures/Fig8.png" />
+</p>
 
 ## Literature Cited
 
