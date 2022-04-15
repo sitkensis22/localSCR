@@ -2340,6 +2340,7 @@ run_classic <- function(model, data, constants, inits, params,
 #' @importFrom coda effectiveSize mcmc.list as.mcmc gelman.diag
 #' @importFrom stats na.omit sd quantile
 #' @importFrom crayon red
+#' @importFrom viridisLite viridis
 #' @examples
 #'\dontrun{
 #' # simulate a single trap array with random positional noise
@@ -2472,13 +2473,14 @@ if(is.null(exclude_params)){
      d3 <- do.call(rbind, d2)
      }
      plot.seq <- seq(3,3000,3)  
+     cols <- viridisLite::viridis(100)[seq(1,100,length.out=length(d2))]
      for(i in 1:3){ # plot first 3 variables to start out
-      plot(1:dim(d2[[1]])[1],d2[[1]][,i],xlab="iteration",
+      plot(1:dim(d2[[1]])[1],d2[[1]][,i],col=cols[1],xlab="iteration",
            ylab=colnames(d3)[i],type="l",ylim=range(do.call(rbind, 
            lapply(d2,function(x) apply(x, 2, range)))[,i]))
       for(j in 2:length(d2)){
         lines(1:dim(d2[[1]])[1],d2[[j]][,i],xlab="iteration",
-            ylab=colnames(d3)[i],type="l",col="red")
+            ylab=colnames(d3)[i],type="l",col=cols[j])
       }
       hist(d3[,i],main="",xlab=colnames(d3)[i])
      }
@@ -2510,12 +2512,13 @@ if(is.null(exclude_params)){
       } # is interactive
   }else
     if((length(attributes(d[[1]])$dimnames[[2]])-length(d.remove[[1]])==1)){
+      cols <- viridisLite::viridis(100)[seq(1,100,length.out=length(d2))]
       par(mfrow=c(1,2))
       plot(1:length(d2[[1]]),d2[[1]],xlab="iteration",ylab=colnames(d3)[i],
-           type="l",ylim=range(d3[,1]))
+           type="l",ylim=range(d3[,1]),col=cols[1])
       for(j in 2:length(d2)){
         lines(1:length(d2[[j]]),d2[[j]],xlab="iteration",
-              ylab=colnames(d3)[i],type="l",col="red")
+              ylab=colnames(d3)[i],type="l",col=cols[j])
       }
       hist(d3[,1],main="",xlab=attributes(d[[1]])$dimnames[[2]][-d.remove[[1]]])
     }
