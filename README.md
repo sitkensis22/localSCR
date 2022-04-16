@@ -44,7 +44,7 @@ You can install the development version of ‘localSCR’ like so:
 ``` r
 library(remotes)
 install_github("sitkensis22/localSCR")
-#> Skipping install of 'localSCR' from a github remote, the SHA1 (3499af64) has not changed since last install.
+#> Skipping install of 'localSCR' from a github remote, the SHA1 (865715b2) has not changed since last install.
 #>   Use `force = TRUE` to force installation
 ```
 
@@ -104,7 +104,7 @@ str(data3d)
 #> List of 3
 #>  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...
 #>  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...
-#>  $ s  : num [1:200, 1:2] 718.2 -210.1 -1023.9 917.9 48.5 ...
+#>  $ s  : num [1:200, 1:2] 717.3 -211.9 -1026.6 917.3 46.9 ...
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : NULL
 #>   .. ..$ : chr [1:2] "sx" "sy"
@@ -223,7 +223,7 @@ tic() # track time elapsed
 out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
 toc()
-#> 159.38 sec elapsed
+#> 142.82 sec elapsed
 
 # summarize output
 samples = do.call(rbind, out)
@@ -385,7 +385,7 @@ out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, 
 parallel=TRUE, RNGseed = 500)
 toc()
-#> 171.27 sec elapsed
+#> 145.76 sec elapsed
 
 # summary table of MCMC output (exclude "s" and "z" parameters)
 nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)

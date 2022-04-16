@@ -7,8 +7,7 @@ output: github_document
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-"
+  comment = "#>"
 )
 ```
 
@@ -274,7 +273,7 @@ plot(poly, add=TRUE)
   <img src="man/figures/Fig6.png" />
 </p>
 
-```{r, fig.show='hide'}
+```{r, fig.show='hide', fig.height=14, fig.width=10}
 
 # get 3D habitat mask array for 3D grid
 hab_mask = mask_polygon(poly = poly, grid = GridX$grid, crs_ = mycrs, prev_mask = NULL)

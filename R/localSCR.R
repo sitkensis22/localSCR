@@ -347,7 +347,7 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter,
 #' # get model for 2D encounter data, binomial encounter distribution, 
 #' # non-sex-specific scaling parameter, and no habitat mask
 #' scr_model = get_classic(dim_y = 2,enc_dist = "binomial",sex_sigma = FALSE,
-#' hab_mask = FALSE)
+#'                          hab_mask = FALSE,trapsClustered = FALSE)
 #'
 #' # inspect model
 #' scr_model
@@ -2751,9 +2751,6 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
 #'
 #' @param model \code{nimbleCode()} used to define model in \code{nimble} package,
 #' possibly generated from \code{\link{get_classic}} function.
-#' @param line_remove either \code{NULL} or an integer value as a scalar or vector
-#' defining which lines of code to remove from model. Set to \code{NULL} when only 
-#' appending to and not replacing code in previous model file.
 #' @param append_code either \code{NULL} or model code produced from 
 #' \code{nimbleCode()}  or \code{\link{get_classic}} function. Note that if
 #' \code{line_remove = NULL}, then code will be appended just after existing model
@@ -2763,6 +2760,9 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
 #' defining which positions to insert new lines of code in the model. Note that
 #' line removal will occur first if \code{line_remove} is set, and then new
 #' lines of code will be inserted at the desired indexing positions. 
+#' @param line_remove either \code{NULL} or an integer value as a scalar or vector
+#' defining which lines of code to remove from model. Set to \code{NULL} when only 
+#' appending to and not replacing code in previous model file.
 #' @param write logical. If \code{TRUE}, then a text file is written to the 
 #' working directory called "new_model.txt". Otherwise, model is written to temp
 #' file and then deleted. Default is \code{FALSE}.
@@ -2781,15 +2781,15 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
 #' })
 #' 
 #' # replace line 3 of old model code with 'p0_prior' 
-#' new_model = customize_model(model = scr_model, line_remove = 3, 
-#'                append_code = p0_prior, line_append = 3, write = FALSE)
-#' 
+#' new_model = customize_model(model = scr_model, append_code = p0_prior, 
+#'                                    line_append = 3, line_remove = 3)
+#'                                    
 #' # inspect new model code
 #' new_model
 #' @name customize_model
 #' @export 
-customize_model <- function(model,line_remove = NULL,append_code = NULL, 
-                          line_append = NULL, write = FALSE){
+customize_model <- function(model,append_code = NULL,line_append = NULL, 
+                        line_remove = NULL,write = FALSE){
   # read in current model file
   txtPath1 <- tempfile(fileext = ".txt")
   sink(txtPath1)
