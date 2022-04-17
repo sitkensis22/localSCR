@@ -37,7 +37,7 @@ computer (including installing rtools): <https://r-nimble.org/download>
 ## Vignettes
 
   - [Classic SCR models: continuous state-space and marked
-    individuals](https://github.com/sitkensis22/localSCR/vignettes/tutorial-1.01.Rmd)
+    individuals](https://github.com/sitkensis22/localSCR/vignettes/tutorial-1.01.html)
 
 ## References
 
