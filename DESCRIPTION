@@ -22,3 +22,7 @@ Imports:
 License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.1.2.9000
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

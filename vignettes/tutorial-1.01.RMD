@@ -1,0 +1,79 @@
+---
+title: "Classic SCR models: continuous state-space and marked individuals"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{tutorial-1.0}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+The first vignette of the 'localSCR' package covers what I define as a set of 'classic' Bayesian spatial capture-recapture (SCR) models (Royle et al. 2014). These models are designed to model SCR data for 'marked' individuals under the assumption of uniformly distributed activity centers (i.e,. a continuous state-space). Although many distance detection functions are possible, the package currently only models the encounter process under the assumption of a bivariate normal model of space use, which is commonly employed in the literature. The package is meant to ease implementation of these Bayesian SCR models using the 'nimble' package (de Valpine et a. 2022), which allows for increased flexibilty with the ability for the user to include custom functions and assign different algorithms to specific model parameters. I took advantage of this functionality with the goal of building a simple, straightforward workflow that was flexible enough to handle most mainstream SCR analysis problems. Visit <https://r-nimble.org/download> for information on installing 'nimble' and Rtools on your computer.
+
+## Implementation
+
+The 'localSCR' package implements Bayesian SCR models using the 'nimble' package (de Valpine et a. 2022) following methods described in Royle et al. (2014). We take advantage of recent developments in computation of SCR models. In this tutorial, three methods are implemented to decrease computational run time:
+
+1) Block updating of x and y activity center coordinates (Turek et al. 2021)
+2) Using vectorized declarations for traps in distance function calculations
+3) Separating the data augmentation process into two steps (Chandler 2018)
+
+In some SCR problems, there are landscape features that create 'unsuitable' habitat for the study species. Habitat masks are used to account for these features and designate suitable (1) or unsuitable (0) habitat, and can be represented as a matrix or array of binary values. We follow the methods of Milletet et al. (2019) to implement the "ones" trick to account for habitat suitability. This restricts the possible locations of latent activity centers to only suitable habitat. The 'localSCR' package provides functions to construct a habitat mask from either raster or polygon data. 
+
+Finally, in some SCR designs, trap arrays may be spread out over the study area such that individuals can only be detected at one of multiple trap arrays (e.g., Furnas et al. 2018). 
+
+
+<p>
+## Turtorial-1.0
+
+This tutorial includes four parts:
+
+1) Create traps (or detectors) and then construct a state-space
+2) Simulate 'classic' SCR data using state-space extent 
+3) Workflow for 2-D trap array including sex-specific scaling parameter and habitat mask
+4) Workflow for 3-D trap array including sex-specific scaling parameter and habitat mask
+</p>
+<br>
+
+<p>
+## Functions used from 'localSCR' package:
+* `grid_classic()` define state-space grid and extent 
+* `sim_classic()` simulate basic spatial capture-recapture data
+* `mask_polygon()` create habitat mask matrix or array from polygon
+* `initialize_classic()` generate starting locations for activity area centers
+* `rescale_classic()` rescale inputs to prepare data for using habitat mask
+* `get_classic()` grabs template model for given inputs using the `nimbleCode()` function
+* `run_classic()` wrapper function to run classic models using 'nimble' package
+* `nimSummary()` summarize lists of Markov Chain Monte Carlo (MCMC) output
+* `realized_density()` generate realized density surface from MCMC output
+</p>
+<br>
+<b> <i>Note: see references at bottom of page</i></b>
+
+
+
+<br>
+
+## References
+
+Chandler, R. B. 2018. Speeding up data augmentation in BUGS.
+<https://groups.google.com/forum/#!topic/hmecology/o6cWDqHHgOE>.
+
+de Valpine P, C. Paciorek, D. Turek, N. Michaud, C. Anderson-Bergman, F. Obermeyer, C. C. Wehrhahn, A. Rodrìguez, L. D. Temple, and S. Paganin. 2022. _NIMBLE: MCMC, Particle
+Filtering, and Programmable Hierarchical Modeling_. doi: 10.5281/zenodo.1211190 (URL:
+<https://doi.org/10.5281/zenodo.1211190>), R package version 0.12.2, URL:<https://cran.r-project.org/package=nimble>.
+
+Furnas, B. J., R. H. Landers, S. Hill, S. S. Itoga, and B. N. Sacks. 2018. Integrated modeling to estimate population size and composition of mule deer. Journal of Wildlife Management 82:1429–1441. 
+
+Turek, D., C. Milleret, T. Ergon, and H. Brøseth 2021. Efficient estimation of large‐scale spatial capture–recapture model. Ecosphere <DOI:10.1002/ecs2.338>5.
+
+Royle, J. A., R. B. Chandler, R. Sollmann, and B. Gardner. 2014. Spatial
+capture‐recapture. Academic Press, Waltham, Massachusetts, USA.
