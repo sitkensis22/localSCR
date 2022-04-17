@@ -39,7 +39,7 @@ explaining detection probability. The models include sex-specific scaling
 parameters and habitat masking.
 }
 \examples{
-# get model for spatialcount model with non-occasion-specific detection
+# get spatial count model with non-occasion-specific detection
 # function, single scaling parameter, no habitat mask, and no clustering
 unmarked_model = get_unmarked(occ_specific=FALSE,sex_sigma = FALSE,
                      hab_mask = FALSE, trapsClustered = FALSE)

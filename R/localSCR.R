@@ -2876,7 +2876,7 @@ customize_model <- function(model,append_code = NULL,line_append = NULL,
 #' @author Daniel Eacker
 #' @importFrom nimble nimbleCode
 #' @examples
-#' # get model for spatialcount model with non-occasion-specific detection
+#' # get spatial count model with non-occasion-specific detection
 #' # function, single scaling parameter, no habitat mask, and no clustering
 #' unmarked_model = get_unmarked(occ_specific=FALSE,sex_sigma = FALSE,
 #'                      hab_mask = FALSE, trapsClustered = FALSE)
