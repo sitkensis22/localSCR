@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{get_classic}
 \alias{get_classic}
-\title{Function to retrieve nimbleCode for spatially-explicit mark recapture models}
+\title{Function to retrieve nimbleCode for spatial capture-recapture models}
 \usage{
 get_classic(
   dim_y,

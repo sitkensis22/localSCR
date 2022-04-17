@@ -1,6 +1,4 @@
-
-#' Function to define state-space for a spatially-explicit mark recapture
-#' models
+#' Function to define state-space for spatial capture-recapture models
 #'
 #' Returns a list of a matrix or array object of grid
 #' coordinates and an Extent object from the \code{raster} package as a 
@@ -88,7 +86,7 @@ grid_classic <- function(X, crs_, buff, res){
 
 
 
-#' Function to simulate basic spatially-explicit mark recapture data
+#' Function to simulate basic spatial capture-recapture data
 #'
 #' Returns a list of simulated data including the encounter
 #' history, binary sex indicator, activity centers, and site identifier.
@@ -322,7 +320,7 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter,
 
 
 
-#' Function to retrieve nimbleCode for spatially-explicit mark recapture models
+#' Function to retrieve nimbleCode for spatial capture-recapture models
 #'
 #' Creates model code using the \code{\link[nimble]{nimbleCode}} function.
 #'
@@ -2106,7 +2104,7 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
 
 
 
-#' Function to run spatially-explicit capture-recapture models in nimble using 
+#' Function to run spatial capture-recapture models in nimble using 
 #' parallel processing
 #'
 #' A wrapper function to conduct Markov Chain Monte Carlo (MCMC) sampling using
@@ -2873,7 +2871,7 @@ customize_model <- function(model,append_code = NULL,line_append = NULL,
 
 
 
-#' Function to retrieve nimbleCode for spatially-explicit count models
+#' Function to retrieve nimbleCode for spatial count models
 #'
 #' Creates model code using the \code{\link[nimble]{nimbleCode}} function.
 #'
