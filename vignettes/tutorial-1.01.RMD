@@ -1,5 +1,7 @@
 ---
 title: "Classic SCR models: continuous state-space and marked individuals"
+description: >
+  Learn how to simulate and analysis basic SCR data 
 author: "Daniel Eacker"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
