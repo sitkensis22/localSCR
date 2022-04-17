@@ -2905,7 +2905,8 @@ customize_model <- function(model,append_code = NULL,line_append = NULL,
 get_unmarked <- function(occ_specific = FALSE, sex_sigma = FALSE,
                         hab_mask = FALSE,trapsClustered = FALSE){
     M <- J <- su <- X <- sigma <- n0 <- zu <- A <- lam0 <- K <- sex <- 
-      nSites <-  site <- pixelWidth <- psi <- prop.habitat <- NULL
+      nSites <-  site <- pixelWidth <- psi <- prop.habitat <- site_indexL <-
+      site_indexU <- NULL
  if(trapsClustered == FALSE){    
   if(isFALSE(hab_mask)){ # determine if hab_mask is included
     if(isFALSE(occ_specific)){

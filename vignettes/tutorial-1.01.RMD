@@ -1,5 +1,7 @@
 ---
 title: "Classic SCR models: continuous state-space and marked individuals"
+author: "Daniel Eacker"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{tutorial-1.0}
