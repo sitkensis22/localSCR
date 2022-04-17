@@ -1,6 +1,6 @@
 #' Function to define state-space for spatial capture-recapture models
 #'
-#' Returns a list of a matrix or array object of grid
+#' @description Returns a list of a matrix or array object of grid
 #' coordinates and an Extent object from the \code{raster} package as a 
 #' state-space.
 #'
@@ -88,7 +88,7 @@ grid_classic <- function(X, crs_, buff, res){
 
 #' Function to simulate basic spatial capture-recapture data
 #'
-#' Returns a list of simulated data including the encounter
+#' @description Returns a list of simulated data including the encounter
 #' history, binary sex indicator, activity centers, and site identifier.
 #'
 #' @param X either a matrix or array object representing the coordinates of traps in
@@ -322,7 +322,7 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter,
 
 #' Function to retrieve nimbleCode for spatial capture-recapture models
 #'
-#' Creates model code using the \code{\link[nimble]{nimbleCode}} function.
+#' @description Creates model code using the \code{\link[nimble]{nimbleCode}} function.
 #'
 #' @param dim_y an integer of either 2 (the default) or that defines what 
 #' dimensional format the encounter history data are in.
@@ -1435,7 +1435,7 @@ return(scrcode)
 
 #' Function to generate starting locations for activity centers
 #'
-#' Generate a matrix of intial starting locations, possibly accounting 
+#' @description Generate a matrix of intial starting locations, possibly accounting 
 #' for habitat mask.
 #'
 #' @param y either a matrix or array of encounter history data, possiblity 
@@ -1666,7 +1666,7 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask){
 #' Function to rescale trap coordinates, grid extent, and starting activity 
 #' center coordinates
 #'
-#' Rescale inputs to prepare data for habitat mask to be used.
+#' @description Rescale inputs to prepare data for habitat mask to be used.
 #'
 #' @param X either a matrix or array representing the coordinates of traps in
 #' UTMs. An array is used when traps are clustered over a survey area.
@@ -1793,7 +1793,7 @@ if(length(dim(X))==3){
 
 #' Function to create habitat mask matrix or array from polygon
 #'
-#' Creates a matrix or array to use as a habitat mask to account for unsuitable 
+#' @description Creates a matrix or array to use as a habitat mask to account for unsuitable 
 #' habitat.
 #'
 #' @param poly a polygon created using the \code{sf} package of class 
@@ -1947,7 +1947,7 @@ return(habitat_mask)
 
 #' Function to create habitat mask matrix or array from raster
 #'
-#' Creates a matrix or array to use as a habitat mask to account for unsuitable 
+#' @description Creates a matrix or array to use as a habitat mask to account for unsuitable 
 #' habitat.
 #'
 #' @param rast a raster layer created using the \code{raster} package of class 
@@ -2107,7 +2107,7 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
 #' Function to run spatial capture-recapture models in nimble using 
 #' parallel processing
 #'
-#' A wrapper function to conduct Markov Chain Monte Carlo (MCMC) sampling using
+#' @description A wrapper function to conduct Markov Chain Monte Carlo (MCMC) sampling using
 #'  nimble.
 #'
 #' @param model \code{nimbleCode} used to define model in \code{nimble} package,
@@ -2331,7 +2331,7 @@ run_classic <- function(model, data, constants, inits, params,
 
 #' Function to summarize MCMC chain output from nimble
 #'
-#' Summarizes lists of MCMC chain output from nimble
+#' @description Summarizes lists of MCMC chain output from nimble
 #'
 #' @param d a list of MCMC samples from each chain returned from 
 #' \code{\link{run_classic}}.
@@ -2553,7 +2553,7 @@ if(is.null(exclude_params)){
 
 #' Function to generate realized density surface from MCMC output
 #'
-#' Streamlined construction of realized density surface from posterior
+#' @description Streamlined construction of realized density surface from posterior
 #' samples of latent indicator variable (\code{z}) and activity center
 #' coordinates (\code{s})
 #'
@@ -2763,7 +2763,7 @@ realized_density <- function(samples, grid, crs_, site, hab_mask, s_alias = "s",
 
 #' Function to efficiently edit rows of model code generated from nimble
 #'
-#' Allows for efficient editing of model code produced by \code{nimbleCode()} 
+#' @description Allows for efficient editing of model code produced by \code{nimbleCode()} 
 #' function
 #'
 #' @param model \code{nimbleCode()} used to define model in \code{nimble} package,
@@ -2873,7 +2873,7 @@ customize_model <- function(model,append_code = NULL,line_append = NULL,
 
 #' Function to retrieve nimbleCode for spatial count models
 #'
-#' Creates model code using the \code{\link[nimble]{nimbleCode}} function.
+#' @description Creates model code using the \code{\link[nimble]{nimbleCode}} function.
 #'
 #' @param occ_specific logical. If \code{FALSE}, the encounter rate will
 #' not include an occasion-specific loop in the detection function; otherwise, 
