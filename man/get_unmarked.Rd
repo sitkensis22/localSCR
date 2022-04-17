@@ -27,10 +27,10 @@ used. Default is \code{FALSE}.}
 arrays across the sampling area.}
 }
 \value{
-a \code{nimbleCode} object from the \code{nimble} package.
+model code created from \code{\link[nimble]{nimbleCode}}.
 }
 \description{
-Creates a \code{nimbleCode} object from the \code{nimble} package.
+Creates model code using the \code{\link[nimble]{nimbleCode}} function.
 }
 \details{
 This function provides templates for unmarked models that can be 

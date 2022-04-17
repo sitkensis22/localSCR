@@ -53,7 +53,9 @@ This ensures that the MCMC samples will be the same during each run using the
  same data, etc. Default is \code{NULL}.}
 
 \item{s_alias}{a character value used to identify the latent activity center
-coordinates used in the model. Default is \code{"s"}}
+coordinates used in the model. Default is \code{"s"}. Note that the length
+of \code{s_alias} must be either 1 (e.g., \code{"s"}) or 2 
+(e.g., \code{c("s","su")}).}
 }
 \value{
 a list of MCMC samples for each parameter traced with length equal to
@@ -61,7 +63,7 @@ a list of MCMC samples for each parameter traced with length equal to
 }
 \description{
 A wrapper function to conduct Markov Chain Monte Carlo (MCMC) sampling using
- nimble
+ nimble.
 }
 \details{
 This function provides a wrapper to easily run Bayesian SCR models

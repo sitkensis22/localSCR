@@ -27,7 +27,7 @@ habitat respectively.
 }
 \description{
 Creates a matrix or array to use as a habitat mask to account for unsuitable 
-habitat
+habitat.
 }
 \details{
 This function creates a habitat matrix or array depending upon 

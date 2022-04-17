@@ -324,7 +324,7 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter,
 
 #' Function to retrieve nimbleCode for spatially-explicit mark recapture models
 #'
-#' Creates a \code{nimbleCode} object from the \code{nimble} package.
+#' Creates model code using the \code{\link[nimble]{nimbleCode}} function.
 #'
 #' @param dim_y an integer of either 2 (the default) or that defines what 
 #' dimensional format the encounter history data are in.
@@ -1796,7 +1796,7 @@ if(length(dim(X))==3){
 #' Function to create habitat mask matrix or array from polygon
 #'
 #' Creates a matrix or array to use as a habitat mask to account for unsuitable 
-#' habitat
+#' habitat.
 #'
 #' @param poly a polygon created using the \code{sf} package of class 
 #' \code{"sfc_POLYGON"}
@@ -1950,7 +1950,7 @@ return(habitat_mask)
 #' Function to create habitat mask matrix or array from raster
 #'
 #' Creates a matrix or array to use as a habitat mask to account for unsuitable 
-#' habitat
+#' habitat.
 #'
 #' @param rast a raster layer created using the \code{raster} package of class 
 #' \code{"RasterLayer"}
@@ -2110,7 +2110,7 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
 #' parallel processing
 #'
 #' A wrapper function to conduct Markov Chain Monte Carlo (MCMC) sampling using
-#'  nimble
+#'  nimble.
 #'
 #' @param model \code{nimbleCode} used to define model in \code{nimble} package,
 #'  possibly generated from \code{\link{get_classic}}.
@@ -2133,7 +2133,9 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
 #' This ensures that the MCMC samples will be the same during each run using the
 #'  same data, etc. Default is \code{NULL}.
 #' @param s_alias a character value used to identify the latent activity center
-#'  coordinates used in the model. Default is \code{"s"}
+#'  coordinates used in the model. Default is \code{"s"}. Note that the length
+#'  of \code{s_alias} must be either 1 (e.g., \code{"s"}) or 2 
+#'  (e.g., \code{c("s","su")}).
 #' @return a list of MCMC samples for each parameter traced with length equal to
 #'  the number of chains run.
 #' @details This function provides a wrapper to easily run Bayesian SCR models
@@ -2257,10 +2259,27 @@ run_classic <- function(model, data, constants, inits, params,
     # MCMC configurations
     mcmcspec<-nimble::configureMCMC(SCRmodelR, monitors=params) 
     # block updating for marked individual activity centers
-    mcmcspec$removeSamplers("s", print = FALSE)
+    if(length(s_alias)!=1 | length(s_alias!=2)){
+    stop("s_alias must be either a scalar or vector of length 2")
+    }  
+    if(length(s_alias)==1){
+    mcmcspec$removeSamplers(s_alias, print = FALSE)
     for(i in 1:constants$M){
       snew = paste(s_alias,"[",i,","," 1:2","]",sep="")
       mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
+    }
+    }else
+    if(length(s_alias)==2){ # for  spatial mark-resight model
+    mcmcspec$removeSamplers(s_alias[1], print = FALSE)
+    for(i in 1:constants$M){
+      snew = paste(s_alias[1],"[",i,","," 1:2","]",sep="")
+      mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
+    }
+    mcmcspec$removeSamplers(s_alias[2], print = FALSE)
+    for(i in 1:constants$M){
+      snew = paste(s_alias[2],"[",i,","," 1:2","]",sep="")
+      mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
+    }
     }
     scrMCMC <- nimble::buildMCMC(mcmcspec)
     CscrMCMC <- nimble::compileNimble(scrMCMC, project = SCRmodelR,
@@ -2856,7 +2875,7 @@ customize_model <- function(model,append_code = NULL,line_append = NULL,
 
 #' Function to retrieve nimbleCode for spatially-explicit count models
 #'
-#' Creates a \code{nimbleCode} object from the \code{nimble} package.
+#' Creates model code using the \code{\link[nimble]{nimbleCode}} function.
 #'
 #' @param occ_specific logical. If \code{FALSE}, the encounter rate will
 #' not include an occasion-specific loop in the detection function; otherwise, 
@@ -2868,7 +2887,7 @@ customize_model <- function(model,append_code = NULL,line_append = NULL,
 #' used. Default is \code{FALSE}.
 #' @param trapsClustered a logical value indicating if traps are clustered in 
 #' arrays across the sampling area.
-#' @return a \code{nimbleCode} object from the \code{nimble} package.
+#' @return model code created from \code{\link[nimble]{nimbleCode}}.
 #' @details This function provides templates for unmarked models that can be 
 #' easily modified to include further model complexity such as covariates 
 #' explaining detection probability. The models include sex-specific scaling 

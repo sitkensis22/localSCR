@@ -29,7 +29,7 @@ a matrix or array of 0's and 1's denoting unsuitable and suitable
 }
 \description{
 Creates a matrix or array to use as a habitat mask to account for unsuitable 
-habitat
+habitat.
 }
 \details{
 This function creates a habitat matrix or array depending upon 

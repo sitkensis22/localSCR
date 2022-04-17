@@ -32,7 +32,7 @@ arrays across the sampling area.}
 a \code{nimbleCode} object from the \code{nimble} package.
 }
 \description{
-Creates a \code{nimbleCode} object from the \code{nimble} package.
+Creates model code using the \code{\link[nimble]{nimbleCode}} function.
 }
 \details{
 This function provides templates that could be copied and easily 
