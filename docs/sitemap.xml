@@ -1,57 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/404.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/articles/classic_scr.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/articles/index.html</loc>
   </url>
   <url>
-    <loc>/LICENSE-text.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/authors.html</loc>
   </url>
   <url>
-    <loc>/LICENSE.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/index.html</loc>
   </url>
   <url>
-    <loc>/reference/customize_model.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>/reference/get_classic.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/LICENSE.html</loc>
   </url>
   <url>
-    <loc>/reference/get_unmarked.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/reference/customize_model.html</loc>
   </url>
   <url>
-    <loc>/reference/grid_classic.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/reference/get_classic.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/reference/get_unmarked.html</loc>
   </url>
   <url>
-    <loc>/reference/initialize_classic.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/reference/grid_classic.html</loc>
   </url>
   <url>
-    <loc>/reference/mask_polygon.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/mask_raster.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/reference/initialize_classic.html</loc>
   </url>
   <url>
-    <loc>/reference/nimSummary.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/reference/mask_polygon.html</loc>
   </url>
   <url>
-    <loc>/reference/realized_density.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/reference/mask_raster.html</loc>
   </url>
   <url>
-    <loc>/reference/rescale_classic.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/reference/nimSummary.html</loc>
   </url>
   <url>
-    <loc>/reference/run_classic.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/reference/realized_density.html</loc>
   </url>
   <url>
-    <loc>/reference/sim_classic.html</loc>
+    <loc>https://sitkensis22.github.io/localSCR/reference/rescale_classic.html</loc>
+  </url>
+  <url>
+    <loc>https://sitkensis22.github.io/localSCR/reference/run_classic.html</loc>
+  </url>
+  <url>
+    <loc>https://sitkensis22.github.io/localSCR/reference/sim_classic.html</loc>
   </url>
 </urlset>
