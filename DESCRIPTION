@@ -18,7 +18,9 @@ Imports:
     sp,
     stringr,
     parallel,
-    tictoc
+    R.utils,
+    tictoc,
+    viridisLite
 License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.1.2.9000
