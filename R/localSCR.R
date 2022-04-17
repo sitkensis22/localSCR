@@ -2852,3 +2852,561 @@ customize_model <- function(model,append_code = NULL,line_append = NULL,
   return(source(txtPath1)$value)
 } # End function 'customize_model'
 
+
+
+#' Function to retrieve nimbleCode for spatially-explicit count models
+#'
+#' Creates a \code{nimbleCode} object from the \code{nimble} package.
+#'
+#' @param occ_specific logical. If \code{FALSE}, the encounter rate will
+#' not include an occasion-specific loop in the detection function; otherwise, 
+#' the model will include a for loop for occasions (K) in the detection function.
+#' Default is \code{FALSE}.
+#' @param sex_sigma a logical value indicating whether the scaling parameter 
+#' ('sigma') is sex-specific.
+#' @param hab_mask a logical value indicating whether a habitat mask will be 
+#' used. Default is \code{FALSE}.
+#' @param trapsClustered a logical value indicating if traps are clustered in 
+#' arrays across the sampling area.
+#' @return a \code{nimbleCode} object from the \code{nimble} package.
+#' @details This function provides templates for unmarked models that can be 
+#' easily modified to include further model complexity such as covariates 
+#' explaining detection probability. The models include sex-specific scaling 
+#' parameters and habitat masking.
+#' @author Daniel Eacker
+#' @importFrom nimble nimbleCode
+#' @examples
+#' # get model for spatialcount model with non-occasion-specific detection
+#' # function, single scaling parameter, no habitat mask, and no clustering
+#' unmarked_model = get_unmarked(occ_specific=FALSE,sex_sigma = FALSE,
+#'                      hab_mask = FALSE, trapsClustered = FALSE)
+#'
+#' # inspect model
+#' unmarked_model
+#' @name get_unmarked
+#' @export
+get_unmarked <- function(occ_specific = FALSE, sex_sigma = FALSE,
+                        hab_mask = FALSE,trapsClustered = FALSE){
+    M <- J <- su <- X <- sigma <- n0 <- zu <- A <- lam0 <- K <- sex <- 
+      nSites <-  site <- pixelWidth <- psi <- prop.habitat <- NULL
+ if(trapsClustered == FALSE){    
+  if(isFALSE(hab_mask)){ # determine if hab_mask is included
+    if(isFALSE(occ_specific)){
+      if(sex_sigma  == FALSE){
+          scrcode <- nimble::nimbleCode({
+            lam0 ~ dunif(0,lam0_upper) # baseline encounter probability
+            sigma ~ dunif(0, sigma_upper) # scaling parameter
+            psi ~ dunif(0, 1) # inclusion prob
+            for(i in 1:M){ 
+              zu[i]~dbern(psi)
+              su[i,1] ~ dunif(x_lower, x_upper)
+              su[i,2] ~ dunif(y_lower, y_upper)
+              dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
+              lam[i,1:J] <- lam0*exp(-dist[i,1:J]^2/(2*sigma^2))*zu[i]
+            } # i individuals
+            # unmarked spatial count model likelihood
+            for(j in 1:J){
+              bigLambda[j] <- sum(lam[1:M,j])
+            for(k in 1:K){
+              n[j,k] ~ dpois(bigLamda[j])
+            } # k occasions
+           } # j traps
+            N <- sum(zu[1:M])
+            D <- N/A
+          })
+        }else
+    if(sex_sigma  == TRUE){
+          scrcode <- nimble::nimbleCode({
+            lam0 ~ dunif(0,lam0_upper) # baseline encounter probability
+            psi_sex ~ dunif(0,1) # probability sex = 1
+            sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+            sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+            psi ~ dunif(0, 1) # inclusion prob
+            for(i in 1:M){
+              zu[i]~dbern(psi)
+              sex[i] ~ dbern(psi_sex)
+              sx[i] <- sex[i] + 1
+              su[i,1] ~ dunif(x_lower, x_upper)
+              su[i,2] ~ dunif(y_lower, y_upper)
+              dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
+              lam[i,1:J] <- lam0*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))*zu[i]
+            } # i individuals
+           # unmarked spatial count model likelihood
+           for(j in 1:J){
+            bigLambda[j] <- sum(lam[1:M,j])
+           for(k in 1:K){
+            n[j,k] ~ dpois(bigLamda[j])
+           } # k occasions
+          } # j traps
+            N <- sum(zu[1:M])
+            D <- N/A
+          })
+        }
+      return(scrcode)
+    } else    # End occ_specific = FALSE
+      if(isFALSE(occ_specific)==FALSE){
+          if(sex_sigma  == FALSE){
+            scrcode <- nimble::nimbleCode({
+              lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
+              sigma ~ dunif(0, sigma_upper) # scaling parameter
+              psi ~ dunif(0, 1) # inclusion prob
+              for(i in 1:M){
+                zu[i]~dbern(psi)
+                su[i,1] ~ dunif(x_lower, x_upper)
+                su[i,2] ~ dunif(y_lower, y_upper)
+                dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
+                for(k in 1:K){
+                  lam[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma^2))*zu[i]
+                } # k occasions
+              } # i individuals
+              # unmarked spatial count model likelihood
+              for(j in 1:J){
+                bigLambda[j] <- sum(lam[1:M,j,1:K]) 
+              for(k in 1:K){
+                n[j,k] ~ dpois(bigLamda[j])
+               } # k occasions
+              } # j traps
+              N <- sum(zu[1:M])
+              D <- N/A
+            })
+          }else
+        if(sex_sigma  == TRUE){
+          scrcode <- nimble::nimbleCode({
+            lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
+            psi_sex ~ dunif(0,1) # probability sex = 1
+            sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+            sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+            psi ~ dunif(0, 1) # inclusion prob
+          for(i in 1:M){
+            zu[i]~dbern(psi)
+            sex[i] ~ dbern(psi_sex)
+            sx[i] <- sex[i] + 1
+            su[i,1] ~ dunif(x_lower, x_upper)
+            su[i,2] ~ dunif(y_lower, y_upper)
+            dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
+             for(k in 1:K){
+             lam[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))*zu[i]
+              } # k occasions
+            } # i marked individuals
+              # unmarked spatial count model likelihood
+              for(j in 1:J){
+                bigLambda[j] <- sum(lam[1:M,j,1:K]) 
+              for(k in 1:K){
+                n[j,k] ~ dpois(bigLamda[j])
+               } # k occasions
+              } # j traps
+                  N <- sum(zu[1:M])
+                  D <- N/A
+                })
+              }
+        return(scrcode)
+      } 
+  } else # End no habitat mask
+if(hab_mask==TRUE){
+ if(isFALSE(occ_specific)){
+   if(sex_sigma  == FALSE){
+     scrcode <- nimble::nimbleCode({
+      lam0 ~ dunif(0,lam0_upper) # baseline encounter probability
+      sigma ~ dunif(0, sigma_upper) # scaling parameter
+      sigma.pixel <- sigma / pixelWidth # scaled for habitat mask
+      psi ~ dunif(0, 1) # inclusion prob
+    for(i in 1:M){
+      zu[i]~dbern(psi)
+      su[i,1] ~ dunif(x_lower, x_upper)
+      su[i,2] ~ dunif(y_lower, y_upper)
+      pOK[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1)] # habitat check
+      OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
+      dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
+      lam[i,1:J] <- lam0*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
+    } # i individuals
+          # unmarked spatial count model likelihood
+          for(j in 1:J){
+            bigLambda[j] <- sum(lam[1:M,j]) 
+          for(k in 1:K){
+            n[j,k] ~ dpois(bigLamda[j])
+           } # k occasions
+          } # j traps
+          N <- sum(zu[1:M])
+          D <- N/A
+        })
+  }else
+if(sex_sigma  == TRUE){
+  scrcode <- nimble::nimbleCode({
+    lam0 ~ dunif(0,lam0_upper) # baseline encounter probability
+    psi_sex ~ dunif(0,1) # probability sex = 1
+    sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+    sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+    sigma.pixel[1] <- sigma[1] / pixelWidth # scaled for habitat mask
+    sigma.pixel[2] <- sigma[2] / pixelWidth # scaled for habitat mask
+    psi ~ dunif(0, 1) # inclusion prob
+  for(i in 1:M){
+    zu[i]~dbern(psi)
+    sex[i] ~ dbern(psi_sex)
+    sx[i] <- sex[i] + 1
+    su[i,1] ~ dunif(x_lower, x_upper)
+    su[i,2] ~ dunif(y_lower, y_upper)
+    pOK[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1)] # habitat check
+    OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
+    dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
+    lam[i,1:J] <- lam0*exp(-dist[i,1:J]^2/(2*sigma.pixel[sx[i]]^2))*zu[i]
+  } # i individuals
+    # unmarked spatial count model likelihood
+    for(j in 1:J){
+      bigLambda[j] <- sum(lam[1:M,j]) 
+    for(k in 1:K){
+      n[j,k] ~ dpois(bigLamda[j])
+     } # k occasions
+    } # j traps
+    N <- sum(zu[1:M])
+    D <- N/A
+  })
+  }
+  return(scrcode)
+  } else   
+     if(isFALSE(occ_specific)==FALSE){
+      if(sex_sigma  == FALSE){
+        scrcode <- nimble::nimbleCode({
+          lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
+          sigma ~ dunif(0, sigma_upper) # scaling parameter
+          sigma.pixel <- sigma / pixelWidth # scaled for habitat mask
+          psi ~ dunif(0, 1) # inclusion prob
+        for(i in 1:M){
+          zu[i]~dbern(psi)
+          su[i,1] ~ dunif(x_lower, x_upper)
+          su[i,2] ~ dunif(y_lower, y_upper)
+          pOK[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1)] # habitat check
+          OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
+          dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
+        for(k in 1:K){
+          lam[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
+        } # k occasions
+      } # i individuals
+        # unmarked spatial count model likelihood
+        for(j in 1:J){
+          bigLambda[j] <- sum(lam[1:M,j,1:K]) 
+        for(k in 1:K){
+          n[j,k] ~ dpois(bigLamda[j])
+         } # k occasions
+        } # j traps
+        N <- sum(zu[1:M])
+        D <- N/A
+      })
+  }else
+    if(sex_sigma  == TRUE){
+      scrcode <- nimble::nimbleCode({
+      lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
+      psi_sex ~ dunif(0,1) # probability sex = 1
+      sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+      sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+      sigma.pixel[1] <- sigma[1] / pixelWidth # scaled for habitat mask
+      sigma.pixel[2] <- sigma[2] / pixelWidth # scaled for habitat mask
+      psi ~ dunif(0, 1) # inclusion prob
+    for(i in 1:M){
+      zu[i]~dbern(psi)
+      sex[i] ~ dbern(psi_sex)
+      sx[i] <- sex[i] + 1
+      su[i,1] ~ dunif(x_lower, x_upper)
+      su[i,2] ~ dunif(y_lower, y_upper)
+      pOK[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1)] # habitat check
+      OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
+      dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
+    for(k in 1:K){
+      lam[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma.pixel[sx[i]]^2))*zu[i]
+    } # k occasions
+  } # i marked individuals
+  # unmarked spatial count model likelihood
+  for(j in 1:J){
+    bigLambda[j] <- sum(lam[1:M,j,1:K]) 
+  for(k in 1:K){
+    n[j,k] ~ dpois(bigLamda[j])
+   } # k occasions
+  } # j traps
+  N <- sum(zu[1:M])
+  D <- N/A
+  })
+ }
+   return(scrcode)
+   }  # end occasion-specific
+  } # end models with hab_mask
+ }else # end trapsClustered == FALSE
+ if(trapsClustered){
+ if(isFALSE(hab_mask)){ # determine if hab_mask is included
+ if(isFALSE(occ_specific)){
+ if(isFALSE(sex_sigma)){
+   scrcode <- nimble::nimbleCode({
+  for(g in 1:nSites){  
+    lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
+  }
+    sigma ~ dunif(0, sigma_upper) # scaling parameter
+    psi ~ dunif(0, 1) # inclusion prob
+  for(i in 1:M){
+   zu[i]~dbern(psi)
+   su[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+   su[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+   dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
+   lam[i,1:J] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma^2))*zu[i]
+  } # i individuals
+  # unmarked spatial count model likelihood
+  for(g in 1:nSites){
+  for(j in 1:J){
+    bigLambda[j,g] <- sum(lam[site_indexL[g]:site_indexU[g],j]) 
+  for(k in 1:K){
+    n[j,k,g] ~ dpois(bigLamda[j,g])
+   } # k occasions
+  } # j traps
+  } # g sites
+  N <- sum(zu[1:M])
+  D <- N/A
+  })
+}else
+ if(sex_sigma  == TRUE){
+  scrcode <- nimble::nimbleCode({
+   for(g in 1:nSites){  
+    lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
+   }
+   psi_sex ~ dunif(0,1) # probability sex = 1
+   sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+   sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+   psi ~ dunif(0, 1) # inclusion prob
+  for(i in 1:M){
+   zu[i]~dbern(psi)
+   sex[i] ~ dbern(psi_sex)
+   sx[i] <- sex[i] + 1
+   su[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+   su[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+   dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
+   lam[i,1:J] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))*zu[i]
+  } # i marked individuals
+  # unmarked spatial count model likelihood
+  for(g in 1:nSites){
+  for(j in 1:J){
+    bigLambda[j,g] <- sum(lam[site_indexL[g]:site_indexU[g],j]) 
+  for(k in 1:K){
+    n[j,k,g] ~ dpois(bigLamda[j,g])
+   } # k occasions
+  } # j traps
+  } # g sites
+  N <- sum(zu[1:M])
+    D <- N/A
+  })
+}
+  return(scrcode)
+} else # end occasion-specific == FALSE
+if(isFALSE(occ_specific)==FALSE){ # occasion-specific models
+if(sex_sigma  == FALSE){
+scrcode <- nimble::nimbleCode({
+sigma ~ dunif(0, sigma_upper) # scaling parameter
+psi ~ dunif(0, 1) # inclusion prob
+for(g in 1:nSites){
+  lam0[g] ~ dunif(0,lam0_upper) # site-specific baseline encounter rate
+} # g sites
+for(i in 1:M){
+  zu[i]~dbern(psi)
+  su[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+  su[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+  dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
+ for(k in 1:K){
+ lam[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))*zu[i]
+  } # k occasions
+} # i marked individuals
+  # unmarked spatial count model likelihood
+  for(g in 1:nSites){
+  for(j in 1:J){
+    bigLambda[j,g] <- sum(lam[site_indexL[g]:site_indexU[g],j]) 
+  for(k in 1:K){
+    n[j,k,g] ~ dpois(bigLamda[j,g])
+   } # k occasions
+  } # j traps
+  } # g sites
+ N <- sum(zu[1:M])
+ D <- N/A
+})
+}else
+if(sex_sigma  == TRUE){
+  scrcode <- nimble::nimbleCode({
+   for(g in 1:nSites){
+    lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
+   } # g sites
+psi_sex ~ dunif(0,1) # probability sex = 1
+sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+psi ~ dunif(0, 1) # inclusion prob
+for(i in 1:M){
+  zu[i]~dbern(psi)
+  sex[i] ~ dbern(psi_sex)
+  sx[i] <- sex[i] + 1
+  su[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+  su[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+  dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
+ for(k in 1:K){
+ lam[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))*zu[i]
+  } # k occasions
+} # i marked individuals
+  # unmarked spatial count model likelihood
+  for(g in 1:nSites){
+  for(j in 1:J){
+    bigLambda[j,g] <- sum(lam[site_indexL[g]:site_indexU[g],j]) 
+  for(k in 1:K){
+    n[j,k,g] ~ dpois(bigLamda[j,g])
+   } # k occasions
+  } # j traps
+  } # g sites
+ N <- sum(zu[1:M])
+ D <- N/A
+  })
+}
+return(scrcode)
+} # end occasion-specific models
+} else # end hab_mask == FALSE
+if(hab_mask==TRUE){
+if(isFALSE(occ_specific)){
+if(isFALSE(sex_sigma)){
+scrcode <- nimble::nimbleCode({
+for(g in 1:nSites){  
+lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
+}
+sigma ~ dunif(0, sigma_upper) # scaling parameter
+sigma.pixel <- sigma / pixelWidth # scaled for habitat mask
+psi ~ dunif(0, 1) # inclusion prob
+for(i in 1:M){
+zu[i]~dbern(psim[i])
+# adjust psi for the proportion of available habitat at each site
+psim[i] <- (1-(1-psi)^prop.habitat[site[i]]) 
+su[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+su[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+pOK[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1),site[i]] # habitat check
+OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
+dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
+lam[i,1:J] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
+} # i individuals
+# unmarked spatial count model likelihood
+for(g in 1:nSites){
+for(j in 1:J){
+  bigLambda[j,g] <- sum(lam[site_indexL[g]:site_indexU[g],j]) 
+for(k in 1:K){
+  n[j,k,g] ~ dpois(bigLamda[j,g])
+ } # k occasions
+} # j traps
+} # g sites
+N <- sum(zu[1:M])
+D <- N/A
+})
+}else
+if(sex_sigma  == TRUE){
+scrcode <- nimble::nimbleCode({
+for(g in 1:nSites){ 
+  lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
+} # g sites 
+  psi_sex ~ dunif(0,1) # probability sex = 1
+  sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+  sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+  sigma.pixel[1] <- sigma[1] / pixelWidth # scaled for habitat mask 
+  sigma.pixel[2] <- sigma[2] / pixelWidth # scaled for habitat mask   
+  psi ~ dunif(0, 1) # inclusion prob
+  for(i in 1:M){
+  sex[i] ~ dbern(psi_sex)
+  sx[i] <- sex[i] + 1
+  zu[i]~dbern(psim[i])
+   # adjust psi for the proportion of available habitat at each site
+  psim[i] <- (1-(1-psi)^prop.habitat[site[i]])
+  su[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+  su[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+  pOK[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1),site[i]] # habitat check
+  OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
+  dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
+  lam[i,1:J] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma.pixel[sx[i]]^2))*zu[i]
+  } # i marked individuals
+# unmarked spatial count model likelihood
+for(g in 1:nSites){
+for(j in 1:J){
+  bigLambda[j,g] <- sum(lam[site_indexL[g]:site_indexU[g],j]) 
+for(k in 1:K){
+  n[j,k,g] ~ dpois(bigLamda[j,g])
+ } # k occasions
+} # j traps
+} # g sites
+N <- sum(zu[1:M])
+D <- N/A
+})
+}
+return(scrcode)
+} else  # End isFALSE(occ_specific)
+if(isFALSE(occ_specific)==FALSE){
+if(sex_sigma  == FALSE){
+scrcode <- nimble::nimbleCode({
+  sigma ~ dunif(0, sigma_upper) # scaling parameter
+  sigma.pixel <- sigma / pixelWidth # scaled for habitat mask
+  psi ~ dunif(0, 1) # inclusion prob
+  for(g in 1:nSites){
+    lam0[g] ~ dunif(0,lam0_upper) # site-specific baseline encounter rate
+  } # g sites
+  for(i in 1:M){
+    zu[i]~dbern(psim[i])
+   # adjust psi for the proportion of available habitat at each site
+  psim[i] <- (1-(1-psi)^prop.habitat[site[i]]) 
+  su[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+  su[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+  pOK[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1),site[i]] # habitat check
+  OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
+  dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
+    for(k in 1:K){
+      lam[i,1:J,k] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
+    } # k occasions
+  } # i individuals
+# unmarked spatial count model likelihood
+for(g in 1:nSites){
+for(j in 1:J){
+  bigLambda[j,g] <- sum(lam[site_indexL[g]:site_indexU[g],j]) 
+for(k in 1:K){
+  n[j,k,g] ~ dpois(bigLamda[j,g])
+ } # k occasions
+} # j traps
+} # g sites
+N <- sum(zu[1:M])
+D <- N/A
+})
+}else
+ if(sex_sigma  == TRUE){
+    scrcode <- nimble::nimbleCode({
+    for(g in 1:nSites){  
+      lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
+    } # g sites  
+psi_sex ~ dunif(0,1) # probability sex = 1
+sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+sigma.pixel[1] <- sigma[1] / pixelWidth # scaled for habitat mask
+sigma.pixel[2] <- sigma[2] / pixelWidth # scaled for habitat mask
+psi ~ dunif(0, 1) # inclusion prob
+for(i in 1:M){
+  zu[i]~dbern(psim[i])
+   # adjust psi for the proportion of available habitat at each site
+  psim[i] <- (1-(1-psi)^prop.habitat[site[i]])
+  sex[i] ~ dbern(psi_sex)
+  sx[i] <- sex[i] + 1
+  su[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
+  su[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
+  pOK[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1),site[i]]# habitat check
+  OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
+  dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
+  for(k in 1:K){
+  lam[i,1:J,k] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma.pixel[sx[i]]^2))*zu[i]
+  } # k occasions
+} # i individuals
+# unmarked spatial count model likelihood
+   for(g in 1:nSites){
+  for(j in 1:J){
+   bigLambda[j,g] <- sum(lam[site_indexL[g]:site_indexU[g],j]) 
+  for(k in 1:K){
+  n[j,k,g] ~ dpois(bigLamda[j,g])
+  } # k occasions
+ } # j traps
+} # g sites
+ N <- sum(zu[1:M])
+ D <- N/A
+  })
+  }
+return(scrcode)
+} # end isFALSE(occ_specific)==FALSE
+    } # end models with hab_mask
+  } # end trapsClustered
+} # End function 'get_unmarked"

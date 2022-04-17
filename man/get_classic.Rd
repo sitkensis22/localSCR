@@ -44,7 +44,7 @@ distributions, sex-specific scaling parameters, and habitat masking.
 # get model for 2D encounter data, binomial encounter distribution, 
 # non-sex-specific scaling parameter, and no habitat mask
 scr_model = get_classic(dim_y = 2,enc_dist = "binomial",sex_sigma = FALSE,
-hab_mask = FALSE)
+                         hab_mask = FALSE,trapsClustered = FALSE)
 
 # inspect model
 scr_model

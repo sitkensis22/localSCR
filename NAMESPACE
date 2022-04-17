@@ -2,6 +2,7 @@
 
 export(customize_model)
 export(get_classic)
+export(get_unmarked)
 export(grid_classic)
 export(initialize_classic)
 export(mask_polygon)

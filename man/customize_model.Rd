@@ -6,19 +6,15 @@
 \usage{
 customize_model(
   model,
-  line_remove = NULL,
   append_code = NULL,
   line_append = NULL,
+  line_remove = NULL,
   write = FALSE
 )
 }
 \arguments{
 \item{model}{\code{nimbleCode()} used to define model in \code{nimble} package,
 possibly generated from \code{\link{get_classic}} function.}
-
-\item{line_remove}{either \code{NULL} or an integer value as a scalar or vector
-defining which lines of code to remove from model. Set to \code{NULL} when only 
-appending to and not replacing code in previous model file.}
 
 \item{append_code}{either \code{NULL} or model code produced from 
 \code{nimbleCode()}  or \code{\link{get_classic}} function. Note that if
@@ -30,6 +26,10 @@ code; otherwise specify the lines to insert new code into by setting
 defining which positions to insert new lines of code in the model. Note that
 line removal will occur first if \code{line_remove} is set, and then new
 lines of code will be inserted at the desired indexing positions.}
+
+\item{line_remove}{either \code{NULL} or an integer value as a scalar or vector
+defining which lines of code to remove from model. Set to \code{NULL} when only 
+appending to and not replacing code in previous model file.}
 
 \item{write}{logical. If \code{TRUE}, then a text file is written to the 
 working directory called "new_model.txt". Otherwise, model is written to temp
@@ -54,9 +54,9 @@ p0_prior = nimble::nimbleCode({
 })
 
 # replace line 3 of old model code with 'p0_prior' 
-new_model = customize_model(model = scr_model, line_remove = 3, 
-               append_code = p0_prior, line_append = 3, write = FALSE)
-
+new_model = customize_model(model = scr_model, append_code = p0_prior, 
+                                   line_append = 3, line_remove = 3)
+                                   
 # inspect new model code
 new_model
 }
