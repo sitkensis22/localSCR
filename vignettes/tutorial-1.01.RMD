@@ -4,7 +4,7 @@ author: "Daniel Eacker"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{tutorial-1.0}
+  %\VignetteIndexEntry{tutorial-1.01}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -34,7 +34,7 @@ Finally, in some SCR designs, trap arrays may be spread out over the study area 
 
 
 <p>
-## Turtorial-1.0
+## Turtorial-1.01
 
 This tutorial includes four parts:
 
