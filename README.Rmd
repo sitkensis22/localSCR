@@ -33,6 +33,8 @@ Be sure to see important information about using 'nimble' on your computer (incl
 ## Vignettes
 * [Classic SCR models: continuous state-space and marked individuals](https://sitkensis22.github.io/localSCR/articles/classic_scr.html)
 
+<a href="https://sitkensis22.github.io/localSCR/articles/classic_scr.html">Classic SCR models: continuous state-space and marked individuals</a>
+
 ## References
 
 de Valpine P, C. Paciorek, D. Turek, N. Michaud, C. Anderson-Bergman, F. Obermeyer, C. C. Wehrhahn, A. Rodrìguez, L. D. Temple, and S. Paganin. 2022. _NIMBLE: MCMC, Particle
