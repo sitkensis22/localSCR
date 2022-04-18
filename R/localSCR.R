@@ -1455,6 +1455,10 @@ return(scrcode)
 #'  augmented population size (i.e., \code{M}).
 #' @param hab_mask either \code{FALSE} (the default) or a matrix or array output
 #'  from \code{\link{mask_polygon}} or \code{\link{mask_raster}} functions.
+#' @param all_random logical. If \code{TRUE}, then encounter data \code{y} are 
+#' ignored and all initial activity center starting locations are randomly chosen.
+#' If \code{FALSE}, then initial values will be the mean capture location for 
+#' detected individuals and random locations for augmented individuals. 
 #' @return a matrix of initial activity center coordinates with \code{M} rows 
 #' and 2 columns.
 #' @details This function generates initial activity center locations based 
@@ -1487,7 +1491,7 @@ return(scrcode)
 #' # generate initial activity center coordinates for 2D trap array without 
 #' # habitat mask
 #' s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, buff = 3*mysigma, 
-#' hab_mask = FALSE)
+#' hab_mask = FALSE, all_random = FALSE)
 #'
 #' # make simple plot
 #' par(mfrow=c(1,1))
@@ -1496,10 +1500,11 @@ return(scrcode)
 #' points(s.st3d, col="red",pch=20)
 #' @name initialize_classic
 #' @export
-initialize_classic <- function(y, M, X, buff, site, hab_mask){
+initialize_classic <- function(y, M, X, buff, site, hab_mask, all_random = FALSE){
   if(length(dim(X))!=2 & length(dim(X))!=3){
     stop("Trapping grid must be only 2 or 3 dimensions")
   }
+  if(isFALSE(all_random)==FALSE){
   # for dim of length 2
   if(length(dim(X))==2){
     n0 <- length(which(apply(y,1,sum)!=0))
@@ -1656,8 +1661,75 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask){
         pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1),site[i]]
         }
       } # end habitat check
-  } # end augmented individuals
-} # end 3D initialize
+   } # end augmented individuals
+ } # end 3D initialize
+} else # end all_random = FALSE    
+ if(isFALSE(all_random) == FALSE){ 
+   # for dim of length 2
+  if(length(dim(X))==2){
+    s.st <- matrix(NA, nrow=M, ncol=2)
+    # create x limits for state-space
+    xlim <- c(min(X[,1] - max(buff)), max(X[,1] + max(buff)))
+     # create y limits for state-space
+    ylim <- c(min(X[,2] - max(buff)), max(X[,2] + max(buff)))
+    for(i in 1:M){
+      if(isFALSE(hab_mask)){ # check for habitat mask for augmented individuals
+        s.st[i,1]<-runif(1,xlim[1],xlim[2])
+        s.st[i,2]<-runif(1,ylim[1],ylim[2])
+      } else
+        if(isFALSE(hab_mask)==FALSE){
+          s.st[i,1]<-runif(1,xlim[1],xlim[2])
+          s.st[i,2]<-runif(1,ylim[1],ylim[2])
+          sx.rescale <- scales::rescale(s.st[i,1], to = c(0,dim(hab_mask)[2]), 
+                                        from=xlim)
+          sy.rescale <- scales::rescale(s.st[i,2], to = c(0,dim(hab_mask)[1]), 
+                                        from=ylim)
+          pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1)]
+          while(pOK==0){
+            s.st[i,1]<-runif(1,xlim[1],xlim[2])
+            s.st[i,2]<-runif(1,ylim[1],ylim[2])
+            sx.rescale <- scales::rescale(s.st[i,1], to = c(0,dim(hab_mask)[2]), 
+                                          from=xlim)
+            sy.rescale <- scales::rescale(s.st[i,2], to = c(0,dim(hab_mask)[1]),
+                                          from=ylim)
+            pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1)]
+          }
+        } # end habitat check
+    } # augmented individuals
+  }  else
+  if(length(dim(X))==3){
+    if(length(dim(X))==3 & length(site)!=M){
+    stop("Include 'site' variable with length M")
+    }
+    s.st <- matrix(NA, nrow=M, ncol=2)
+  for(i in 1:M){
+        xlim <- c(min(X[,1,site[i]] - max(buff)), max(X[,1,site[i]] + max(buff))) # create x limits for state-space
+        ylim <- c(min(X[,2,site[i]] - max(buff)), max(X[,2,site[i]] + max(buff))) # create y limits for state-space
+    if(isFALSE(hab_mask)){ # check for habitat mask for augmented individuals
+        s.st[i,1]<-runif(1,xlim[1],xlim[2])
+        s.st[i,2]<-runif(1,ylim[1],ylim[2])
+    } else
+      if(isFALSE(hab_mask)==FALSE){
+        s.st[i,1] <-runif(1,xlim[1],xlim[2])
+        s.st[i,2] <-runif(1,ylim[1],ylim[2])
+        sx.rescale <- scales::rescale(s.st[i,1], to = c(0,dim(hab_mask)[2]), 
+                                      from=xlim)
+        sy.rescale <- scales::rescale(s.st[i,2], to = c(0,dim(hab_mask)[1]), 
+                                      from=ylim)
+        pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1),site[i]]
+        while(pOK==0){
+        s.st[i,1] <-runif(1,xlim[1],xlim[2])
+        s.st[i,2] <-runif(1,ylim[1],ylim[2])
+        sx.rescale <- scales::rescale(s.st[i,1], to = c(0,dim(hab_mask)[2]), 
+                                      from=xlim)
+        sy.rescale <- scales::rescale(s.st[i,2], to = c(0,dim(hab_mask)[1]), 
+                                      from=ylim)
+        pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1),site[i]]
+        }
+      } # end habitat check
+   } # end augmented individuals
+ } # end 3D initialize
+} # end all_random = TRUE  
   return(s.st)
 } # end function 'initialize_classic'
 

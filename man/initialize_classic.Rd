@@ -4,7 +4,7 @@
 \alias{initialize_classic}
 \title{Function to generate starting locations for activity centers}
 \usage{
-initialize_classic(y, M, X, buff, site, hab_mask)
+initialize_classic(y, M, X, buff, site, hab_mask, all_random = FALSE)
 }
 \arguments{
 \item{y}{either a matrix or array of encounter history data, possiblity 
@@ -29,6 +29,11 @@ augmented) belongs to. Note that \code{site} is provided from
 
 \item{hab_mask}{either \code{FALSE} (the default) or a matrix or array output
 from \code{\link{mask_polygon}} or \code{\link{mask_raster}} functions.}
+
+\item{all_random}{logical. If \code{TRUE}, then encounter data \code{y} are 
+ignored and all initial activity center starting locations are randomly chosen.
+If \code{FALSE}, then initial values will be the mean capture location for 
+detected individuals and random locations for augmented individuals.}
 }
 \value{
 a matrix of initial activity center coordinates with \code{M} rows 
@@ -69,7 +74,7 @@ enc_dist = "binomial", hab_mask = FALSE, setSeed = 50)
 # generate initial activity center coordinates for 2D trap array without 
 # habitat mask
 s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, buff = 3*mysigma, 
-hab_mask = FALSE)
+hab_mask = FALSE, all_random = FALSE)
 
 # make simple plot
 par(mfrow=c(1,1))
