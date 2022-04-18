@@ -1,7 +1,7 @@
 ---
 title: "Classic SCR models: continuous state-space and marked individuals"
 description: >
-  Learn how to simulate and analysis basic SCR data 
+  Learn how to simulate and analyze basic spatial capture-recapture data 
 author: "Daniel Eacker"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 ## Introduction
 <p>
-The first vignette of the 'localSCR' package covers what I define as a set of 'classic' Bayesian spatial capture-recapture (SCR) models (Royle et al. 2014). These models are designed to model SCR data for 'marked' individuals under the assumption of uniformly distributed activity centers (i.e,. a continuous state-space). Although many distance detection functions are possible, the package currently only models the encounter process under the assumption of a bivariate normal model of space use, which is commonly employed in the literature. The package is meant to ease implementation of these Bayesian SCR models using the 'nimble' package (de Valpine et a. 2022), which allows for increased flexibilty with the ability for the user to include custom functions and assign different algorithms to specific model parameters. I took advantage of this functionality with the goal of building a simple, straightforward workflow that was flexible enough to handle most mainstream SCR analysis problems. Visit <https://r-nimble.org/download> for information on installing 'nimble' and Rtools on your computer.
+The first vignette of the 'localSCR' package covers what I define as a set of 'classic' Bayesian spatial capture-recapture (SCR) models (Royle et al. 2014). These models are designed to model SCR data for 'marked' individuals under the assumption of uniformly distributed activity centers (i.e,. a continuous state-space). Although many distance detection functions are possible, the package currently only models the encounter process under the assumption of a bivariate normal model of space use, which is commonly employed in the literature. The package is meant to ease implementation of Bayesian SCR models using the 'nimble' package (de Valpine et a. 2022), which allows for increased flexibilty with the ability for the user to include custom functions and assign different algorithms to specific model parameters. I took advantage of this functionality with the goal of building a simple, straightforward workflow that was flexible enough to handle most mainstream SCR analysis problems. Visit <https://r-nimble.org/download> for information on installing 'nimble' and Rtools on your computer.
 </p>
 ## Implementation
 <p>
@@ -93,8 +93,8 @@ ggplot() + geom_point(data=as.data.frame(Grid$grid),aes(x=x,y=y),color="grey60",
     theme(axis.text = element_text(size=12),axis.title = element_text(size=16))
 ```
 
-<p align="center">
-  <img src="../man/figures/Fig1.png" />
+<p align="center" >
+  <img src="../man/figures/Fig1.png" style="width:70%"/>
 </p>
 
 <p>
@@ -113,7 +113,7 @@ N = 200, K = 4, base_encounter = 0.10, enc_dist = "binomial", hab_mask = FALSE, 
 # inspect simulated data
 str(data3d)
 
-# bind simulated activity centers with vector of the number of individuals detections
+# bind simulated activity centers with vector of the number of individual detections
 sdata = as.data.frame(cbind(data3d$s,Ndet=apply(data3d$y,1,sum)))
  
 # make ggplot
@@ -127,7 +127,7 @@ ggplot() + geom_point(data=as.data.frame(Grid$grid),aes(x=x,y=y),color="grey60",
 ```
 
 <p align="center">
-  <img src="../man/figures/Fig2.png" />
+  <img src="../man/figures/Fig2.png" style="width:70%" />
 </p>
 <p>
 In the plot we can see the point sizes are relative to the number of detections ('Ndet') for each simulated individual. Although most individuals detected near or on the grid have a large number of detections, we still pick up some individuals multiple times on the edge of the grid just by chance. Also, the point pattern appears random because we are drawing simulated activity center coordinates using `runif()`, which adheres to our assumption of a random distribution of individual activity centers across the state-space in our classis SCR analysis. 
@@ -191,7 +191,7 @@ ggplot() + geom_point(data=as.data.frame(Grid$grid),aes(x=x,y=y),color="grey60",
 ```
 
 <p align="center">
-  <img src="../man/figures/Fig3.png" />
+  <img src="../man/figures/Fig3.png" style="width:70%" />
 </p>
 <p>
 In the figure above we can see the effect of the polygon in creating a habitat mask for the state-space. The `initialize_classic()` function contains the initial activity center locations to within the polygon (note that those points on the edges were in suitable habitat when the continuous location were discretized and checked with the habitat mask). 
@@ -258,7 +258,7 @@ abline(v=200, col="red") # add line for simulated abundance
 ```
 
 <p align="center">
-  <img src="../man/figures/Fig4.png" />
+  <img src="../man/figures/Fig4.png" style="width:70%"/>
 </p>
 <p>
 We can see from the histogram of the posterior samples of `N` that our model estimates were close to the simulated value of 200 individuals (shows by red line) and were biased slightly low at around 186 individuals. This is expected since this is only one realization of the detection process. In this example, we divided the pixelWidth by 100 in deriving the area (`A`) in our list of constants. This allowed us to estimate density in activity centers/100 m<sup>2</sup> rather than activity centers/m<sup>2</sup>. Note that care must be taken with any rescaling of the data or constants.
@@ -283,7 +283,7 @@ plot(r, col=viridis(100),main=expression("Realized density (activity centers/100
 ```
 
 <p align="center">
-  <img src="../man/figures/Fig5.png" />
+  <img src="../man/figures/Fig5.png"  style="width:70%" />
 </p>
 <p>
 Next we repeat a similar workflow but now we have two trap arrays that are clustered in space, and thus, there is a negligble chance of detecting an individual at more than one trap array. In this case, the functions in 'localSCR' can automatically detect that the traps are in a 3-dimensional format and we note that `sim_classic` will return a variable called `site` that identifies which trap array that each individual (both detected and augmented) belongs to. Note that the number of rows in the simulated data `y` will equal the simulated population size (here in the example, `N = 200`). However, because we are using a trick provided by Chandler (2018) to separate the data augmentation process into two steps, we only need the encounter data for those individuals that were detected in the model likelihood. Also, because we have no occasion-specific detection covariates, we can sum `y` over individuals and traps to result in a 2-dimensional encounter history array (i.e., `y[i,j]`). This speeds us the model under these conditions and we can specify this when we get the SCR model using `get_model(y_dim = 2,...)` by setting `y_dim = 2`. Otherwise, the workflow is very similar to having a 2-dimensional trap array in the previous example.
@@ -329,13 +329,13 @@ ggplot() + geom_point(data=as.data.frame(GridX$grid[,,1]),aes(x=V1,y=V2),color="
 ```
 
 <p align="center">
-  <img src="../man/figures/Fig6.png" />
+  <img src="../man/figures/Fig6.png" style="width:70%" />
 </p>
 <p>
 In the figure we can see our two spatially separated trapping grids and that the polgon overlaps some of the grided area. The area outside the polygon will be considere unsuitable when the habitat matrix is created. Note that the `site` variable will be only as long as the simulated population size (here, 200) and thus, we will need to augment the variable to have the length equal to the total augmented population size (i.e., `M = 400`). Otherwise the workflow is very similar to the previous one. 
 </p>
 
-```{r, fig.show='hide'}
+```{r, fig.show='hide',fig.width = 8,fig.height=14}
 # get 3D habitat mask array for 3D grid
 hab_mask = mask_polygon(poly = poly, grid = GridX$grid, crs_ = mycrs, prev_mask = NULL)
 
@@ -408,7 +408,7 @@ nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)
 ```
 
 <p align="center">
-  <img src="../man/figures/Fig7.png" />
+  <img src="../man/figures/Fig7.png" style="width:70%"/>
 </p>
 
 <p>
@@ -471,7 +471,7 @@ pcomb
 ```
 
 <p align="center">
-  <img src="../man/figures/Fig8.png" />
+  <img src="../man/figures/Fig8.png" style="width:90%"/>
 </p>
 
 

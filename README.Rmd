@@ -2,8 +2,6 @@
 output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -28,7 +26,7 @@ install_github("sitkensis22/localSCR")
 ```
 
 Be sure to see important information about using 'nimble' on your computer (including installing rtools):
-<https://r-nimble.org/download>
+<https://r-nimble.org/download>.
 
 ## Vignettes
 * <a href="https://sitkensis22.github.io/localSCR/articles/classic_scr.html">Classic SCR models: continuous state-space and marked individuals</a>

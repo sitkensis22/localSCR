@@ -1,10 +1,7 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 # localSCR
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 The goal of ‘localSCR’ is to provide user-friendly functions to
@@ -32,11 +29,11 @@ install_github("sitkensis22/localSCR")
 ```
 
 Be sure to see important information about using ‘nimble’ on your
-computer (including installing rtools): <https://r-nimble.org/download>
+computer (including installing rtools): <https://r-nimble.org/download>.
 
 ## Vignettes
 
-  - <a href="https://sitkensis22.github.io/localSCR/articles/classic_scr.html">Classic
+-   <a href="https://sitkensis22.github.io/localSCR/articles/classic_scr.html">Classic
     SCR models: continuous state-space and marked individuals</a>
 
 ## References
