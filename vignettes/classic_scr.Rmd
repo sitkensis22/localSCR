@@ -69,7 +69,6 @@ library(localSCR)
 ```
 
 ### (1) Simulate a single trap array with random positional noise and create state-space
-The first example generates a 
 
 ```{r, fig.show='hide'}
 # simulate a single trap array with random positional noise
@@ -336,7 +335,7 @@ ggplot() + geom_point(data=as.data.frame(GridX$grid[,,1]),aes(x=V1,y=V2),color="
 In the figure we can see our two spatially separated trapping grids and that the polgon overlaps some of the grided area. The area outside the polygon will be considere unsuitable when the habitat matrix is created. Note that the `site` variable will be only as long as the simulated population size (here, 200) and thus, we will need to augment the variable to have the length equal to the total augmented population size (i.e., `M = 400`). Otherwise the workflow is very similar to the previous one. 
 </p>
 
-```{r, fig.show='hide', fig.height=14, fig.width=10}
+```{r, fig.show='hide'}
 # get 3D habitat mask array for 3D grid
 hab_mask = mask_polygon(poly = poly, grid = GridX$grid, crs_ = mycrs, prev_mask = NULL)
 
