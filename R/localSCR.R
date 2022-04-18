@@ -1504,7 +1504,7 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask, all_random = FALSE
   if(length(dim(X))!=2 & length(dim(X))!=3){
     stop("Trapping grid must be only 2 or 3 dimensions")
   }
-  if(isFALSE(all_random)==FALSE){
+  if(isFALSE(all_random)){
   # for dim of length 2
   if(length(dim(X))==2){
     n0 <- length(which(apply(y,1,sum)!=0))
