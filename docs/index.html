@@ -61,7 +61,20 @@
 </h1></div>
 <!-- badges: start -->
 <!-- badges: end -->
-<p>The goal of ‘localSCR’ is to provide user-friendly functions to implement Bayesian spatial capture-recapture models (Royle et al. 2014) using the ‘nimble’ package (de Valpine et a. 2022) in R. The package currently has functions to 1) assist with defining the state-space grid and extent for a given 2-dimensional or 3-dimensional trap array (i.e., when traps are clustered in space), 2) simulate data under different encounter distributions and other parameters, 3) create habitat masks from either raster data or spatial polygons, 4) provide template SECR models that are easily customizable, 5) fit and summarize SECR models using ‘nimble’ (de Valpine et a. 2022) with options for parallel processing, and 6) create realized density surfaces from MCMC output. Future functionality will include discrete state-space models and implementing localized approaches as in Milleret et al. (2019) and Woodruff et al. (2020).</p>
+<p>The goal of ‘localSCR’ is to provide user-friendly functions to
+implement Bayesian spatial capture-recapture models (Royle et al. 2014)
+using the ‘nimble’ package (de Valpine et a. 2022) in R. The package
+currently has functions to 1) assist with defining the state-space grid
+and extent for a given 2-dimensional or 3-dimensional trap array (i.e.,
+when traps are clustered in space), 2) simulate data under different
+encounter distributions and other parameters, 3) create habitat masks
+from either raster data or spatial polygons, 4) provide template SECR
+models that are easily customizable, 5) fit and summarize SECR models
+using ‘nimble’ (de Valpine et a. 2022) with options for parallel
+processing, and 6) create realized density surfaces from MCMC output.
+Future functionality will include discrete state-space models and
+implementing localized approaches as in Milleret et al. (2019) and
+Woodruff et al. (2020).</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -69,22 +82,35 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://remotes.r-lib.org" class="external-link">remotes</a></span><span class="op">)</span>
 <span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"sitkensis22/localSCR"</span><span class="op">)</span></code></pre></div>
-<p>Be sure to see important information about using ‘nimble’ on your computer (including installing rtools): <a href="https://r-nimble.org/download" class="external-link uri">https://r-nimble.org/download</a></p>
+<p>Be sure to see important information about using ‘nimble’ on your
+computer (including installing rtools): <a href="https://r-nimble.org/download" class="external-link uri">https://r-nimble.org/download</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="vignettes">Vignettes<a class="anchor" aria-label="anchor" href="#vignettes"></a>
 </h2>
 <ul>
-<li><a href="https://sitkensis22.github.io/localSCR/articles/classic_scr.html">Classic SCR models: continuous state-space and marked individuals</a></li>
+<li><a href="https://sitkensis22.github.io/localSCR/articles/classic_scr.html">Classic
+SCR models: continuous state-space and marked individuals</a></li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<p>de Valpine P, C. Paciorek, D. Turek, N. Michaud, C. Anderson-Bergman, F. Obermeyer, C. C. Wehrhahn, A. Rodrìguez, L. D. Temple, and S. Paganin. 2022. <em>NIMBLE: MCMC, Particle Filtering, and Programmable Hierarchical Modeling</em>. doi: 10.5281/zenodo.1211190 (URL: <a href="https://doi.org/10.5281/zenodo.1211190" class="external-link uri">https://doi.org/10.5281/zenodo.1211190</a>), R package version 0.12.2, URL:<a href="https://cran.r-project.org/package=nimble" class="external-link uri">https://cran.r-project.org/package=nimble</a>.</p>
-<p>Milleret, C., P. Dupont, C. Bonenfant, H. Henrik Brøseth, Ø. Flagstad, C. Sutherland, and R. Bischof. 2019. A local evaluation of the individual state‐space to scale up Bayesian spatial capture‐recapture. Ecology and Evolution 9:352–363.</p>
-<p>Royle, J. A., R. B. Chandler, R. Sollmann, and B. Gardner. 2014. Spatial capture‐recapture. Academic Press, Waltham, Massachusetts, USA.</p>
-<p>Woodruff, S., D. R. Eacker, and L. Waits. 2020. Estimating coyote density in local, discrete Bayesian capture-recapture models. Journal of Wildlife Management 10.1002/jwmg.21967</p>
+<p>de Valpine P, C. Paciorek, D. Turek, N. Michaud, C. Anderson-Bergman,
+F. Obermeyer, C. C. Wehrhahn, A. Rodrìguez, L. D. Temple, and S.
+Paganin. 2022. <em>NIMBLE: MCMC, Particle Filtering, and Programmable
+Hierarchical Modeling</em>. doi: 10.5281/zenodo.1211190 (URL: <a href="https://doi.org/10.5281/zenodo.1211190" class="external-link uri">https://doi.org/10.5281/zenodo.1211190</a>), R package
+version 0.12.2, URL:<a href="https://cran.r-project.org/package=nimble" class="external-link uri">https://cran.r-project.org/package=nimble</a>.</p>
+<p>Milleret, C., P. Dupont, C. Bonenfant, H. Henrik Brøseth, Ø.
+Flagstad, C. Sutherland, and R. Bischof. 2019. A local evaluation of the
+individual state‐space to scale up Bayesian spatial capture‐recapture.
+Ecology and Evolution 9:352–363.</p>
+<p>Royle, J. A., R. B. Chandler, R. Sollmann, and B. Gardner. 2014.
+Spatial capture‐recapture. Academic Press, Waltham, Massachusetts,
+USA.</p>
+<p>Woodruff, S., D. R. Eacker, and L. Waits. 2020. Estimating coyote
+density in local, discrete Bayesian capture-recapture models. Journal of
+Wildlife Management 10.1002/jwmg.21967</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
@@ -123,7 +149,8 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.2.</p>
 </div>
 
     </footer>

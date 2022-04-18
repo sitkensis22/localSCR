@@ -108,7 +108,8 @@ Now lets simulate some spatial capture-recapture data using `sim_classic()`. Not
 ```{r, fig.show='hide'}
 # simulate SCR data
 data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = mysigma, prop_sex = 1,
-N = 200, K = 4, base_encounter = 0.10, enc_dist = "binomial", hab_mask = FALSE, setSeed = 100)
+N = 200, K = 4, base_encounter = 0.10, enc_dist = "binomial", 
+hab_mask = FALSE, setSeed = 100)
 
 # inspect simulated data
 str(data3d)
@@ -161,11 +162,13 @@ poly = st_sfc(st_polygon(x=list(matrix(c(-1765,-1765,1730,-1650,1600,1650,0,1350
 -1850,1000,-1765,-1765),ncol=2, byrow=TRUE))), crs =  mycrs)
 
 # create habitat mask
-hab_mask = mask_polygon(poly = poly, grid = Grid$grid, crs_ = mycrs, prev_mask = NULL)
+hab_mask = mask_polygon(poly = poly, grid = Grid$grid, crs_ = mycrs, 
+prev_mask = NULL)
 
 # simulate data for uniform state-space and habitat mask
 data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = mysigma, prop_sex = 0.7,
-N = 200, K = 4, base_encounter = 0.15, enc_dist = "binomial",hab_mask = hab_mask, setSeed = 100)
+N = 200, K = 4, base_encounter = 0.15, enc_dist = "binomial",
+hab_mask = hab_mask, setSeed = 100)
 
 # total augmented population size 
 M = 400
@@ -174,7 +177,8 @@ M = 400
 s.st3d = initialize_classic(y=data3d$y, M=M, X=traps, buff = 3*max(mysigma), hab_mask = hab_mask)
 
 # bind simulated activity centers with vector of either 1 (detected) or 0 (not detected)
-s.stdata = as.data.frame(cbind(s.st3d,Det=c(as.numeric(apply(data3d$y,1,sum)>0),rep(0,M-nrow(data3d$y)))))
+s.stdata = as.data.frame(cbind(s.st3d,Det=c(as.numeric(apply(data3d$y,1,sum)>0),
+rep(0,M-nrow(data3d$y)))))
 
 # convert Det to factor
 s.stdata$Det = as.factor(s.stdata$Det)
@@ -201,7 +205,8 @@ We now have most of the components we will need to analyze the simulated data se
 
 ```{r, fig.show='hide'}
 # rescale inputs
-rescale_list = rescale_classic(X = traps, ext = Grid$ext, s.st = s.st3d, hab_mask = hab_mask)
+rescale_list = rescale_classic(X = traps, ext = Grid$ext, s.st = s.st3d, 
+hab_mask = hab_mask)
 
 # store rescaled extent
 ext = rescale_list$ext
@@ -235,19 +240,22 @@ s.st3d = rescale_list$s.st
 
 # define all initial values
 inits = list(sigma = runif(2, 250, 350), s = s.st3d,psi=runif(1,0.2,0.3),
-p0 = runif(1, 0.05, 0.15),pOK=data$OK,z=c(rep(NA,constants$n0),rep(0,constants$M-constants$n0)))
+p0 = runif(1, 0.05, 0.15),pOK=data$OK,z=c(rep(NA,constants$n0),
+rep(0,constants$M-constants$n0)))
 
 # parameters to monitor
 params = c("sigma","psi","p0","N","D","psi_sex","s","z")
 
 # get model
-scr_model = get_classic(dim_y = 2, enc_dist = "binomial",sex_sigma = TRUE,hab_mask=TRUE,trapsClustered=FALSE)
+scr_model = get_classic(dim_y = 2, enc_dist = "binomial",sex_sigma = TRUE,hab_mask=TRUE,
+trapsClustered=FALSE)
 
 # run model
 library(tictoc)
 tic() # track time elapsed
 out = run_classic(model = scr_model, data=data, constants=constants,
-inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, RNGseed = 500)
+inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, 
+RNGseed = 500)
 toc()
 
 # summarize output
@@ -337,7 +345,8 @@ In the figure we can see our two spatially separated trapping grids and that the
 
 ```{r, fig.show='hide',fig.width = 8,fig.height=14}
 # get 3D habitat mask array for 3D grid
-hab_mask = mask_polygon(poly = poly, grid = GridX$grid, crs_ = mycrs, prev_mask = NULL)
+hab_mask = mask_polygon(poly = poly, grid = GridX$grid, crs_ = mycrs, 
+prev_mask = NULL)
 
 # simulate data for uniform state-space and habitat mask (N is simulated abundance per site)
 data4d = sim_classic(X = Xarray, ext = GridX$ext, crs_ = mycrs, sigma_ = mysigma, prop_sex = 0.7,
@@ -350,10 +359,12 @@ M = 400
 site = c(data4d$site,c(rep(1,((M-length(data4d$site))/2)),rep(2,((M-length(data4d$site))/2))))
 
 # get initial activity center starting values 
-s.st4d = initialize_classic(y=data4d$y, M=M, X=Xarray, buff = 3*max(mysigma), site = site, hab_mask = hab_mask)
+s.st4d = initialize_classic(y=data4d$y, M=M, X=Xarray, buff = 3*max(mysigma), site = site,
+hab_mask = hab_mask)
 
 # rescale inputs
-rescale_list = rescale_classic(X = Xarray, ext = GridX$ext, s.st = s.st4d, site = site, hab_mask = hab_mask)
+rescale_list = rescale_classic(X = Xarray, ext = GridX$ext, s.st = s.st4d, site = site, 
+hab_mask = hab_mask)
 
 # store rescaled extent and convert to matrix
 ext = do.call(rbind, lapply(rescale_list$ext, as.vector))
@@ -385,7 +396,8 @@ s.st = rescale_list$s.st
 
 # define all initial values
 inits = list(sigma = runif(2, 250, 350), s = s.st,psi=runif(1,0.2,0.3),
-p0 = runif(dim(data$X)[3], 0.1, 0.2),sex=ifelse(is.na(data$sex),rbinom(constants$M-constants$n0,1,0.5),NA),
+p0 = runif(dim(data$X)[3], 0.1, 0.2),sex=ifelse(is.na(data$sex),
+rbinom(constants$M-constants$n0,1,0.5),NA),
 pOK=data$OK,z=c(rep(NA,constants$n0),rep(0,constants$M-constants$n0)),
 psi_sex=runif(1,0.4,0.6))
 
@@ -393,7 +405,8 @@ psi_sex=runif(1,0.4,0.6))
 params = c("sigma","psi","p0","N","D","psi_sex","s","z")
 
 # get model
-scr_model = get_classic(dim_y = 2, enc_dist = "binomial",sex_sigma = TRUE,hab_mask=TRUE,trapsClustered = TRUE)
+scr_model = get_classic(dim_y = 2, enc_dist = "binomial",sex_sigma = TRUE,hab_mask=TRUE,
+trapsClustered = TRUE)
 
 # run model
 library(tictoc)
@@ -457,7 +470,8 @@ prow <- plot_grid(p1 + theme(legend.position="none"),
            )
 
 # extract the legend from one of the plots
-legend_t <- get_legend(p1 + theme(legend.position = "top",legend.direction = "horizontal",legend.text = element_text(size=14),legend.title = element_text(size=16)))
+legend_t <- get_legend(p1 + theme(legend.position = "top",legend.direction = "horizontal",
+legend.text = element_text(size=14),legend.title = element_text(size=16)))
 
 # add the legend above the row we made earlier. Give it 20% of the height
 # of one plot (via rel_heights).
