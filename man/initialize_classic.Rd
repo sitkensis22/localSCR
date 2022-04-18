@@ -32,8 +32,8 @@ from \code{\link{mask_polygon}} or \code{\link{mask_raster}} functions.}
 
 \item{all_random}{logical. If \code{TRUE}, then encounter data \code{y} are 
 ignored and all initial activity center starting locations are randomly chosen.
-If \code{FALSE}, then initial values will be the mean capture location for 
-detected individuals and random locations for augmented individuals.}
+If \code{FALSE} (the default), then initial values will be the mean capture 
+location for detected individuals and random locations for augmented individuals.}
 }
 \value{
 a matrix of initial activity center coordinates with \code{M} rows 
