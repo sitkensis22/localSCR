@@ -103,25 +103,25 @@ Finally, in some SCR designs, trap arrays may be spread out over the study area 
 </h2>
 <ul>
 <li>
+<code><a href="../reference/get_classic.html">get_classic()</a></code> grabs template model for given inputs using the <code>nimbleCode()</code> function</li>
+<li>
 <code><a href="../reference/grid_classic.html">grid_classic()</a></code> define state-space grid and extent</li>
-<li>
-<code><a href="../reference/sim_classic.html">sim_classic()</a></code> simulate basic spatial capture-recapture data</li>
-<li>
-<code><a href="../reference/mask_polygon.html">mask_polygon()</a></code> create habitat mask matrix or array from polygon</li>
 <li>
 <code><a href="../reference/initialize_classic.html">initialize_classic()</a></code> generate starting locations for activity area centers</li>
 <li>
-<code><a href="../reference/rescale_classic.html">rescale_classic()</a></code> rescale inputs to prepare data for using habitat mask</li>
-<li>
-<code><a href="../reference/get_classic.html">get_classic()</a></code> grabs template model for given inputs using the <code>nimbleCode()</code> function</li>
-<li>
-<code><a href="../reference/run_classic.html">run_classic()</a></code> wrapper function to run classic models using ‘nimble’ package</li>
+<code><a href="../reference/mask_polygon.html">mask_polygon()</a></code> create habitat mask matrix or array from polygon</li>
 <li>
 <code><a href="../reference/nimSummary.html">nimSummary()</a></code> summarize lists of Markov Chain Monte Carlo (MCMC) output</li>
 <li>
 <code><a href="../reference/realized_density.html">realized_density()</a></code> generate realized density surface from MCMC output</li>
+<li>
+<code><a href="../reference/rescale_classic.html">rescale_classic()</a></code> rescale inputs to prepare data for using habitat mask</li>
+<li>
+<code><a href="../reference/run_classic.html">run_classic()</a></code> wrapper function to run classic models using ‘nimble’ package</li>
+<li>
+<code><a href="../reference/sim_classic.html">sim_classic()</a></code> simulate basic spatial capture-recapture data</li>
 </ul>
-<p><br><b> <i>Note: see references at bottom of page</i></b></p>
+<p><br></p>
 </div>
 <div class="section level2">
 <h2 id="turtorial">Turtorial<a class="anchor" aria-label="anchor" href="#turtorial"></a>
@@ -187,7 +187,7 @@ hab_mask <span class="op">=</span> <span class="cn">FALSE</span>, setSeed <span 
 <span class="co">#&gt; List of 3</span>
 <span class="co">#&gt;  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...</span>
 <span class="co">#&gt;  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...</span>
-<span class="co">#&gt;  $ s  : num [1:200, 1:2] -661 -833 180 -1525 -108 ...</span>
+<span class="co">#&gt;  $ s  : num [1:200, 1:2] -661 -833 179 -1525 -109 ...</span>
 <span class="co">#&gt;   ..- attr(*, "dimnames")=List of 2</span>
 <span class="co">#&gt;   .. ..$ : NULL</span>
 <span class="co">#&gt;   .. ..$ : chr [1:2] "sx" "sy"</span>
@@ -292,7 +292,7 @@ hab_mask <span class="op">=</span> <span class="va">hab_mask</span><span class="
 <span class="co"># prepare data</span>
 <span class="va">data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">data3d</span><span class="op">$</span><span class="va">y</span><span class="op">)</span>
 <span class="va">data</span><span class="op">$</span><span class="va">y</span> <span class="op">=</span> <span class="va">data</span><span class="op">$</span><span class="va">y</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">y</span>, <span class="fl">1</span>, <span class="va">sum</span><span class="op">)</span><span class="op">!=</span><span class="fl">0</span><span class="op">)</span>,,<span class="op">]</span> <span class="co"># remove augmented records </span>
-<span class="va">data</span><span class="op">$</span><span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">y</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, <span class="va">sum</span><span class="op">)</span> <span class="co"># covert to 2d by summing over occasions</span>
+<span class="va">data</span><span class="op">$</span><span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">y</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, <span class="va">sum</span><span class="op">)</span> <span class="co"># covert to 2d by summing over individuals and traps</span>
 
 <span class="co"># add rescaled traps</span>
 <span class="va">data</span><span class="op">$</span><span class="va">X</span> <span class="op">=</span> <span class="va">rescale_list</span><span class="op">$</span><span class="va">X</span>
@@ -335,7 +335,7 @@ trapsClustered<span class="op">=</span><span class="cn">FALSE</span><span class=
 inits<span class="op">=</span><span class="va">inits</span>, params <span class="op">=</span> <span class="va">params</span>,niter <span class="op">=</span> <span class="fl">10000</span>, nburnin<span class="op">=</span><span class="fl">1000</span>, thin<span class="op">=</span><span class="fl">1</span>, nchains<span class="op">=</span><span class="fl">2</span>, parallel<span class="op">=</span><span class="cn">TRUE</span>, 
 RNGseed <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; 100.172 sec elapsed</span>
+<span class="co">#&gt; 102.049 sec elapsed</span>
 
 <span class="co"># summarize output</span>
 <span class="va">samples</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">out</span><span class="op">)</span>
@@ -463,7 +463,7 @@ x_lower <span class="op">=</span> <span class="va">ext</span><span class="op">[<
 
 <span class="co"># store and format encounter history data</span>
 <span class="va">data</span><span class="op">$</span><span class="va">y</span> <span class="op">=</span> <span class="va">data4d</span><span class="op">$</span><span class="va">y</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">data4d</span><span class="op">$</span><span class="va">y</span>, <span class="fl">1</span>, <span class="va">sum</span><span class="op">)</span><span class="op">!=</span><span class="fl">0</span><span class="op">)</span>,,<span class="op">]</span> <span class="co"># remove augmented records </span>
-<span class="va">data</span><span class="op">$</span><span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">y</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, <span class="va">sum</span><span class="op">)</span> <span class="co"># covert to 2d by summing over occasions</span>
+<span class="va">data</span><span class="op">$</span><span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">y</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, <span class="va">sum</span><span class="op">)</span> <span class="co"># covert to 2d by summing over individuals and traps</span>
 
 <span class="co"># add z and zeros vector data for latent inclusion indicator</span>
 <span class="va">data</span><span class="op">$</span><span class="va">z</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">constants</span><span class="op">$</span><span class="va">n0</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>,<span class="va">constants</span><span class="op">$</span><span class="va">M</span> <span class="op">-</span> <span class="va">constants</span><span class="op">$</span><span class="va">n0</span><span class="op">)</span><span class="op">)</span>
@@ -498,7 +498,7 @@ trapsClustered <span class="op">=</span> <span class="cn">TRUE</span><span class
 inits<span class="op">=</span><span class="va">inits</span>, params <span class="op">=</span> <span class="va">params</span>,niter <span class="op">=</span> <span class="fl">10000</span>, nburnin<span class="op">=</span><span class="fl">1000</span>, thin<span class="op">=</span><span class="fl">1</span>, nchains<span class="op">=</span><span class="fl">2</span>, 
 parallel<span class="op">=</span><span class="cn">TRUE</span>, RNGseed <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; 103.276 sec elapsed</span>
+<span class="co">#&gt; 102.114 sec elapsed</span>
 
 <span class="co"># summary table of MCMC output (exclude "s" and "z" parameters)</span>
 <span class="fu"><a href="../reference/nimSummary.html">nimSummary</a></span><span class="op">(</span><span class="va">out</span>, exclude_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s"</span>,<span class="st">"z"</span><span class="op">)</span>, trace <span class="op">=</span> <span class="cn">TRUE</span>, plot_all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
@@ -595,7 +595,7 @@ That’s it! You’ve made it through the first ‘localSCR’ tutorial. Please 
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <p>Chandler, R. B. 2018. Speeding up data augmentation in BUGS. <a href="https://groups.google.com/forum/#!topic/hmecology/o6cWDqHHgOE" class="external-link uri">https://groups.google.com/forum/#!topic/hmecology/o6cWDqHHgOE</a>.</p>
-<p>de Valpine P, C. Paciorek, D. Turek, N. Michaud, C. Anderson-Bergman, F. Obermeyer, C. C. Wehrhahn, A. Rodrìguez, L. D. Temple, and S. Paganin. 2022. <em>NIMBLE: MCMC, Particle Filtering, and Programmable Hierarchical Modeling</em>. doi: 10.5281/zenodo.1211190 (URL: <a href="https://doi.org/10.5281/zenodo.1211190" class="external-link uri">https://doi.org/10.5281/zenodo.1211190</a>), R package version 0.12.2, URL:<a href="https://cran.r-project.org/package=nimble" class="external-link uri">https://cran.r-project.org/package=nimble</a>.</p>
+<p>de Valpine P, C. Paciorek, D. Turek, N. Michaud, C. Anderson-Bergman, F. Obermeyer, C. C. Wehrhahn, A. Rodrìguez, L. D. Temple, and S. Paganin. 2022. <em>NIMBLE: MCMC, Particle Filtering, and Programmable Hierarchical Modeling</em>. doi: 10.5281/zenodo.1211190 (URL: <a href="https://doi.org/10.5281/zenodo.1211190" class="external-link uri">https://doi.org/10.5281/zenodo.1211190</a>), R package version 0.12.2, URL: <a href="https://cran.r-project.org/package=nimble" class="external-link uri">https://cran.r-project.org/package=nimble</a>.</p>
 <p>Furnas, B. J., R. H. Landers, S. Hill, S. S. Itoga, and B. N. Sacks. 2018. Integrated modeling to estimate population size and composition of mule deer. Journal of Wildlife Management 82:1429–1441.</p>
 <p>Turek, D., C. Milleret, T. Ergon, and H. Brøseth 2021. Efficient estimation of large‐scale spatial capture–recapture model. Ecosphere <a href="DOI:10.1002/ecs2.338" class="uri">DOI:10.1002/ecs2.338</a>5.</p>
 <p>Royle, J. A., R. B. Chandler, R. Sollmann, and B. Gardner. 2014. Spatial capture‐recapture. Academic Press, Waltham, Massachusetts, USA.</p>
