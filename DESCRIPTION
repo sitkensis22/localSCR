@@ -31,6 +31,6 @@ Suggests:
     knitr,
     rasterVis,
     rmarkdown,
-    viridis,
+    viridis
 VignetteBuilder: knitr
 URL: https://sitkensis22.github.io/localSCR/
