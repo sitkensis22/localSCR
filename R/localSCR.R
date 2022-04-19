@@ -2341,7 +2341,7 @@ run_classic <- function(model, data, constants, inits, params,
     # test out effect of AF_slice sampler to reduce autocorrlation and cross correlation
     if(s_alias == "su"){
      mcmcspec$removeSamplers(c("psi","lam0","sigma"))
-     mcmcspec$addSampler(target = c("psi","lam0","sigma"), type = "AF_slice")
+     mcmcspec$addSampler(target = c("psi","lam0","sigma"), type = "AF_slice", silent = TRUE)
     }
     }else
     if(length(s_alias)==2){ # for  spatial mark-resight model
