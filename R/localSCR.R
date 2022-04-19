@@ -3010,7 +3010,7 @@ get_unmarked <- function(occ_specific = FALSE,
             for(j in 1:J){
               bigLambda[j] <- sum(lam[1:M,j])
             for(k in 1:K){
-              n[j,k] ~ dpois(bigLamda[j])
+              n[j,k] ~ dpois(bigLambda[j])
             } # k occasions
            } # j traps
             N <- sum(zu[1:M])
@@ -3036,7 +3036,7 @@ get_unmarked <- function(occ_specific = FALSE,
               for(j in 1:J){
                 bigLambda[j] <- sum(lam[1:M,j,1:K]) 
               for(k in 1:K){
-                n[j,k] ~ dpois(bigLamda[j])
+                n[j,k] ~ dpois(bigLambda[j])
                } # k occasions
               } # j traps
               N <- sum(zu[1:M])
@@ -3065,7 +3065,7 @@ if(hab_mask==TRUE){
           for(j in 1:J){
             bigLambda[j] <- sum(lam[1:M,j]) 
           for(k in 1:K){
-            n[j,k] ~ dpois(bigLamda[j])
+            n[j,k] ~ dpois(bigLambda[j])
            } # k occasions
           } # j traps
           N <- sum(zu[1:M])
@@ -3094,7 +3094,7 @@ if(hab_mask==TRUE){
         for(j in 1:J){
           bigLambda[j] <- sum(lam[1:M,j,1:K]) 
         for(k in 1:K){
-          n[j,k] ~ dpois(bigLamda[j])
+          n[j,k] ~ dpois(bigLambda[j])
          } # k occasions
         } # j traps
         N <- sum(zu[1:M])
@@ -3125,7 +3125,7 @@ if(hab_mask==TRUE){
   for(j in 1:J){
     bigLambda[j,g] <- sum(lam[site_indexL[g]:site_indexU[g],j]) 
   for(k in 1:K){
-    n[j,k,g] ~ dpois(bigLamda[j,g])
+    n[j,k,g] ~ dpois(bigLambda[j,g])
    } # k occasions
   } # j traps
   } # g sites
@@ -3155,7 +3155,7 @@ for(i in 1:M){
   for(j in 1:J){
     bigLambda[j,g] <- sum(lam[site_indexL[g]:site_indexU[g],j]) 
   for(k in 1:K){
-    n[j,k,g] ~ dpois(bigLamda[j,g])
+    n[j,k,g] ~ dpois(bigLambda[j,g])
    } # k occasions
   } # j traps
   } # g sites
@@ -3190,7 +3190,7 @@ for(g in 1:nSites){
 for(j in 1:J){
   bigLambda[j,g] <- sum(lam[site_indexL[g]:site_indexU[g],j]) 
 for(k in 1:K){
-  n[j,k,g] ~ dpois(bigLamda[j,g])
+  n[j,k,g] ~ dpois(bigLambda[j,g])
  } # k occasions
 } # j traps
 } # g sites
@@ -3225,7 +3225,7 @@ for(g in 1:nSites){
 for(j in 1:J){
   bigLambda[j,g] <- sum(lam[site_indexL[g]:site_indexU[g],j]) 
 for(k in 1:K){
-  n[j,k,g] ~ dpois(bigLamda[j,g])
+  n[j,k,g] ~ dpois(bigLambda[j,g])
  } # k occasions
 } # j traps
 } # g sites
