@@ -184,7 +184,7 @@ hab_mask <span class="op">=</span> <span class="cn">FALSE</span>, setSeed <span 
 <span class="co">#&gt; List of 3</span>
 <span class="co">#&gt;  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...</span>
 <span class="co">#&gt;  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...</span>
-<span class="co">#&gt;  $ s  : num [1:200, 1:2] -660 -832 179 -1523 -108 ...</span>
+<span class="co">#&gt;  $ s  : num [1:200, 1:2] -660 -832 180 -1523 -108 ...</span>
 <span class="co">#&gt;   ..- attr(*, "dimnames")=List of 2</span>
 <span class="co">#&gt;   .. ..$ : NULL</span>
 <span class="co">#&gt;   .. ..$ : chr [1:2] "sx" "sy"</span>
@@ -326,7 +326,7 @@ trapsClustered<span class="op">=</span><span class="cn">FALSE</span><span class=
 inits<span class="op">=</span><span class="va">inits</span>, params <span class="op">=</span> <span class="va">params</span>,niter <span class="op">=</span> <span class="fl">10000</span>, nburnin<span class="op">=</span><span class="fl">1000</span>, thin<span class="op">=</span><span class="fl">1</span>, nchains<span class="op">=</span><span class="fl">2</span>, parallel<span class="op">=</span><span class="cn">TRUE</span>, 
 RNGseed <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; 100.445 sec elapsed</span>
+<span class="co">#&gt; 104.728 sec elapsed</span>
 
 <span class="co"># summarize output</span>
 <span class="va">samples</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">out</span><span class="op">)</span>
@@ -486,7 +486,7 @@ trapsClustered <span class="op">=</span> <span class="cn">TRUE</span><span class
 inits<span class="op">=</span><span class="va">inits</span>, params <span class="op">=</span> <span class="va">params</span>,niter <span class="op">=</span> <span class="fl">10000</span>, nburnin<span class="op">=</span><span class="fl">1000</span>, thin<span class="op">=</span><span class="fl">1</span>, nchains<span class="op">=</span><span class="fl">2</span>, 
 parallel<span class="op">=</span><span class="cn">TRUE</span>, RNGseed <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; 103.281 sec elapsed</span>
+<span class="co">#&gt; 104.84 sec elapsed</span>
 
 <span class="co"># summary table of MCMC output (exclude "s" and "z" parameters)</span>
 <span class="fu"><a href="../reference/nimSummary.html">nimSummary</a></span><span class="op">(</span><span class="va">out</span>, exclude_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s"</span>,<span class="st">"z"</span><span class="op">)</span>, trace <span class="op">=</span> <span class="cn">TRUE</span>, plot_all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
@@ -566,9 +566,9 @@ legend.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.
 <span class="va">pcomb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span><span class="va">legend_t</span>, <span class="va">prow</span>, ncol <span class="op">=</span> <span class="fl">1</span>, rel_heights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">.2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># add x and y axis labels</span>
-<span class="va">pcomb</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/annotate_figure.html" class="external-link">annotate_figure</a></span><span class="op">(</span><span class="va">pcomb</span>, bottom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">textGrob</a></span><span class="op">(</span><span class="st">"Easting"</span>, gp<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">gpar</a></span><span class="op">(</span>fontsize<span class="op">=</span><span class="fl">18</span><span class="op">)</span>, vjust <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, hjust <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,
-    left <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">textGrob</a></span><span class="op">(</span><span class="st">"Northing"</span>, rot<span class="op">=</span><span class="fl">90</span>, gp<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">gpar</a></span><span class="op">(</span>fontsize<span class="op">=</span><span class="fl">18</span><span class="op">)</span>,
-         vjust <span class="op">=</span> <span class="fl">1</span>, hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>
+<span class="va">pcomb</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rpkgs.datanovia.com/ggpubr/reference/annotate_figure.html" class="external-link">annotate_figure</a></span><span class="op">(</span><span class="va">pcomb</span>, bottom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">textGrob</a></span><span class="op">(</span><span class="st">"Easting"</span>, gp<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">gpar</a></span><span class="op">(</span>fontsize<span class="op">=</span><span class="fl">18</span><span class="op">)</span>, vjust <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,
+hjust <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,left <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/grid.text.html" class="external-link">textGrob</a></span><span class="op">(</span><span class="st">"Northing"</span>, rot<span class="op">=</span><span class="fl">90</span>, 
+gp<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">gpar</a></span><span class="op">(</span>fontsize<span class="op">=</span><span class="fl">18</span><span class="op">)</span>,vjust <span class="op">=</span> <span class="fl">1</span>, hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>
 <span class="va">pcomb</span></code></pre></div>
 <p align="center">
 <img src="../reference/figures/Fig8.png" style="width:90%"></p>
