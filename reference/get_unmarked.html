@@ -105,7 +105,7 @@ explaining detection probability. The models include habitat masking.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     for (j in 1:J) {</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         bigLambda[j] &lt;- sum(lam[1:M, j])</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         for (k in 1:K) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             n[j, k] ~ dpois(bigLamda[j])</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             n[j, k] ~ dpois(bigLambda[j])</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     N &lt;- sum(zu[1:M])</span>
