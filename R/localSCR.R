@@ -2343,6 +2343,7 @@ run_classic <- function(model, data, constants, inits, params,
      mcmcspec$removeSamplers(c("psi","lam0","sigma"))
      mcmcspec$addSampler(target = c("psi","lam0","sigma"), type = "AF_slice", silent = TRUE)
     }
+      #
     }else
     if(length(s_alias)==2){ # for  spatial mark-resight model
     mcmcspec$removeSamplers(s_alias[1], print = FALSE)
