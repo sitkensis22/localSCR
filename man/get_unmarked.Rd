@@ -4,21 +4,13 @@
 \alias{get_unmarked}
 \title{Function to retrieve nimbleCode for spatial count models}
 \usage{
-get_unmarked(
-  occ_specific = FALSE,
-  sex_sigma = FALSE,
-  hab_mask = FALSE,
-  trapsClustered = FALSE
-)
+get_unmarked(occ_specific = FALSE, hab_mask = FALSE, trapsClustered = FALSE)
 }
 \arguments{
 \item{occ_specific}{logical. If \code{FALSE}, the encounter rate will
 not include an occasion-specific loop in the detection function; otherwise, 
 the model will include a for loop for occasions (K) in the detection function.
 Default is \code{FALSE}.}
-
-\item{sex_sigma}{a logical value indicating whether the scaling parameter 
-('sigma') is sex-specific.}
 
 \item{hab_mask}{a logical value indicating whether a habitat mask will be 
 used. Default is \code{FALSE}.}
@@ -35,14 +27,13 @@ Creates model code using the \code{\link[nimble]{nimbleCode}} function.
 \details{
 This function provides templates for unmarked models that can be 
 easily modified to include further model complexity such as covariates 
-explaining detection probability. The models include sex-specific scaling 
-parameters and habitat masking.
+explaining detection probability. The models include habitat masking.
 }
 \examples{
 # get spatial count model with non-occasion-specific detection
 # function, single scaling parameter, no habitat mask, and no clustering
-unmarked_model = get_unmarked(occ_specific=FALSE,sex_sigma = FALSE,
-                     hab_mask = FALSE, trapsClustered = FALSE)
+unmarked_model = get_unmarked(occ_specific=FALSE,hab_mask = FALSE, 
+                              trapsClustered = FALSE)
 
 # inspect model
 unmarked_model
