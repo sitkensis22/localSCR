@@ -79,7 +79,11 @@
 <p>
 The first vignette of the ‘localSCR’ package covers what I define as a set of ‘classic’ Bayesian spatial capture-recapture (SCR) models (Royle et al. 2014). These models are designed to model SCR data for ‘marked’ individuals under the assumption of uniformly distributed activity centers (i.e,. a continuous state-space). Although many distance detection functions are possible, the package currently only models the encounter process under the assumption of a bivariate normal model of space use, which is commonly employed in the literature. The package is meant to ease implementation of Bayesian SCR models using the ‘nimble’ package (de Valpine et a. 2022), which allows for increased flexibilty with the ability for the user to include custom functions and assign different algorithms to specific model parameters. I took advantage of this functionality with the goal of building a simple, straightforward workflow that was flexible enough to handle most mainstream SCR analysis problems. Visit <a href="https://r-nimble.org/download" class="external-link uri">https://r-nimble.org/download</a> for information on installing ‘nimble’ and Rtools on your computer.
 </p>
-<br> ## Implementation
+<p><br></p>
+</div>
+<div class="section level2">
+<h2 id="implementation">Implementation<a class="anchor" aria-label="anchor" href="#implementation"></a>
+</h2>
 <p>
 </p>
 <p>The ‘localSCR’ package implements Bayesian SCR models using the ‘nimble’ package (de Valpine et a. 2022) following methods described in Royle et al. (2014). We take advantage of recent developments in computation of SCR models. In this tutorial, three methods are implemented to decrease computational run time:</p>
@@ -134,7 +138,10 @@ Finally, in some SCR designs, trap arrays may be spread out over the study area 
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># load 'localSCR' package</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sitkensis22.github.io/localSCR/">localSCR</a></span><span class="op">)</span></code></pre></div>
-<p><br> ### (1) Simulate a single trap array with random positional noise and create state-space</p>
+<p><br></p>
+<div class="section level3">
+<h3 id="simulate-a-single-trap-array-with-random-positional-noise-and-create-state-space">(1) Simulate a single trap array with random positional noise and create state-space<a class="anchor" aria-label="anchor" href="#simulate-a-single-trap-array-with-random-positional-noise-and-create-state-space"></a>
+</h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># simulate a single trap array with random positional noise</span>
 <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">800</span>, <span class="fl">800</span>, length.out <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
@@ -163,7 +170,11 @@ Finally, in some SCR designs, trap arrays may be spread out over the study area 
 <p><br> Here, we can see the state-space grid that was created from <code><a href="../reference/grid_classic.html">grid_classic()</a></code>. Also, the traps (or detectors) are plotted over top in blue. We arbitrarily chose a grid resolution of 100 in this example (i.g., <code>res = 100</code>), but this will vary by problem. In most situations, it is prudent to test the effect of different grid resolutions on the estimated abundance and density in SCR models (see Royle et al. 2014). Also, note the use to the EPSG code to define the coordinate reference system for our state-space (see <a href="https://epsg.io/32608" class="external-link uri">https://epsg.io/32608</a>).</p>
 Now lets simulate some spatial capture-recapture data using <code><a href="../reference/sim_classic.html">sim_classic()</a></code>. Note for this example, we will simulate a ‘true’ population size of 200 individuals (<code>N = 200</code>), 4 sampling occasions (<code>K = 4</code>), a scaling parameter (<code>sigma_</code>) of 300 m, a baseline encounter probability of 0.10 (<code>base_encounter = 0.10</code>), no sex-specificity (<code>prop_sex = 1</code>), and no habitat mask (<code>hab_mask = FALSE</code>). We also use <code>setSeed = 100</code> to make the simulate reproducible. We provide the function the extent of the state-space output from <code><a href="../reference/grid_classic.html">grid_classic()</a></code> as ‘ext = Grid$ext’. Note that Grid is a list here.
 
-<p><br> ### (2) Simulate SCR data and make a plot of it.</p>
+<p><br></p>
+</div>
+<div class="section level3">
+<h3 id="simulate-scr-data-and-make-a-plot-of-it-">(2) Simulate SCR data and make a plot of it.<a class="anchor" aria-label="anchor" href="#simulate-scr-data-and-make-a-plot-of-it-"></a>
+</h3>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># simulate SCR data</span>
 <span class="va">data3d</span> <span class="op">=</span> <span class="fu"><a href="../reference/sim_classic.html">sim_classic</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">traps</span>, ext <span class="op">=</span> <span class="va">Grid</span><span class="op">$</span><span class="va">ext</span>, crs_ <span class="op">=</span> <span class="va">mycrs</span>, sigma_ <span class="op">=</span> <span class="va">mysigma</span>, prop_sex <span class="op">=</span> <span class="fl">1</span>,
@@ -175,7 +186,7 @@ hab_mask <span class="op">=</span> <span class="cn">FALSE</span>, setSeed <span 
 <span class="co">#&gt; List of 3</span>
 <span class="co">#&gt;  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...</span>
 <span class="co">#&gt;  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...</span>
-<span class="co">#&gt;  $ s  : num [1:200, 1:2] -659 -831 182 -1522 -106 ...</span>
+<span class="co">#&gt;  $ s  : num [1:200, 1:2] -652 -824 186 -1513 -101 ...</span>
 <span class="co">#&gt;   ..- attr(*, "dimnames")=List of 2</span>
 <span class="co">#&gt;   .. ..$ : NULL</span>
 <span class="co">#&gt;   .. ..$ : chr [1:2] "sx" "sy"</span>
@@ -200,7 +211,11 @@ hab_mask <span class="op">=</span> <span class="cn">FALSE</span>, setSeed <span 
 <p>We add on an additional layer of complexity by introducing a habitat mask. After constructing a polygon feature using the ‘sf’ package, we then use the function <code><a href="../reference/mask_polygon.html">mask_polygon()</a></code> to build a habitat mask as a matrix object. The habitat matrix is either ‘0’ (unsuitable) or ‘1’ (suitable). In the habitat matrix the rows represent the y-coordinate (“Northing”) of the state-space grid and the columns represent the x-coordinate (“Easting”) of the state-space grid. We’ll use this habitat matrix as data below in this part of the tutorial.</p>
 We also see the use of <code><a href="../reference/initialize_classic.html">initialize_classic()</a></code>, which automatically generates plausible starting activity center locations for all individuals. Note that for detected individuals, the function uses the mean capture location as the starting location while random locations are used for augmented individuals. Given our simulated population size of 200, we specify the total augmented population size (detected + augmented individuals) at 400 (<code>M = 400</code>).
 
-<p><br> ### (3) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask</p>
+<p><br></p>
+</div>
+<div class="section level3">
+<h3 id="workflow-for-simple-scr-model-with-sex-specific-sigma-binomial-encounter-distribution-and-habitat-mask">(3) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask<a class="anchor" aria-label="anchor" href="#workflow-for-simple-scr-model-with-sex-specific-sigma-binomial-encounter-distribution-and-habitat-mask"></a>
+</h3>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># simulate a single trap array with random positional noise</span>
 <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">800</span>, <span class="fl">800</span>, length.out <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
@@ -315,7 +330,7 @@ trapsClustered<span class="op">=</span><span class="cn">FALSE</span><span class=
 inits<span class="op">=</span><span class="va">inits</span>, params <span class="op">=</span> <span class="va">params</span>,niter <span class="op">=</span> <span class="fl">10000</span>, nburnin<span class="op">=</span><span class="fl">1000</span>, thin<span class="op">=</span><span class="fl">1</span>, nchains<span class="op">=</span><span class="fl">2</span>, parallel<span class="op">=</span><span class="cn">TRUE</span>, 
 RNGseed <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; 104.414 sec elapsed</span>
+<span class="co">#&gt; 102.521 sec elapsed</span>
 
 <span class="co"># summarize output</span>
 <span class="va">samples</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">out</span><span class="op">)</span>
@@ -360,7 +375,11 @@ hab_mask <span class="op">=</span> <span class="va">hab_mask</span><span class="
 <br><p>
 Next we repeat a similar workflow but now we have two trap arrays that are clustered in space, and thus, there is a negligble chance of detecting an individual at more than one trap array. In this case, the functions in ‘localSCR’ can automatically detect that the traps are in a 3-dimensional format and we note that <code>sim_classic</code> will return a variable called <code>site</code> that identifies which trap array that each individual (both detected and augmented) belongs to. Note that the number of rows in the simulated data <code>y</code> will equal the simulated population size (here in the example, <code>N = 200</code>). However, because we are using a trick provided by Chandler (2018) to separate the data augmentation process into two steps, we only need the encounter data for those individuals that were detected in the model likelihood. Also, because we have no occasion-specific detection covariates, we can sum <code>y</code> over individuals and traps to result in a 2-dimensional encounter history array (i.e., <code>y[i,j]</code>). This speeds us the model under these conditions and we can specify this when we get the SCR model using <code>get_classic(y_dim = 2,...)</code> by setting <code>y_dim = 2</code>. Otherwise, the workflow is very similar to having a 2-dimensional trap array in the previous example.
 </p>
-<p><br> ### (4) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask using a 3D trap array or clustered traps.</p>
+<p><br></p>
+</div>
+<div class="section level3">
+<h3 id="workflow-for-simple-scr-model-with-sex-specific-sigma-binomial-encounter-distribution-and-habitat-mask-using-a-3d-trap-array-or-clustered-traps-">(4) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask using a 3D trap array or clustered traps.<a class="anchor" aria-label="anchor" href="#workflow-for-simple-scr-model-with-sex-specific-sigma-binomial-encounter-distribution-and-habitat-mask-using-a-3d-trap-array-or-clustered-traps-"></a>
+</h3>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># simulate a single trap array with random positional noise</span>
 <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">800</span>, <span class="fl">800</span>, length.out <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
@@ -474,7 +493,7 @@ trapsClustered <span class="op">=</span> <span class="cn">TRUE</span><span class
 inits<span class="op">=</span><span class="va">inits</span>, params <span class="op">=</span> <span class="va">params</span>,niter <span class="op">=</span> <span class="fl">10000</span>, nburnin<span class="op">=</span><span class="fl">1000</span>, thin<span class="op">=</span><span class="fl">1</span>, nchains<span class="op">=</span><span class="fl">2</span>, 
 parallel<span class="op">=</span><span class="cn">TRUE</span>, RNGseed <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; 104.613 sec elapsed</span>
+<span class="co">#&gt; 102.619 sec elapsed</span>
 
 <span class="co"># summary table of MCMC output (exclude "s" and "z" parameters)</span>
 <span class="fu"><a href="../reference/nimSummary.html">nimSummary</a></span><span class="op">(</span><span class="va">out</span>, exclude_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s"</span>,<span class="st">"z"</span><span class="op">)</span>, trace <span class="op">=</span> <span class="cn">TRUE</span>, plot_all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
@@ -564,7 +583,12 @@ gp<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/grid/gpar
 <br><p>
 That’s it! You’ve made it through the first ‘localSCR’ tutorial. Please see Royle et al. (2014) for more details about SCR theory and modeling. The next tutorial will be similar but focused on spatial count models that make inference to abundance/density for unmarked populations.
 </p>
-<p><br> ## References</p>
+<p><br></p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
 <p>Chandler, R. B. 2018. Speeding up data augmentation in BUGS. <a href="https://groups.google.com/forum/#!topic/hmecology/o6cWDqHHgOE" class="external-link uri">https://groups.google.com/forum/#!topic/hmecology/o6cWDqHHgOE</a>.</p>
 <p>de Valpine P, C. Paciorek, D. Turek, N. Michaud, C. Anderson-Bergman, F. Obermeyer, C. C. Wehrhahn, A. Rodrìguez, L. D. Temple, and S. Paganin. 2022. <em>NIMBLE: MCMC, Particle Filtering, and Programmable Hierarchical Modeling</em>. doi: 10.5281/zenodo.1211190 (URL: <a href="https://doi.org/10.5281/zenodo.1211190" class="external-link uri">https://doi.org/10.5281/zenodo.1211190</a>), R package version 0.12.2, URL:<a href="https://cran.r-project.org/package=nimble" class="external-link uri">https://cran.r-project.org/package=nimble</a>.</p>
 <p>Furnas, B. J., R. H. Landers, S. Hill, S. S. Itoga, and B. N. Sacks. 2018. Integrated modeling to estimate population size and composition of mule deer. Journal of Wildlife Management 82:1429–1441.</p>
