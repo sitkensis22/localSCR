@@ -41,18 +41,6 @@ Finally, in some SCR designs, trap arrays may be spread out over the study area 
 <br>
 <p>
 
-## Turtorial
-
-This tutorial includes four parts:
-
-1) Create traps (or detectors) and then construct a state-space
-2) Simulate 'classic' SCR data using state-space extent 
-3) Workflow for 2-D trap array including sex-specific scaling parameter and habitat mask
-4) Workflow for 3-D trap array including sex-specific scaling parameter and habitat mask
-</p>
-<br>
-<p>
-
 ## Functions used from 'localSCR' package:
 * `grid_classic()` define state-space grid and extent 
 * `sim_classic()` simulate basic spatial capture-recapture data
@@ -66,6 +54,18 @@ This tutorial includes four parts:
 </p>
 <br>
 <b> <i>Note: see references at bottom of page</i></b>
+
+## Turtorial
+
+This tutorial includes four parts:
+
+1) Create traps (or detectors) and then construct a state-space
+2) Simulate 'classic' SCR data using state-space extent 
+3) Workflow for 2-D trap array including sex-specific scaling parameter and habitat mask
+4) Workflow for 3-D trap array including sex-specific scaling parameter and habitat mask
+</p>
+<br>
+<p>
 
 ```{r setup}
 # load 'localSCR' package
