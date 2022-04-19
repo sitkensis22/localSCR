@@ -2343,7 +2343,6 @@ run_classic <- function(model, data, constants, inits, params,
      mcmcspec$removeSamplers(c("psi","lam0","sigma"))
      mcmcspec$addSampler(target = c("psi","lam0","sigma"), type = "AF_slice", silent = TRUE)
     }
-      #
     }else
     if(length(s_alias)==2){ # for  spatial mark-resight model
     mcmcspec$removeSamplers(s_alias[1], print = FALSE)
@@ -2382,6 +2381,11 @@ run_classic <- function(model, data, constants, inits, params,
         for(i in 1:constants$M){
           snew = paste(s_alias,"[",i,","," 1:2","]",sep="")
           mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
+        }
+  # test out effect of AF_slice sampler to reduce autocorrlation and cross correlation
+        if(s_alias == "su"){
+         mcmcspec$removeSamplers(c("psi","lam0","sigma"))
+         mcmcspec$addSampler(target = c("psi","lam0","sigma"), type = "AF_slice", silent = TRUE)
         }
         }else
         if(length(s_alias)==2){ # for  spatial mark-resight model
