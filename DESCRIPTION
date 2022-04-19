@@ -29,6 +29,7 @@ Suggests:
     ggplot2,
     ggpubr,
     knitr,
+    modeltools,
     rasterVis,
     rmarkdown,
     viridis
