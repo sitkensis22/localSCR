@@ -19,11 +19,14 @@ knitr::opts_chunk$set(
 ```
 
 ## Introduction
+
 <p>
 The first vignette of the 'localSCR' package covers what I define as a set of 'classic' Bayesian spatial capture-recapture (SCR) models (Royle et al. 2014). These models are designed to model SCR data for 'marked' individuals under the assumption of uniformly distributed activity centers (i.e,. a continuous state-space). Although many distance detection functions are possible, the package currently only models the encounter process under the assumption of a bivariate normal model of space use, which is commonly employed in the literature. The package is meant to ease implementation of Bayesian SCR models using the 'nimble' package (de Valpine et a. 2022), which allows for increased flexibilty with the ability for the user to include custom functions and assign different algorithms to specific model parameters. I took advantage of this functionality with the goal of building a simple, straightforward workflow that was flexible enough to handle most mainstream SCR analysis problems. Visit <https://r-nimble.org/download> for information on installing 'nimble' and Rtools on your computer.
 </p>
 <br>
+
 ## Implementation
+
 <p>
 The 'localSCR' package implements Bayesian SCR models using the 'nimble' package (de Valpine et a. 2022) following methods described in Royle et al. (2014). We take advantage of recent developments in computation of SCR models. In this tutorial, three methods are implemented to decrease computational run time:
 
@@ -37,6 +40,7 @@ Finally, in some SCR designs, trap arrays may be spread out over the study area 
 </p>
 <br>
 <p>
+
 ## Turtorial
 
 This tutorial includes four parts:
@@ -48,6 +52,7 @@ This tutorial includes four parts:
 </p>
 <br>
 <p>
+
 ## Functions used from 'localSCR' package:
 * `grid_classic()` define state-space grid and extent 
 * `sim_classic()` simulate basic spatial capture-recapture data
@@ -67,6 +72,7 @@ This tutorial includes four parts:
 library(localSCR)
 ```
 <br>
+
 ### (1) Simulate a single trap array with random positional noise and create state-space
 
 ```{r, fig.show='hide'}
@@ -103,6 +109,7 @@ Here, we can see the state-space grid that was created from `grid_classic()`. Al
 Now lets simulate some spatial capture-recapture data using `sim_classic()`. Note for this example, we will simulate a 'true' population size of 200 individuals (`N = 200`), 4 sampling occasions (`K = 4`), a scaling parameter (`sigma_`) of 300 m, a baseline encounter probability of 0.10 (`base_encounter = 0.10`), no sex-specificity (`prop_sex = 1`), and no habitat mask (`hab_mask = FALSE`). We also use `setSeed = 100` to make the simulate reproducible. We provide the function the extent of the state-space output from `grid_classic()` as 'ext = Grid$ext'. Note that Grid is a list here.
 </p>
 <br>
+
 ### (2) Simulate SCR data and make a plot of it.
 
 ```{r, fig.show='hide'}
@@ -141,6 +148,7 @@ We add on an additional layer of complexity by introducing a habitat mask. After
 We also see the use of `initialize_classic()`, which automatically generates plausible starting activity center locations for all individuals. Note that for detected individuals, the function uses the mean capture location as the starting location while random locations are used for augmented individuals. Given our simulated population size of 200, we specify the total augmented population size (detected + augmented individuals) at 400 (`M = 400`).
 </p>
 <br>
+
 ### (3) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask
 
 ```{r, fig.show='hide'}
@@ -303,6 +311,7 @@ plot(r, col=viridis(100),main=expression("Realized density (activity centers/100
 Next we repeat a similar workflow but now we have two trap arrays that are clustered in space, and thus, there is a negligble chance of detecting an individual at more than one trap array. In this case, the functions in 'localSCR' can automatically detect that the traps are in a 3-dimensional format and we note that `sim_classic` will return a variable called `site` that identifies which trap array that each individual (both detected and augmented) belongs to. Note that the number of rows in the simulated data `y` will equal the simulated population size (here in the example, `N = 200`). However, because we are using a trick provided by Chandler (2018) to separate the data augmentation process into two steps, we only need the encounter data for those individuals that were detected in the model likelihood. Also, because we have no occasion-specific detection covariates, we can sum `y` over individuals and traps to result in a 2-dimensional encounter history array (i.e., `y[i,j]`). This speeds us the model under these conditions and we can specify this when we get the SCR model using `get_classic(y_dim = 2,...)` by setting `y_dim = 2`. Otherwise, the workflow is very similar to having a 2-dimensional trap array in the previous example.
 </p>
 <br>
+
 ### (4) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask using a 3D trap array or clustered traps.
 
 ```{r, fig.show='hide'}
@@ -499,6 +508,7 @@ pcomb
 That's it! You've made it through the first 'localSCR' tutorial. Please see Royle et al. (2014) for more details about SCR theory and modeling. The next tutorial will be similar but focused on spatial count models that make inference to abundance/density for unmarked populations.
 </p>
 <br>
+
 ## References
 
 Chandler, R. B. 2018. Speeding up data augmentation in BUGS.
