@@ -25,7 +25,12 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.1.2.9000
 Suggests: 
+    cowplot,
+    ggplot2,
+    ggpubr,
     knitr,
-    rmarkdown
+    rasterVis,
+    rmarkdown,
+    viridis,
 VignetteBuilder: knitr
 URL: https://sitkensis22.github.io/localSCR/
