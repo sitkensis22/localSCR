@@ -191,15 +191,19 @@ rep(0,M-nrow(data3d$y)))))
 
 # convert Det to factor
 s.stdata$Det = as.factor(s.stdata$Det)
-  
+
+# make 1 as the baseline level for plotting
+s.stdata$Det = factor(s.stdata$Det, levels = c("1","0"))
+
 # make ggplot
-ggplot() + geom_point(data=as.data.frame(Grid$grid),aes(x=x,y=y),color="grey60",size=1.25) + 
+ggplot() + geom_point(data=as.data.frame(Grid$grid),aes(x=x,y=y),color="grey60",size=1.5) + 
     geom_point(data=as.data.frame(traps),aes(x=x,y=y),color="blue",size=3) +
-    geom_point(data=s.stdata,aes(x=V1,y=V2,fill=Det,color=Det),size = 3) +
+    geom_point(data=s.stdata,aes(x=V1,y=V2,fill=Det,color=Det),size = 3.5) +
+    geom_point(data=s.stdata[s.stdata$Det==1,],aes(x=V1,y=V2),size = 3.5,color="lawngreen") +
     geom_sf(data=poly, fill = NA) + coord_sf(datum=st_crs(mycrs)) +
     theme_classic() + ylab("Northing") + xlab("Easting") +
     scale_x_continuous(expand=c(0.025, 0.025)) + 
-    scale_color_manual(values = c("orangered","darkorchid1")) +
+    scale_color_manual(values = c("lawngreen","orangered")) +
     scale_y_continuous(expand=c(0.025, 0.025)) + 
     theme(axis.text = element_text(size=12),axis.title = element_text(size=16))
 ```
