@@ -195,11 +195,11 @@ s.stdata$Det = as.factor(s.stdata$Det)
 # make ggplot
 ggplot() + geom_point(data=as.data.frame(Grid$grid),aes(x=x,y=y),color="grey60",size=1.25) + 
     geom_point(data=as.data.frame(traps),aes(x=x,y=y),color="blue",size=3) +
-    geom_point(data=s.stdata,aes(x=V1,y=V2,fill=Det,color=Det),size = 2.5) +
+    geom_point(data=s.stdata,aes(x=V1,y=V2,fill=Det,color=Det),size = 3) +
     geom_sf(data=poly, fill = NA) + coord_sf(datum=st_crs(mycrs)) +
     theme_classic() + ylab("Northing") + xlab("Easting") +
     scale_x_continuous(expand=c(0.025, 0.025)) + 
-    scale_color_manual(values = c("orangered","springgreen")) +
+    scale_color_manual(values = c("orangered","darkorchid1")) +
     scale_y_continuous(expand=c(0.025, 0.025)) + 
     theme(axis.text = element_text(size=12),axis.title = element_text(size=16))
 ```
