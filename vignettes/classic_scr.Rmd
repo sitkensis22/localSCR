@@ -480,9 +480,9 @@ legend.text = element_text(size=14),legend.title = element_text(size=16)))
 pcomb <- plot_grid(legend_t, prow, ncol = 1, rel_heights = c(.2, 1))
 
 # add x and y axis labels
-pcomb <-annotate_figure(pcomb, bottom = textGrob("Easting", gp=gpar(fontsize=18), vjust = -1, hjust = 0),
-    left = textGrob("Northing", rot=90, gp=gpar(fontsize=18),
-         vjust = 1, hjust = 0.5))
+pcomb <-annotate_figure(pcomb, bottom = textGrob("Easting", gp=gpar(fontsize=18), vjust = -1,
+hjust = 0),left = textGrob("Northing", rot=90, 
+gp=gpar(fontsize=18),vjust = 1, hjust = 0.5))
 pcomb
 ```
 
