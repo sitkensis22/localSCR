@@ -168,7 +168,7 @@ Finally, in some SCR designs, trap arrays may be spread out over the study area 
 <p>
 </p>
 <p><br> Here, we can see the state-space grid that was created from <code><a href="../reference/grid_classic.html">grid_classic()</a></code>. Also, the traps (or detectors) are plotted over top in blue. We arbitrarily chose a grid resolution of 100 in this example (i.g., <code>res = 100</code>), but this will vary by problem. In most situations, it is prudent to test the effect of different grid resolutions on the estimated abundance and density in SCR models (see Royle et al. 2014). Also, note the use to the EPSG code to define the coordinate reference system for our state-space (see <a href="https://epsg.io/32608" class="external-link uri">https://epsg.io/32608</a>).</p>
-Now lets simulate some spatial capture-recapture data using <code><a href="../reference/sim_classic.html">sim_classic()</a></code>. Note for this example, we will simulate a ‘true’ population size of 200 individuals (<code>N = 200</code>), 4 sampling occasions (<code>K = 4</code>), a scaling parameter (<code>sigma_</code>) of 300 m, a baseline encounter probability of 0.10 (<code>base_encounter = 0.10</code>), no sex-specificity (<code>prop_sex = 1</code>), and no habitat mask (<code>hab_mask = FALSE</code>). We also use <code>setSeed = 100</code> to make the simulate reproducible. We provide the function the extent of the state-space output from <code><a href="../reference/grid_classic.html">grid_classic()</a></code> as ‘ext = Grid$ext’. Note that Grid is a list here.
+Now lets simulate some spatial capture-recapture data using <code><a href="../reference/sim_classic.html">sim_classic()</a></code>. Note for this example, we will simulate a ‘true’ population size of 200 individuals (<code>N = 200</code>), 4 sampling occasions (<code>K = 4</code>), a scaling parameter (<code>sigma_</code>) of 300 m, a baseline encounter probability of 0.10 (<code>base_encounter = 0.10</code>), no sex-specificity (<code>prop_sex = 1</code>), and no habitat mask (<code>hab_mask = FALSE</code>). We also use <code>setSeed = 100</code> to make the simulate reproducible. We provide the function the extent of the state-space output from <code><a href="../reference/grid_classic.html">grid_classic()</a></code> as <code>ext = Grid$ext</code>. Note that Grid is a list here.
 
 <p><br></p>
 </div>
@@ -186,7 +186,7 @@ hab_mask <span class="op">=</span> <span class="cn">FALSE</span>, setSeed <span 
 <span class="co">#&gt; List of 3</span>
 <span class="co">#&gt;  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...</span>
 <span class="co">#&gt;  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...</span>
-<span class="co">#&gt;  $ s  : num [1:200, 1:2] -665 -836 173 -1526 -114 ...</span>
+<span class="co">#&gt;  $ s  : num [1:200, 1:2] -664 -836 175 -1526 -112 ...</span>
 <span class="co">#&gt;   ..- attr(*, "dimnames")=List of 2</span>
 <span class="co">#&gt;   .. ..$ : NULL</span>
 <span class="co">#&gt;   .. ..$ : chr [1:2] "sx" "sy"</span>
@@ -334,7 +334,7 @@ trapsClustered<span class="op">=</span><span class="cn">FALSE</span><span class=
 inits<span class="op">=</span><span class="va">inits</span>, params <span class="op">=</span> <span class="va">params</span>,niter <span class="op">=</span> <span class="fl">10000</span>, nburnin<span class="op">=</span><span class="fl">1000</span>, thin<span class="op">=</span><span class="fl">1</span>, nchains<span class="op">=</span><span class="fl">2</span>, parallel<span class="op">=</span><span class="cn">TRUE</span>, 
 RNGseed <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; 97.439 sec elapsed</span>
+<span class="co">#&gt; 102.014 sec elapsed</span>
 
 <span class="co"># summarize output</span>
 <span class="va">samples</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">out</span><span class="op">)</span>
@@ -497,7 +497,7 @@ trapsClustered <span class="op">=</span> <span class="cn">TRUE</span><span class
 inits<span class="op">=</span><span class="va">inits</span>, params <span class="op">=</span> <span class="va">params</span>,niter <span class="op">=</span> <span class="fl">10000</span>, nburnin<span class="op">=</span><span class="fl">1000</span>, thin<span class="op">=</span><span class="fl">1</span>, nchains<span class="op">=</span><span class="fl">2</span>, 
 parallel<span class="op">=</span><span class="cn">TRUE</span>, RNGseed <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; 99.748 sec elapsed</span>
+<span class="co">#&gt; 104.836 sec elapsed</span>
 
 <span class="co"># summary table of MCMC output (exclude "s" and "z" parameters)</span>
 <span class="fu"><a href="../reference/nimSummary.html">nimSummary</a></span><span class="op">(</span><span class="va">out</span>, exclude_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s"</span>,<span class="st">"z"</span><span class="op">)</span>, trace <span class="op">=</span> <span class="cn">TRUE</span>, plot_all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
