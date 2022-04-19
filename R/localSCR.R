@@ -2329,7 +2329,7 @@ run_classic <- function(model, data, constants, inits, params,
     # MCMC configurations
     mcmcspec<-nimble::configureMCMC(SCRmodelR, monitors=params) 
     # block updating for marked individual activity centers
-    if(length(s_alias)!=1 | length(s_alias!=2)){
+    if(length(s_alias)!=1 & length(s_alias!=2)){
     stop("s_alias must be either a scalar or vector of length 2")
     }  
     if(length(s_alias)==1){
@@ -2341,7 +2341,7 @@ run_classic <- function(model, data, constants, inits, params,
     }else
     if(length(s_alias)==2){ # for  spatial mark-resight model
     mcmcspec$removeSamplers(s_alias[1], print = FALSE)
-    for(i in 1:constants$M){
+    for(i in 1:constants$m){
       snew = paste(s_alias[1],"[",i,","," 1:2","]",sep="")
       mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
     }
@@ -2368,11 +2368,27 @@ run_classic <- function(model, data, constants, inits, params,
         SCRmodelC <- nimble::compileNimble(SCRmodelR) # compile code
         # MCMC configurations
         mcmcspec<-nimble::configureMCMC(SCRmodelR, monitors=params) 
-        # block updating for marked individual activity centers
-        mcmcspec$removeSamplers("s", print = FALSE)
+        if(length(s_alias)!=1 & length(s_alias)!=2){
+        stop("s_alias must be either a scalar or vector of length 2")
+        }  
+        if(length(s_alias)==1){
+        mcmcspec$removeSamplers(s_alias, print = FALSE)
         for(i in 1:constants$M){
-          snew = paste("s[",i,","," 1:2","]",sep="")
-          mcmcspec$addSampler(target = snew, type = 'RW_block')
+          snew = paste(s_alias,"[",i,","," 1:2","]",sep="")
+          mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
+        }
+        }else
+        if(length(s_alias)==2){ # for  spatial mark-resight model
+        mcmcspec$removeSamplers(s_alias[1], print = FALSE)
+        for(i in 1:constants$m){
+          snew = paste(s_alias[1],"[",i,","," 1:2","]",sep="")
+          mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
+        }
+        mcmcspec$removeSamplers(s_alias[2], print = FALSE)
+        for(i in 1:constants$M){
+          snew = paste(s_alias[2],"[",i,","," 1:2","]",sep="")
+          mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
+        }
         }
         scrMCMC <- nimble::buildMCMC(mcmcspec)
         CscrMCMC <- nimble::compileNimble(scrMCMC, project = SCRmodelR,
