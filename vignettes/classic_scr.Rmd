@@ -42,18 +42,18 @@ Finally, in some SCR designs, trap arrays may be spread out over the study area 
 <p>
 
 ## Functions used from 'localSCR' package:
-* `grid_classic()` define state-space grid and extent 
-* `sim_classic()` simulate basic spatial capture-recapture data
-* `mask_polygon()` create habitat mask matrix or array from polygon
-* `initialize_classic()` generate starting locations for activity area centers
-* `rescale_classic()` rescale inputs to prepare data for using habitat mask
+
 * `get_classic()` grabs template model for given inputs using the `nimbleCode()` function
-* `run_classic()` wrapper function to run classic models using 'nimble' package
+* `grid_classic()` define state-space grid and extent 
+* `initialize_classic()` generate starting locations for activity area centers
+* `mask_polygon()` create habitat mask matrix or array from polygon
 * `nimSummary()` summarize lists of Markov Chain Monte Carlo (MCMC) output
 * `realized_density()` generate realized density surface from MCMC output
+* `rescale_classic()` rescale inputs to prepare data for using habitat mask
+* `run_classic()` wrapper function to run classic models using 'nimble' package
+* `sim_classic()` simulate basic spatial capture-recapture data
 </p>
 <br>
-<b> <i>Note: see references at bottom of page</i></b>
 
 ## Turtorial
 
@@ -229,7 +229,7 @@ ext = rescale_list$ext
 # prepare data
 data = list(y=data3d$y)
 data$y = data$y[which(apply(data$y, 1, sum)!=0),,] # remove augmented records 
-data$y = apply(data$y, c(1,2), sum) # covert to 2d by summing over occasions
+data$y = apply(data$y, c(1,2), sum) # covert to 2d by summing over individuals and traps
 
 # add rescaled traps
 data$X = rescale_list$X
@@ -400,7 +400,7 @@ x_lower = ext[,1],x_upper = ext[,2],y_lower = ext[,3],y_upper = ext[,4])
 
 # store and format encounter history data
 data$y = data4d$y[which(apply(data4d$y, 1, sum)!=0),,] # remove augmented records 
-data$y = apply(data$y, c(1,2), sum) # covert to 2d by summing over occasions
+data$y = apply(data$y, c(1,2), sum) # covert to 2d by summing over individuals and traps
 
 # add z and zeros vector data for latent inclusion indicator
 data$z = c(rep(1,constants$n0),rep(NA,constants$M - constants$n0))
@@ -519,8 +519,7 @@ Chandler, R. B. 2018. Speeding up data augmentation in BUGS.
 <https://groups.google.com/forum/#!topic/hmecology/o6cWDqHHgOE>.
 
 de Valpine P, C. Paciorek, D. Turek, N. Michaud, C. Anderson-Bergman, F. Obermeyer, C. C. Wehrhahn, A. Rodrìguez, L. D. Temple, and S. Paganin. 2022. _NIMBLE: MCMC, Particle
-Filtering, and Programmable Hierarchical Modeling_. doi: 10.5281/zenodo.1211190 (URL:
-<https://doi.org/10.5281/zenodo.1211190>), R package version 0.12.2, URL:<https://cran.r-project.org/package=nimble>.
+Filtering, and Programmable Hierarchical Modeling_. doi: 10.5281/zenodo.1211190 (URL: <https://doi.org/10.5281/zenodo.1211190>), R package version 0.12.2, URL: <https://cran.r-project.org/package=nimble>.
 
 Furnas, B. J., R. H. Landers, S. Hill, S. S. Itoga, and B. N. Sacks. 2018. Integrated modeling to estimate population size and composition of mule deer. Journal of Wildlife Management 82:1429–1441. 
 
