@@ -65,7 +65,7 @@
       <img src="" class="logo" alt=""><h1>Classic SCR models: continuous state-space and marked individuals</h1>
                         <h4 data-toc-skip class="author">Daniel Eacker</h4>
             
-            <h4 data-toc-skip class="date">2022-04-19</h4>
+            <h4 data-toc-skip class="date">2022-04-20</h4>
       
       
       <div class="d-none name"><code>classic_scr.Rmd</code></div>
@@ -187,7 +187,7 @@ hab_mask <span class="op">=</span> <span class="cn">FALSE</span>, setSeed <span 
 <span class="co">#&gt; List of 3</span>
 <span class="co">#&gt;  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...</span>
 <span class="co">#&gt;  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...</span>
-<span class="co">#&gt;  $ s  : num [1:200, 1:2] -659 -831 181 -1522 -106 ...</span>
+<span class="co">#&gt;  $ s  : num [1:200, 1:2] -658 -830 182 -1521 -106 ...</span>
 <span class="co">#&gt;   ..- attr(*, "dimnames")=List of 2</span>
 <span class="co">#&gt;   .. ..$ : NULL</span>
 <span class="co">#&gt;   .. ..$ : chr [1:2] "sx" "sy"</span>
@@ -335,7 +335,7 @@ trapsClustered<span class="op">=</span><span class="cn">FALSE</span><span class=
 inits<span class="op">=</span><span class="va">inits</span>, params <span class="op">=</span> <span class="va">params</span>,niter <span class="op">=</span> <span class="fl">10000</span>, nburnin<span class="op">=</span><span class="fl">1000</span>, thin<span class="op">=</span><span class="fl">1</span>, nchains<span class="op">=</span><span class="fl">2</span>, parallel<span class="op">=</span><span class="cn">TRUE</span>, 
 RNGseed <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; 100.033 sec elapsed</span>
+<span class="co">#&gt; 106.658 sec elapsed</span>
 
 <span class="co"># summarize output</span>
 <span class="va">samples</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">out</span><span class="op">)</span>
@@ -498,7 +498,7 @@ trapsClustered <span class="op">=</span> <span class="cn">TRUE</span><span class
 inits<span class="op">=</span><span class="va">inits</span>, params <span class="op">=</span> <span class="va">params</span>,niter <span class="op">=</span> <span class="fl">10000</span>, nburnin<span class="op">=</span><span class="fl">1000</span>, thin<span class="op">=</span><span class="fl">1</span>, nchains<span class="op">=</span><span class="fl">2</span>, 
 parallel<span class="op">=</span><span class="cn">TRUE</span>, RNGseed <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; 103.105 sec elapsed</span>
+<span class="co">#&gt; 110.978 sec elapsed</span>
 
 <span class="co"># summary table of MCMC output (exclude "s" and "z" parameters)</span>
 <span class="fu"><a href="../reference/nimSummary.html">nimSummary</a></span><span class="op">(</span><span class="va">out</span>, exclude_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s"</span>,<span class="st">"z"</span><span class="op">)</span>, trace <span class="op">=</span> <span class="cn">TRUE</span>, plot_all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>

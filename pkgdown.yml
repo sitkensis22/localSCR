@@ -3,7 +3,7 @@ pkgdown: 2.0.2
 pkgdown_sha: ~
 articles:
   classic_scr: classic_scr.html
-last_built: 2022-04-19T22:55Z
+last_built: 2022-04-20T05:37Z
 urls:
   reference: https://sitkensis22.github.io/localSCR/reference
   article: https://sitkensis22.github.io/localSCR/articles
