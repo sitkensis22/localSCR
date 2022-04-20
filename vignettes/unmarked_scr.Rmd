@@ -100,8 +100,8 @@ Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = 100)
 
 # make ggplot of grid and trap locations
 library(ggplot2)
-ggplot() + geom_point(data=as.data.frame(Grid$grid),aes(x=x,y=y),color="grey60",
-                      size=1.25) + 
+ggplot() + geom_point(data=as.data.frame(Grid$grid),aes(x=x,y=y),
+                      color="grey60", size=1.25) + 
     geom_point(data=as.data.frame(traps),aes(x=x,y=y),color="blue",size=2) +
     theme_classic() + ylab("Northing") + xlab("Easting") +
     scale_x_continuous(expand=c(-0.1, 0.1)) + 
