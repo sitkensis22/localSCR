@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of 'localSCR' is to provide user-friendly functions to implement Bayesian spatial capture-recapture models (Royle et al. 2014) using the 'nimble' package (de Valpine et a. 2022) in R. The package currently has functions to 1) assist with defining the state-space grid and extent for a given 2-dimensional or 3-dimensional trap array (i.e., when traps are clustered in space), 2) simulate data under different encounter distributions and other parameters, 3) create habitat masks from either raster data or spatial polygons, 4) provide template SECR models that are easily customizable, 5) fit and summarize SECR models using 'nimble' (de Valpine et a. 2022) with options for parallel processing, and 6) create realized density surfaces from MCMC output. Future functionality will include discrete state-space models and implementing localized approaches as in Milleret et al. (2019) and Woodruff et al. (2020). 
+The goal of 'localSCR' is to provide user-friendly functions to implement Bayesian spatial capture-recapture models (Royle et al. 2014) using the 'nimble' package (de Valpine et a. 2022) in R. The package currently has functions to 1) assist with defining the state-space grid and extent for a given 2-dimensional or 3-dimensional trap array (i.e., when traps are clustered in space), 2) simulate data under different encounter distributions and other parameters, 3) create habitat masks from either raster data or spatial polygons, 4) provide template SCR models that are easily customizable, 5) fit and summarize SCR models using 'nimble' (de Valpine et a. 2022) with options for parallel processing, and 6) create realized density surfaces from MCMC output. Future functionality will include discrete state-space models and implementing localized approaches as in Milleret et al. (2019) and Woodruff et al. (2020). 
 
 ## Installation
 
@@ -30,6 +30,7 @@ Be sure to see important information about using 'nimble' on your computer (incl
 
 ## Vignettes
 * <a href="https://sitkensis22.github.io/localSCR/articles/classic_scr.html">Classic SCR models: continuous state-space and marked individuals</a>
+* <a href="https://sitkensis22.github.io/localSCR/articles/unmarked_scr.html">Spatial count models: continuous state-space and unmarked individuals</a>
 
 ## References
 
