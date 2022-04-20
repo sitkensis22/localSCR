@@ -109,8 +109,9 @@ ggplot() + geom_point(data=as.data.frame(Grid$grid),aes(x=x,y=y),color="grey60",
     theme(axis.text = element_text(size=12),axis.title = element_text(size=16))
 ```
 
+<br>
 <p align="center" >
-  <img src="../man/figures/vignette_02/Fig1.png" style="width:80%"/>
+  <img src="../man/figures/vignette_02/Fig1.png" style="width:70%"/>
 </p>
 <br>
 <p>
@@ -121,7 +122,8 @@ Now lets first simulate some spatial capture-recapture data using `sim_classic()
 <br>
 
 
-### (2) Simulate SCR data and convert it to spatial count data.
+### (2) Simulate SCR data and convert it to spatial count data
+
 
 
 ```{r, fig.show='hide'}
@@ -141,6 +143,7 @@ n = apply(data3d$y, c(2,3), sum)
 str(n)
 ```
 
+<br>
 <p>
 We can see the data were transformed from a 3-dimensional array (`y[i,j,k]`) to a 2-dimensional array (`n[j,k]`) by summing over individuals. In the spatial count model, we cannot identify individuals but we can observe a count of unmarked individuals at each occasion and trap (Royle et al. 2014). In general, this model depends on spatial autocorrelation in the observations to estimate model parameters. We'll see how the estimates compare to a problem with marked individuals that was presented in the first vignette by running an analogous spatial count modeling problem . We'll use the same trap array but set a single scaling parameter (`sigma_`) of 300 m.
 
@@ -151,10 +154,10 @@ We also see the use of `initialize_classic()`, which generates plausible startin
 <br>
 
 
-### (3) Workflow for simple spatial count model with Poisson encounter distribution and habitat mask
+### (3) Workflow for spatial count model with Poisson encounter distribution and habitat mask using a 2D trap array.
 
 
-<br>
+
 ```{r, fig.show='hide'}
 # simulate a dense, spatially autocorrelated trap array with random positional noise
 x <- seq(-800, 800, length.out = 5)
@@ -205,7 +208,7 @@ ggplot() + geom_point(data=as.data.frame(Grid$grid),aes(x=x,y=y),color="grey60",
 ```
 
 <p align="center">
-  <img src="../man/figures/vignette_02/Fig2.png" style="width:80%" />
+  <img src="../man/figures/vignette_02/Fig2.png" style="width:70%" />
 </p>
 <br>
 <p>
@@ -274,7 +277,7 @@ abline(v=200, col="red") # add line for simulated abundance
 ```
 
 <p align="center">
-  <img src="../man/figures/vignette_02/Fig3.png" style="width:80%"/>
+  <img src="../man/figures/vignette_02/Fig3.png" style="width:70%"/>
 </p>
 <br>
 <p>
@@ -295,13 +298,13 @@ nimSummary(out, exclude_params = c("su","zu"), trace=FALSE)
 <br>
 <p>
 Although we are able to produce estimates, they are not reliable due to the lack of convergence and huge uncertainty. This will be the case for many spatial count modeling problems and thus, it is common to include prior information or combine marked and unmarked individuals into a spatial mark-resight analysis (the topic of vignette 3). Here, we'll test out the effect of bringing in prior information on the scaling parameter; this could occur if we had estimates of `sigma` from a previous study or another data source.We'll first need to use a moment matching function (e.g., normal to gamma moments) from the 'modeltools' package (add citation) called `estGammaParam()`. The gamma distribution is appropriate since it has support from 0 to infinity. For this example, we'll just grab some estimates of posterior standard error from part 3 of vignette 1. We know the 'true' simulated value of sigma is 300. 
+</p>
 <br>
 
 
 ### (4) Adding prior information on the scaling and encounter rate parameters
 
 
-<br>
 ```{r, fig.show='hide'}
 
 # get from Github and load
@@ -316,11 +319,11 @@ hist(rgamma(100000,shape=gparam$alpha,rate=1/gparam$beta),main="",xlab="Gamma pr
 ```
 
 <p align="center">
-  <img src="../man/figures/vignette_02/Fig4.png" />
+  <img src="../man/figures/vignette_02/Fig4.png" style="width:70%" />
 </p>
 <br>
-
-To add our prior information, we'll use `customize_model()` to edit our previously created model. Then, we'll rerun the model using `run_classic`. 
+<p>
+To add our prior information, we'll use `customize_model()` to edit our previously created model. Then, we'll rerun the model using `run_classic`. </p>
 
 <br>
 
@@ -358,13 +361,13 @@ abline(v=200, col="red") # add line for simulated abundance
 ```
 
 <p align="center">
-  <img src="../man/figures/vignette_02/Fig5.png" />
+  <img src="../man/figures/vignette_02/Fig5.png" style="width:70%" />
 </p>
 <br>
 
-
+<p>
 Again, we see that convergence is not great despite having prior information on sigma, but it's an improvement and the median estimate of N is close to the simulated value of 200. The uncertainty both the encounter rate `lam0` and the augmentation parameter `psi` is still huge, which translates into large uncertainty in abundance. We can try adding prior information about the encounter rate as well and see how this affects the estimates. We'll use a similar strategy as we did for the scaling parameter 'sigma'. 
-
+</p>
 
 <br>
 ```{r, fig.show='hide',fig.width = 8,fig.height=14}
@@ -401,7 +404,7 @@ nimSummary(out, exclude_params = c("su","zu"), trace=TRUE, plot_all=FALSE)
 ```
 
 <p align="center">
-  <img src="../man/figures/vignette_02/Fig6.png" />
+  <img src="../man/figures/vignette_02/Fig6.png" style="width:70%" />
 </p>
 <br>
 <p>
@@ -429,11 +432,11 @@ plot(r, col=viridis(100),
 
 
 <p align="center">
-  <img src="../man/figures/vignette_02/Fig7.png" />
+  <img src="../man/figures/vignette_02/Fig7.png" style="width:70%" />
 </p>
 <br>
 
-
+<p>
 We demonstrated the ability of functions such as `customize_model()` to efficiently edit model code without have to copy and paste a large amount of text. We used 'sim_classic()' to first generate a 3-dimensional encounter history data set for marked individuals, and then we summed over traps and occasions to arrive at a spatial count data set (`n[j,k]`). 
 
 As a final step example in this tutorial, we demonstrate the ability of the 'localSCR' package to aid in analyzing a spatial count model when we have clustered trap arrays (i.e., trap arrays that are spaced out far enough that individuals can only be detected on one array). The workflow will be similar to part 3 in our example, except that we'll need to create an indexing to allocate augmented individuals to the correct trap array. For this, we'll create the objects `site_indexL` and `site_indexU` and we will see this index in the model as `site_indexL[g]:site_indexU[g]`. We'll also use the same informative priors the we developed above in part 4. 
@@ -441,10 +444,9 @@ As a final step example in this tutorial, we demonstrate the ability of the 'loc
 </p>
 
 
-### (5) 
+### (5) Workflow for spatial count model with Poisson encounter distribution and habitat mask using a 3D trap array or clustered trap
 
 
-<br>
 ```{r, fig.show='hide'}
 # simulate a single trap array with random positional noise
 x <- seq(-800, 800, length.out = 5)
@@ -485,7 +487,7 @@ ggplot() + geom_point(data=as.data.frame(GridX$grid[,,1]),aes(x=V1,y=V2),
 ```
 
 <p align="center">
-  <img src="../man/figures/vignette_02/Fig8.png" style="width:80%" />
+  <img src="../man/figures/vignette_02/Fig8.png" style="width:70%" />
 </p>
 <br>
 <p>
@@ -498,13 +500,15 @@ In the figure we can see our two spatially separated trapping grids and that the
 hab_mask = mask_polygon(poly = poly, grid = GridX$grid, crs_ = mycrs, prev_mask = NULL)
 
 # simulate data for uniform state-space and habitat mask (N is simulated abundance)
-data4d = sim_classic(X = Xarray, ext = GridX$ext, crs_ = mycrs, sigma_ = mysigma, 
-                   prop_sex = 1,N = 200, K = 4, base_encounter = 0.3, 
-                   enc_dist = "poisson",hab_mask = hab_mask, setSeed = 100)
+data4d = sim_classic(X = Xarray, ext = GridX$ext, crs_ = mycrs, 
+                     sigma_ = mysigma,prop_sex = 1,N = 200, K = 4,  
+                   base_encounter = 0.3, enc_dist = "poisson",
+                   hab_mask = hab_mask, setSeed = 100)
 
 # organize by site and bind into an array
 library(abind) # load abind package
-y = abind(data4d$y[which(data4d$site==1),,],data4d$y[which(data4d$site==2),,], along = 4)
+y = abind(data4d$y[which(data4d$site==1),,],
+          data4d$y[which(data4d$site==2),,], along = 4)
 
 # total augmented population size 
 M = 400
@@ -524,8 +528,9 @@ rescale_list = rescale_classic(X = Xarray, ext = GridX$ext, s.st = s.st4d,
 ext = do.call(rbind, lapply(rescale_list$ext, as.vector))
 
 # Prepare data by summing over traps and occasions and add to list
-data = list(n = apply(y, c(2,3,4), sum),x_lower = ext[,1],x_upper = ext[,2],
-            y_lower = ext[,3],y_upper = ext[,4],X = rescale_list$X)
+data = list(n = apply(y, c(2,3,4), sum),x_lower = ext[,1],
+            x_upper = ext[,2],y_lower = ext[,3]
+            ,y_upper = ext[,4],X = rescale_list$X)
 
 # add hab_mask, proportion of available habitat, and OK for habitat check
 data$hab_mask = hab_mask
@@ -662,7 +667,7 @@ pcomb
 ```
 <br>
 <p align="center">
-  <img src="../man/figures/vignette_02/Fig9.png" style="width:50%"/>
+  <img src="../man/figures/vignette_02/Fig9.png" style="width:90%"/>
 </p>
 
 
@@ -670,7 +675,7 @@ pcomb
 <p>
 Way to go! You've made it through the second 'localSCR' tutorial. Please see Royle et al. (2014) for more details about spatial count theory and modeling. The next tutorial will be similar but focused on spatial mark-resight models that make inference to abundance/density for marked/unmarked populations.
 </p>
-
+<br>
 ## References
 
 Chandler, R. B. 2018. Speeding up data augmentation in BUGS.
