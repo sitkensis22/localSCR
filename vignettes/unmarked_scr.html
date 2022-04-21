@@ -554,7 +554,7 @@ population size of 200, we specify the total augmented population size
 <div id="workflow-for-spatial-count-model-with-poisson-encounter-distribution-and-habitat-mask-using-a-2d-trap-array." class="section level3">
 <h3>(3) Workflow for spatial count model with Poisson encounter
 distribution and habitat mask using a 2D trap array.</h3>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># simulate a dense, spatially autocorrelated trap array with random positional noise</span></span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># simulate a single trap array with random positional noisee</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">800</span>, <span class="dv">800</span>, <span class="at">length.out =</span> <span class="dv">5</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">800</span>, <span class="dv">800</span>, <span class="at">length.out =</span> <span class="dv">5</span>)</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>traps <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">expand.grid</span>(<span class="at">x =</span> x, <span class="at">y =</span> y))</span>

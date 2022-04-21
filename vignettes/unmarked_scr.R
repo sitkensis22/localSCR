@@ -56,7 +56,7 @@ library(localSCR)
 #  #> int [1:25, 1:4] 0 3 2 0 1 1 1 1 1 1 ...
 
 ## ---- fig.show='hide',eval=FALSE----------------------------------------------
-#  # simulate a dense, spatially autocorrelated trap array with random positional noise
+#  # simulate a single trap array with random positional noisee
 #  x <- seq(-800, 800, length.out = 5)
 #  y <- seq(-800, 800, length.out = 5)
 #  traps <- as.matrix(expand.grid(x = x, y = y))
