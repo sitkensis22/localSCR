@@ -2868,14 +2868,14 @@ realized_density <- function(samples, grid, crs_, site, hab_mask,
 #' possibly generated from \code{\link{get_classic}} function.
 #' @param append_code Either \code{NULL} or model code produced from 
 #' \code{nimbleCode()}  or \code{\link{get_classic}} function. Note that if
-#' \code{line_remove = NULL}, then code will be appended just after existing model
+#' \code{remove_line = NULL}, then code will be appended just after existing model
 #' code; otherwise specify the lines to insert new code into by setting 
-#' \code{line_append}.
-#' @param line_append Either \code{NULL} or an integer value as a scalar or vector
+#' \code{append_line}.
+#' @param append_line Either \code{NULL} or an integer value as a scalar or vector
 #' defining which positions to insert new lines of code in the model. Note that
-#' line removal will occur first if \code{line_remove} is set, and then new
+#' line removal will occur first if \code{remove_line} is set, and then new
 #' lines of code will be inserted at the desired indexing positions. 
-#' @param line_remove Either \code{NULL} or an integer value as a scalar or vector
+#' @param remove_line Either \code{NULL} or an integer value as a scalar or vector
 #' defining which lines of code to remove from model. Set to \code{NULL} when only 
 #' appending to and not replacing code in previous model file.
 #' @param write Logical. If \code{TRUE}, then a text file is written to the 
@@ -2897,74 +2897,116 @@ realized_density <- function(samples, grid, crs_, site, hab_mask,
 #' 
 #' # replace line 3 of old model code with 'p0_prior' 
 #' new_model = customize_model(model = scr_model, append_code = p0_prior, 
-#'                                    line_append = 3, line_remove = 3)
+#'                                    append_line = 3, remove_line = 3)
 #'                                    
 #' # inspect new model code
 #' new_model
 #' @name customize_model
 #' @export 
-customize_model <- function(model,append_code = NULL,line_append = NULL, 
-                        line_remove = NULL,write = FALSE){
-  # read in current model file
-  txtPath1 <- tempfile(fileext = ".txt")
-  sink(txtPath1)
-  print(model)
-  sink()
+customize_model <- function(model,append_code = NULL,append_line = NULL, 
+                        remove_line = NULL,write = FALSE){
+  # read in main model
+     model_list <- as.list(model)
+     file_list <- list()
+     length_lines <- numeric(length(model_list))
+   for(i in 1:length(model_list)){
+     tmodel <- strsplit(as.character(model[i]),"\n")[[1]]
+     file_list[[i]] <- tempfile(fileext = ".txt")
+     writeLines(tmodel, file_list[[i]])
+     length_lines[i] <- length(readLines(file_list[[i]],encoding="UTF-8"))
+   }
+   main_model <- character(sum(length_lines))
+   for(i in 1:length(model_list)){
+    main_model[which(main_model=="")[1]:ifelse(length_lines[i]==1,(which(main_model=="")[1]),
+                  (which(main_model=="")[1])+length_lines[i]-1)] =
+                  readLines(file_list[[i]],encoding="UTF-8")
+   }
+   main_model[length(main_model)+1] <- "}"
+   unlink(unlist(file_list)) # unlink temp files
   # check for removal of lines and do this first
-  if(isFALSE(is.null(line_remove))){
-   temp_model <- c("nimble::nimbleCode({",
-          readLines(txtPath1,encoding="UTF-8")[-c(1,line_remove,
-          length(readLines(txtPath1,encoding="UTF-8")))],
-                  "})")
-   writeLines(temp_model,txtPath1,useBytes = FALSE) 
+  if(isFALSE(is.null(remove_line))){
+      remove_model <- main_model[-remove_line]
   }
   # just append new code after old code
-  if(isFALSE(is.null(append_code)) & is.null(line_append)){ 
-    txtPath2 <- tempfile(fileext = ".txt")
-    sink(txtPath2)
-    print(append_code)
-    sink()
-    temp_model <- c("nimble::nimbleCode({",
-          readLines(txtPath1,encoding="UTF-8")[-c(1,
-          length(readLines(txtPath1,encoding="UTF-8")))],  
-          readLines(txtPath2,encoding="UTF-8")[-c(1,
-          length(readLines(txtPath2,encoding="UTF-8")))],
-                  "})")
-  on.exit(unlink(txtPath2))
+  if(isFALSE(is.null(append_code)) & is.null(append_line)){ 
+       model_list <- as.list(append_code)
+       file_list <- list()
+       length_lines <- numeric(length(model_list))
+   for(i in 1:length(model_list)){
+     tmodel <- strsplit(as.character(append_code[i]),"\n")[[1]]
+     file_list[[i]] <- tempfile(fileext = ".txt")
+     writeLines(tmodel, file_list[[i]])
+     length_lines[i] <- length(readLines(file_list[[i]],encoding="UTF-8"))
+   }
+   append_model <- character(sum(length_lines))
+   for(i in 1:length(model_list)){
+    append_model[which(append_model=="")[1]:ifelse(length_lines[i]==1,(which(append_model=="")[1]),
+                  (which(append_model=="")[1])+length_lines[i]-1)] =
+                  readLines(file_list[[i]],encoding="UTF-8")
+   }
+   append_model[length(append_model)+1] <- "}"
+   unlink(unlist(file_list))
+   if(is.null(remove_line)){
+    updated_model <- c("{",
+          main_model[-c(1,length(remove_model))],
+          append_model[-c(1,length(append_model))],
+                  "}") 
+   }else
+   if(isFALSE(is.null(remove_line))){ 
+   updated_model <- c("{",
+          remove_model[-c(1,length(remove_model))],
+          append_model[-c(1,length(append_model))],
+                  "}")
+   } # check for line removal
   }else # add new code to specific index position in character vector
-  if(isFALSE(is.null(append_code)) & isFALSE(is.null(line_append))){ 
-    txtPath2 <- tempfile(fileext = ".txt")
-    sink(txtPath2)
-    print(append_code)
-    sink()
-    temp_model <- c("nimble::nimbleCode({",
-          readLines(txtPath1,encoding="UTF-8")[-c(1,
-          length(readLines(txtPath1,encoding="UTF-8")))],
-                  "})")
-    add_model <- readLines(txtPath2,encoding="UTF-8")[-c(1,
-         length(readLines(txtPath2,encoding="UTF-8")))]
-    temp_model <- R.utils::insert(temp_model,ats = line_append,
-                            values = add_model)
-  on.exit(unlink(txtPath2))
+  if(isFALSE(is.null(append_code)) & isFALSE(is.null(append_line))){
+       model_list <- as.list(append_code)
+       file_list <- list()
+       length_lines <- numeric(length(model_list))
+   for(i in 1:length(model_list)){
+     tmodel <- strsplit(as.character(append_code[i]),"\n")[[1]]
+     file_list[[i]] <- tempfile(fileext = ".txt")
+     writeLines(tmodel, file_list[[i]])
+     length_lines[i] <- length(readLines(file_list[[i]],encoding="UTF-8"))
+   }
+   append_model <- character(sum(length_lines))
+   for(i in 1:length(model_list)){
+    append_model[which(append_model=="")[1]:ifelse(length_lines[i]==1,(which(append_model=="")[1]),
+                  (which(append_model=="")[1])+length_lines[i]-1)] =
+                  readLines(file_list[[i]],encoding="UTF-8")
+   }
+   append_model[length(append_model)+1] <- "}"
+   unlink(unlist(file_list))
+  # updated_model <- character(length(main_model))
+   # check if length(append_line) == length(append_model[-c(1,length(append_model))])
+   if(length(append_line) != length(append_model[-c(1,length(append_model))])){
+     stop(paste("length of append_line must equal lines of append_code minus outside braces, i.e.,","{","}"))
+   }
+      if(is.null(remove_line)){
+        updated_model <- character(length(main_model)+length(append_model)-2)
+        updated_model[append_line] <- append_model[-c(1,length(append_model))]
+        updated_model[(1:(length(updated_model)-1))[-c(1,append_line)]] <- main_model[-c(1,length(main_model))]
+        updated_model[c(1,length(updated_model))] <- c("{","}") 
+   }else
+   if(isFALSE(is.null(remove_line))){ 
+        updated_model <- character(length(remove_model)+length(append_model)-2)
+        updated_model[append_line] <- append_model[-c(1,length(append_model))]
+        updated_model[(1:(length(updated_model)-1))[-c(1,append_line)]] <- remove_model[-c(1,length(remove_model))]
+        updated_model[c(1,length(updated_model))] <- c("{","}") 
+   } # check for line removal
+    # don't need R.utils!
   }
+     # if nothing is done to code, just return original code
+  if(is.null(remove_line) & is.null(append_code) & is.null(append_line)){
+    updated_model <- main_model
+     warning("Returning same model code as input into function")
+  }
+  # if write to file
   if(write){
     local.path <- paste0(getwd(),"/new_model.txt")
-    writeLines(temp_model,local.path,useBytes = FALSE) 
+    writeLines(updated_model,local.path,useBytes = FALSE) 
   }
-  # if nothing is done to code, just return original code
-  if(is.null(line_remove) & is.null(append_code) & is.null(line_append)){
-    warning("Returning same model code as input into function")
-     temp_model <- c("nimble::nimbleCode({",
-        readLines(txtPath1,encoding="UTF-8")[-c(1,
-        length(readLines(txtPath1,encoding="UTF-8")))],
-        "})")
-  }
-  sink(txtPath1)
-  print(temp_model)
-  sink()
-  writeLines(temp_model,txtPath1,useBytes = FALSE) 
-  on.exit(unlink(txtPath1))
-  return(source(txtPath1)$value)
+  return(updated_model)
 } # End function 'customize_model'
 
 

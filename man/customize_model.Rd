@@ -7,8 +7,8 @@
 customize_model(
   model,
   append_code = NULL,
-  line_append = NULL,
-  line_remove = NULL,
+  append_line = NULL,
+  remove_line = NULL,
   write = FALSE
 )
 }
@@ -18,16 +18,16 @@ possibly generated from \code{\link{get_classic}} function.}
 
 \item{append_code}{Either \code{NULL} or model code produced from 
 \code{nimbleCode()}  or \code{\link{get_classic}} function. Note that if
-\code{line_remove = NULL}, then code will be appended just after existing model
+\code{remove_line = NULL}, then code will be appended just after existing model
 code; otherwise specify the lines to insert new code into by setting 
-\code{line_append}.}
+\code{append_line}.}
 
-\item{line_append}{Either \code{NULL} or an integer value as a scalar or vector
+\item{append_line}{Either \code{NULL} or an integer value as a scalar or vector
 defining which positions to insert new lines of code in the model. Note that
-line removal will occur first if \code{line_remove} is set, and then new
+line removal will occur first if \code{remove_line} is set, and then new
 lines of code will be inserted at the desired indexing positions.}
 
-\item{line_remove}{Either \code{NULL} or an integer value as a scalar or vector
+\item{remove_line}{Either \code{NULL} or an integer value as a scalar or vector
 defining which lines of code to remove from model. Set to \code{NULL} when only 
 appending to and not replacing code in previous model file.}
 
@@ -55,7 +55,7 @@ p0_prior = nimble::nimbleCode({
 
 # replace line 3 of old model code with 'p0_prior' 
 new_model = customize_model(model = scr_model, append_code = p0_prior, 
-                                   line_append = 3, line_remove = 3)
+                                   append_line = 3, remove_line = 3)
                                    
 # inspect new model code
 new_model
