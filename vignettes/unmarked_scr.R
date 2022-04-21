@@ -242,7 +242,6 @@ library(localSCR)
 #  #> 1193.95 sec elapsed
 #  
 #  # summarize output (exclude "su" and "zu" from table and make posterior/trace plots)
-#  
 #  nimSummary(out, exclude_params = c("su","zu"), trace=TRUE, plot_all=FALSE)
 #  #>       post.mean post.sd    q2.5     q50   q97.5 f0    n.eff  Rhat
 #  #> D         0.223   0.053   0.137   0.219   0.343  1  275.831 1.001
