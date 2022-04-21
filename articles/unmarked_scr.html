@@ -213,7 +213,8 @@ Now lets first simulate some spatial capture-recapture data using <code><a href=
 <span class="va">n</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">data3d</span><span class="op">$</span><span class="va">y</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span>, <span class="va">sum</span><span class="op">)</span>
 
 <span class="co"># inspect n[j,k]</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>
+<span class="co">#&gt; int [1:25, 1:4] 0 3 2 0 1 1 1 1 1 1 ...</span></code></pre></div>
 <br><p>
 </p>
 <p>We can see the data were transformed from a 3-dimensional array (<code>y[i,j,k]</code>) to a 2-dimensional array (<code>n[j,k]</code>) by summing over individuals. In the spatial count model, we cannot identify individuals but we can observe a count of unmarked individuals at each occasion and trap (Royle et al. 2014). In general, this model depends on spatial autocorrelation in the observations to estimate model parameters. We’ll see how the estimates compare to a problem with marked individuals that was presented in the first vignette by running an analogous spatial count modeling problem . We’ll use the same trap array but set a single scaling parameter (<code>sigma_</code>) of 300 m.</p>
