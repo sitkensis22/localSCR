@@ -36,24 +36,3 @@ Suggests:
     viridis
 VignetteBuilder: knitr
 URL: https://sitkensis22.github.io/localSCR/
-Collate:
-    'customize_model.r'
-    'get_classic.r'
-    'get_unmarked.r'
-    'grid_classic.r'
-    'initialize_classic.r'
-    'mask_polygon.r'
-    'mask_raster.r'
-    'nimSummary.r'
-    'realized_density.r'
-    'rescale_classic.r'
-    'run_classic.r'
-    'sim_classic.r'
-    
-    
-    
-    
-    
-    
-    
-    

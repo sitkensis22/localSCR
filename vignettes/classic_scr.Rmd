@@ -74,7 +74,7 @@ library(localSCR)
 
 ### (1) Simulate a single trap array with random positional noise and create state-space
 
-```{r, fig.show='hide'}
+```{r, fig.show='hide',eval=FALSE}
 # simulate a single trap array with random positional noise
 x <- seq(-800, 800, length.out = 5)
 y <- seq(-800, 800, length.out = 5)
@@ -112,7 +112,7 @@ Now lets simulate some spatial capture-recapture data using `sim_classic()`. Not
 
 ### (2) Simulate SCR data and make a plot of it.
 
-```{r, fig.show='hide'}
+```{r, fig.show='hide',eval=FALSE}
 # simulate SCR data
 data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs,
               sigma_ = mysigma, prop_sex = 1,N = 200, K = 4, 
@@ -121,6 +121,13 @@ data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs,
 
 # inspect simulated data
 str(data3d)
+#> List of 3
+#>  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...
+#>  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...
+#>  $ s  : num [1:200, 1:2] -658 -830 182 -1521 -106 ...
+#>   ..- attr(*, "dimnames")=List of 2
+#>   .. ..$ : NULL
+#>   .. ..$ : chr [1:2] "sx" "sy"
 
 # bind simulated activity centers with vector of the number of individual detections
 sdata = as.data.frame(cbind(data3d$s,Ndet=apply(data3d$y,1,sum)))
@@ -153,7 +160,7 @@ We also see the use of `initialize_classic()`, which generates plausible startin
 
 ### (3) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask
 
-```{r, fig.show='hide'}
+```{r, fig.show='hide',eval=FALSE}
 # simulate a single trap array with random positional noise
 x <- seq(-800, 800, length.out = 5)
 y <- seq(-800, 800, length.out = 5)
@@ -221,7 +228,7 @@ In the figure above we can see the effect of the polygon in creating a habitat m
 We now have most of the components we will need to analyze the simulated data set. However, because we are using a habitat mask in the model (`hab_mask`), we first must rescale the traps, grid extent, and initial activity center locations. 
 </p>
 <br>
-```{r, fig.show='hide'}
+```{r, fig.show='hide',eval=FALSE}
 # rescale inputs
 rescale_list = rescale_classic(X = traps, ext = Grid$ext, s.st = s.st3d, 
 hab_mask = hab_mask)
@@ -275,6 +282,7 @@ out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE, 
 RNGseed = 500)
 toc()
+#> 106.658 sec elapsed
 
 # summarize output
 samples = do.call(rbind, out)
@@ -293,9 +301,17 @@ We can see from the histogram of the posterior samples of `N` that our model est
 Next we use`nimSummary()` to quickly summarize the MCMC samples. Note that there are other options to summarize MCMC output, but this function is provided with the package and depends partly on the 'coda' package. Then, we make a realized density plot of the MCMC samples using `realized_density()`. In this function we make use of the list of grid and extent we created earlier called `Grid` as well as our saved coordinates reference system (`mycrs`). In this example, we use the 'raster' package to make a simple plot of the output. We can see that the habitat mask has resulted in some cells having `NA` values where the habitat was unsuitable.
 </p>
 <br>
-```{r, fig.show='hide'}
+```{r, fig.show='hide',eval=FALSE}
 # summarize MCMC samples (exclude parameters and don't plot)
 nimSummary(out, exclude_params = c("s","z"), trace=FALSE)
+#>          post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat
+#> D            0.217   0.027   0.174   0.214   0.279  1 287.723 1.003
+#> N          232.708  28.761 186.000 229.000 298.000  1 287.723 1.003
+#> p0           0.133   0.024   0.091   0.131   0.183  1 405.761 1.012
+#> psi          0.581   0.076   0.456   0.574   0.749  1 298.192 1.003
+#> psi_sex      0.758   0.054   0.648   0.761   0.855  1 465.875 1.003
+#> sigma[1]   306.583  45.277 236.604 299.853 411.239  1 254.652 1.000
+#> sigma[2]   278.029  25.147 232.727 276.585 331.032  1 273.259 1.011
 
 # make realized density plot 
 r = realized_density(samples = out, grid = Grid$grid, crs_ = mycrs, 
@@ -322,7 +338,7 @@ Next we repeat a similar workflow but now we have two trap arrays that are clust
 
 ### (4) Workflow for simple SCR model with sex-specific sigma, binomial encounter distribution, and habitat mask using a 3D trap array or clustered traps.
 
-```{r, fig.show='hide'}
+```{r, fig.show='hide',eval=FALSE}
 # simulate a single trap array with random positional noise
 x <- seq(-800, 800, length.out = 5)
 y <- seq(-800, 800, length.out = 5)
@@ -367,7 +383,7 @@ ggplot() + geom_point(data=as.data.frame(GridX$grid[,,1]),aes(x=V1,y=V2),color="
 In the figure we can see our two spatially separated trapping grids and that the polgon overlaps some of the gridded area. The area outside the polygon will be considered unsuitable when the habitat matrix is created. Note that the `site` variable will be only as long as the simulated population size (here, 200) and thus, we will need to augment the variable to have the length equal to the total augmented population size (i.e., `M = 400`). Otherwise the workflow is very similar to the previous one. 
 </p>
 <br>
-```{r, fig.show='hide',fig.width = 8,fig.height=14}
+```{r, fig.show='hide',fig.width = 8,fig.height=14,eval=FALSE}
 # get 3D habitat mask array for 3D grid
 hab_mask = mask_polygon(poly = poly, grid = GridX$grid, crs_ = mycrs, 
 prev_mask = NULL)
@@ -444,9 +460,19 @@ out = run_classic(model = scr_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, 
 parallel=TRUE, RNGseed = 500)
 toc()
+#> 110.978 sec elapsed
 
 # summary table of MCMC output (exclude "s" and "z" parameters)
 nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)
+#>          post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat
+#> D            0.100   0.015   0.074   0.098   0.136  1 221.187 1.063
+#> N          223.906  34.525 166.000 221.000 306.000  1 221.187 1.063
+#> p0[1]        0.112   0.027   0.066   0.109   0.173  1 531.737 1.005
+#> p0[2]        0.108   0.024   0.069   0.106   0.162  1 534.815 1.006
+#> psi          0.569   0.090   0.409   0.562   0.776  1 229.467 1.062
+#> psi_sex      0.553   0.079   0.394   0.553   0.703  1 304.397 1.021
+#> sigma[1]   252.076  37.377 192.030 247.679 335.659  1 264.634 1.009
+#> sigma[2]   330.496  35.807 270.581 326.672 411.406  1 268.864 1.015
 ```
 
 <p align="center">
@@ -459,7 +485,7 @@ These trace plots show a bit of autocorrelation and we might run a few more iter
 We again make a realized density surface and note that the `realized_density()` function outputs a list of length 2 in this example since we have 2 spatially separated trapping grids here that are in a 3-dimensional array format. 
 </p>
 <br>
-```{r, fig.show='hide'}
+```{r, fig.show='hide',eval=FALSE}
 # generate realized density surface
 r = realized_density(samples=out, grid=GridX$grid, crs_=mycrs,
                       site=constants$site, hab_mask=hab_mask)

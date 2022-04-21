@@ -42,20 +42,6 @@ In some SCR problems, there are landscape features that create 'unsuitable' habi
 Finally, in some SCR designs, clusters of trap arrays may be spread out over the study area such that individuals can only be detected at one of multiple trap arrays (e.g., Furnas et al. 2018). This necessitates including the traps as a 3-dimensional array, using a site identifier to track which site a detected or augmented individual belongs to, and using a dynamic indexing in the model. 
 </p>
 <br>
-<p>
-
-
-## Turtorial
-
-
-This tutorial includes four parts:
-1) Create traps (or detectors) and then construct a state-space
-2) Simulate 'classic' SCR data and covert to spatial count data  
-3) Workflow for 2-D trap array including habitat mask
-4) Adding prior information on the scaling and encounter rate parameters
-5) Workflow for 3-D trap array including  habitat mask
-</p>
-<br>
 
 <p>
 
@@ -74,6 +60,20 @@ This tutorial includes four parts:
 </p>
 <br>
 
+<p>
+
+
+## Turtorial
+
+
+This tutorial includes four parts:
+1) Create traps (or detectors) and then construct a state-space
+2) Simulate 'classic' SCR data and covert to spatial count data  
+3) Workflow for 2-D trap array including habitat mask
+4) Adding prior information on the scaling and encounter rate parameters
+5) Workflow for 3-D trap array including  habitat mask
+</p>
+<br>
 
 ```{r setup}
 # load 'localSCR' package
@@ -85,7 +85,7 @@ library(localSCR)
 ### (1) Simulate a single trap array with random positional noise and create state-space
 
 
-```{r, fig.show='hide'}
+```{r, fig.show='hide',eval=FALSE}
 # simulate a single trap array with random positional noise
 x <- seq(-800, 800, length.out = 5)
 y <- seq(-800, 800, length.out = 5)
@@ -126,7 +126,7 @@ Now lets first simulate some spatial capture-recapture data using `sim_classic()
 
 
 
-```{r, fig.show='hide'}
+```{r, fig.show='hide',eval=FALSE}
 # simulate SCR data
 data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, 
                      sigma_ = mysigma, prop_sex = 1,N = 200, K = 4,
@@ -135,6 +135,13 @@ data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs,
 
 # inspect simulated data
 str(data3d)
+#> List of 3
+#>  $ y  : int [1:200, 1:25, 1:4] 0 0 0 0 0 0 0 0 0 0 ...
+#>  $ sex: int [1:200] 1 1 1 1 1 1 1 1 1 1 ...
+#>  $ s  : num [1:200, 1:2] -662 -834 177 -1526 -110 ...
+#>   ..- attr(*, "dimnames")=List of 2
+#>   .. ..$ : NULL
+#>   .. ..$ : chr [1:2] "sx" "sy"
 
 # We sum over traps and occasions to produce a 2-dimensional spatial count data set
 n = apply(data3d$y, c(2,3), sum)
@@ -158,7 +165,7 @@ We also see the use of `initialize_classic()`, which generates plausible startin
 
 
 
-```{r, fig.show='hide'}
+```{r, fig.show='hide',eval=FALSE}
 # simulate a dense, spatially autocorrelated trap array with random positional noise
 x <- seq(-800, 800, length.out = 5)
 y <- seq(-800, 800, length.out = 5)
@@ -222,7 +229,7 @@ Because the model uses the Poisson encounter distribution, we also need to intia
 <br>
 
 
-```{r, fig.show='hide'}
+```{r, fig.show='hide',eval=FALSE}
 # rescale inputs
 rescale_list = rescale_classic(X = traps, ext = Grid$ext, s.st = s.st3d, 
                                hab_mask = hab_mask)
@@ -267,6 +274,7 @@ out = run_classic(model = sc_model, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE,
 RNGseed = 500, s_alias="su")
 toc()
+#> 511.62 sec elapsed
 
 # summarize output
 samples = do.call(rbind, out)
@@ -289,10 +297,15 @@ Next we use`nimSummary()` to quickly summarize the MCMC samples. Note that there
 </p>
 <br>
 
-```{r, fig.show='hide'}
+```{r, fig.show='hide',eval=FALSE}
 # summarize MCMC samples (exclude parameters and don't plot)
 nimSummary(out, exclude_params = c("su","zu"), trace=FALSE)
-
+#>       post.mean post.sd    q2.5     q50   q97.5 f0  n.eff  Rhat
+#> D         0.234   0.121   0.040   0.221   0.453  1 33.817 1.121
+#> N       250.204 129.023  43.000 237.000 485.000  1 33.817 1.121
+#> lam0      0.385   0.238   0.065   0.357   0.906  1 68.708 1.020
+#> psi       0.500   0.258   0.086   0.475   0.968  1 33.594 1.119
+#> sigma   344.133 202.596 146.564 270.782 932.274  1 31.582 1.282
 ```
 
 <br>
@@ -305,7 +318,7 @@ Although we are able to produce estimates, they are not reliable due to the lack
 ### (4) Adding prior information on the scaling and encounter rate parameters
 
 
-```{r, fig.show='hide'}
+```{r, fig.show='hide',eval=FALSE}
 
 # get from Github and load
 #install_github("austinnam/modeltools",force=TRUE) 
@@ -327,7 +340,7 @@ To add our prior information, we'll use `customize_model()` to edit our previous
 
 <br>
 
-```{r, fig.show='hide'}
+```{r, fig.show='hide',eval=FALSE}
 # define new code to replace line 3 in 'sc_model'
 library(nimble)
 new_prior = nimbleCode({
@@ -352,6 +365,7 @@ out = run_classic(model = sc_model_inf, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE,
 RNGseed = 500,s_alias="su")
 toc()
+#> 836.56 sec elapsed
 
 # summarize output
 samples = do.call(rbind, out)
@@ -370,7 +384,7 @@ Again, we see that convergence is not great despite having prior information on 
 </p>
 
 <br>
-```{r, fig.show='hide',fig.width = 8,fig.height=14}
+```{r, fig.show='hide',eval=FALSE,fig.width = 8,fig.height=14}
 # define new code to replace line 3 in 'sc_model'
 new_prior = nimbleCode({
    lam0 ~ dgamma(alpha_lam0, 1/beta_lam0) # note that dgamma takes rate (1/beta)
@@ -397,10 +411,17 @@ out = run_classic(model = sc_model_inf2, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE,
 RNGseed = 500,s_alias="su")
 toc()
+#> 1193.95 sec elapsed
 
 # summarize output (exclude "su" and "zu" from table and make posterior/trace plots)
 
 nimSummary(out, exclude_params = c("su","zu"), trace=TRUE, plot_all=FALSE)
+#>       post.mean post.sd    q2.5     q50   q97.5 f0    n.eff  Rhat
+#> D         0.223   0.053   0.137   0.219   0.343  1  275.831 1.001
+#> N       238.946  56.449 147.000 234.000 367.000  1  275.831 1.001
+#> lam0      0.298   0.029   0.244   0.297   0.358  1 1374.996 1.000
+#> psi       0.478   0.114   0.288   0.468   0.737  1  287.766 1.001
+#> sigma   287.307  28.393 234.682 286.116 346.612  1  301.998 1.013
 ```
 
 <p align="center">
@@ -415,7 +436,7 @@ Finally, we make a realized density plot of the MCMC samples using `realized_den
 <br>
 
 
-```{r, fig.show='hide'}
+```{r, fig.show='hide',eval=FALSE}
 # make realized density plot (need to specify s_alias and z_alias)
 r = realized_density(samples = out, grid = Grid$grid, crs_ = mycrs, site = NULL, 
                      hab_mask = hab_mask, s_alias = "su", z_alias = "zu")       
@@ -447,7 +468,7 @@ As a final step example in this tutorial, we demonstrate the ability of the 'loc
 ### (5) Workflow for spatial count model with Poisson encounter distribution and habitat mask using a 3D trap array or clustered trap
 
 
-```{r, fig.show='hide'}
+```{r, fig.show='hide',eval=FALSE}
 # simulate a single trap array with random positional noise
 x <- seq(-800, 800, length.out = 5)
 y <- seq(-800, 800, length.out = 5)
@@ -495,7 +516,7 @@ In the figure we can see our two spatially separated trapping grids and that the
 </p>
 <br>
 
-```{r, fig.show='hide',fig.width = 8,fig.height=14}
+```{r, fig.show='hide',eval=FALSE,fig.width = 8,fig.height=14}
 # get 3D habitat mask array for 3D grid
 hab_mask = mask_polygon(poly = poly, grid = GridX$grid, crs_ = mycrs, prev_mask = NULL)
 
@@ -597,9 +618,17 @@ out = run_classic(model = sc_model_inf, data=data, constants=constants,
 inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, 
 parallel=TRUE, RNGseed = 500, s_alias = "su")
 toc()
+#> 968.93 sec elapsed
 
 # summary table of MCMC output (exclude "su" and "zu" parameters)
 nimSummary(out, exclude_params = c("su","zu"))
+#>         post.mean post.sd    q2.5     q50   q97.5 f0    n.eff  Rhat
+#> D           0.102   0.022   0.066   0.099   0.152  1  270.831 1.008
+#> N         228.569  49.067 149.000 223.000 342.000  1  270.831 1.008
+#> lam0[1]     0.295   0.027   0.247   0.294   0.352  1 3595.823 1.002
+#> lam0[2]     0.299   0.027   0.249   0.298   0.355  1 2805.852 1.001
+#> psi         0.581   0.125   0.376   0.569   0.865  1  305.124 1.007
+#> sigma     295.497  27.822 243.024 295.005 352.028  1  319.216 1.002
 ```
 
 <br>
@@ -608,7 +637,7 @@ These results are similar to our model run in part 4 with the informative priors
 </p>
 <br>
 
-```{r, fig.show='hide'}
+```{r, fig.show='hide',eval=FALSE}
 # generate realized density surface (note setting z_alias and s_alias)
 r = realized_density(samples=out, grid=GridX$grid, crs_=mycrs,
                       site=constants$site, hab_mask=hab_mask,
