@@ -418,7 +418,6 @@ toc()
 #> 1193.95 sec elapsed
 
 # summarize output (exclude "su" and "zu" from table and make posterior/trace plots)
-
 nimSummary(out, exclude_params = c("su","zu"), trace=TRUE, plot_all=FALSE)
 #>       post.mean post.sd    q2.5     q50   q97.5 f0    n.eff  Rhat
 #> D         0.223   0.053   0.137   0.219   0.343  1  275.831 1.001
@@ -709,7 +708,10 @@ pcomb
 Way to go! You've made it through the second 'localSCR' tutorial. Please see Royle et al. (2014) for more details about spatial count theory and modeling. The next tutorial will be similar but focused on spatial mark-resight models that make inference to abundance/density for marked/unmarked populations.
 </p>
 <br>
+
+
 ## References
+
 
 Chandler, R. B. 2018. Speeding up data augmentation in BUGS.
 <https://groups.google.com/forum/#!topic/hmecology/o6cWDqHHgOE>.
