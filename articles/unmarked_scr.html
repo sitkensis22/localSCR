@@ -387,7 +387,7 @@ To add our prior information, we’ll use <code><a href="../reference/customize_
 
 <span class="co"># delete old prior on line 3 and replace with new prior </span>
 <span class="va">sc_model_inf</span> <span class="op">=</span> <span class="fu"><a href="../reference/customize_model.html">customize_model</a></span><span class="op">(</span>model <span class="op">=</span> <span class="va">sc_model</span>, append_code <span class="op">=</span> <span class="va">new_prior</span>,
-                               line_append<span class="op">=</span><span class="fl">3</span>,line_remove<span class="op">=</span><span class="fl">3</span><span class="op">)</span>
+                               append_line<span class="op">=</span><span class="fl">3</span>,remove_line<span class="op">=</span><span class="fl">3</span><span class="op">)</span>
 
 <span class="co"># inspect model (not run)</span>
 <span class="co"># sc_model_inf</span>
@@ -425,7 +425,7 @@ Again, we see that convergence is not great despite having prior information on 
 
 <span class="co"># delete old prior on line 3 and replace with new prior </span>
 <span class="va">sc_model_inf2</span> <span class="op">=</span> <span class="fu"><a href="../reference/customize_model.html">customize_model</a></span><span class="op">(</span>model <span class="op">=</span> <span class="va">sc_model_inf</span>, append_code <span class="op">=</span> <span class="va">new_prior</span>,
-                               line_append<span class="op">=</span><span class="fl">2</span>,line_remove<span class="op">=</span><span class="fl">2</span><span class="op">)</span>
+                               append_line<span class="op">=</span><span class="fl">2</span>,remove_line<span class="op">=</span><span class="fl">2</span><span class="op">)</span>
 
 <span class="co"># inspect model (not run)</span>
 <span class="co"># sc_model_inf2</span>
@@ -619,8 +619,8 @@ pOK<span class="op">=</span><span class="va">data</span><span class="op">$</span
 <span class="op">}</span><span class="op">)</span>
 
 <span class="co"># now create new model</span>
-<span class="va">sc_model_inf</span> <span class="op">=</span> <span class="fu"><a href="../reference/customize_model.html">customize_model</a></span><span class="op">(</span><span class="va">sc_model</span>, <span class="va">add_model</span>, line_append <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">4</span><span class="op">)</span>,
-                               line_remove <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">5</span><span class="op">)</span><span class="op">)</span>
+<span class="va">sc_model_inf</span> <span class="op">=</span> <span class="fu"><a href="../reference/customize_model.html">customize_model</a></span><span class="op">(</span><span class="va">sc_model</span>, <span class="va">add_model</span>, append_line <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">4</span><span class="op">)</span>,
+                               remove_line <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">5</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># inspect model (not run)</span>
 <span class="co"># sc_model_inf</span>
