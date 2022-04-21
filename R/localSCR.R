@@ -3007,9 +3007,9 @@ customize_model <- function(model,append_code = NULL,append_line = NULL,
   }
   txtPath1 <- tempfile(fileext = ".txt")
   sink(txtPath1)
-  print(udpated_model)
+  print(updated_model)
   sink()
-  writeLines(udpated_model,txtPath1,useBytes = FALSE) 
+  writeLines(updated_model,txtPath1,useBytes = FALSE) 
   on.exit(unlink(txtPath1))
   return(source(txtPath1)$value)
 } # End function 'customize_model'
