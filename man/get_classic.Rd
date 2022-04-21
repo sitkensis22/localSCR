@@ -13,23 +13,23 @@ get_classic(
 )
 }
 \arguments{
-\item{dim_y}{an integer of either 2 (the default) or that defines what 
+\item{dim_y}{An integer of either 2 (the default) or that defines what 
 dimensional format the encounter history data are in.}
 
-\item{enc_dist}{either \code{"binomial"} or \code{"poisson"}. Default is
+\item{enc_dist}{Either \code{"binomial"} or \code{"poisson"}. Default is
 \code{"binomial"}.}
 
-\item{sex_sigma}{a logical value indicating whether the scaling parameter 
+\item{sex_sigma}{A logical value indicating whether the scaling parameter 
 ('sigma') is sex-specific}
 
-\item{hab_mask}{a logical value indicating whether a habitat mask will be 
+\item{hab_mask}{A logical value indicating whether a habitat mask will be 
 used. Default is \code{FALSE}.}
 
-\item{trapsClustered}{a logical value indicating if traps are clustered in 
+\item{trapsClustered}{A logical value indicating if traps are clustered in 
 arrays across the sampling area.}
 }
 \value{
-a \code{nimbleCode} object from the \code{nimble} package.
+A \code{nimbleCode} object from the \code{nimble} package.
 }
 \description{
 Creates model code using the \code{\link[nimble]{nimbleCode}} function.

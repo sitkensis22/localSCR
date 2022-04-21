@@ -15,27 +15,27 @@ realized_density(
 )
 }
 \arguments{
-\item{samples}{either a matrix (for a single MCMC chain) or list of posterior
+\item{samples}{Either a matrix (for a single MCMC chain) or list of posterior
 samples from multiple chains from MCMC sampling; possibly returned from 
 \code{\link{run_classic}}.}
 
-\item{grid}{a matrix or array object of the the state-space grid. This is 
+\item{grid}{A matrix or array object of the the state-space grid. This is 
 returned from \code{\link{grid_classic}}.}
 
-\item{crs_}{the UTM coordinate reference system (EPSG code) used for your
+\item{crs_}{The UTM coordinate reference system (EPSG code) used for your
 location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).}
 
-\item{site}{site indentifier variable included for detected and augmented 
+\item{site}{Site identifier variable included for detected and augmented 
 individuals used as a constant in model runs.}
 
-\item{hab_mask}{either \code{FALSE} (the default) or a matrix or arary 
+\item{hab_mask}{Either \code{FALSE} (the default) or a matrix or arary 
 output from \code{\link{mask_polygon}}
 or \code{\link{mask_raster}} functions.}
 
-\item{s_alias}{a character value used to identify the latent activity center 
+\item{s_alias}{A character value used to identify the latent activity center 
 coordinates used in the model. Default is \code{"s"}.}
 
-\item{z_alias}{a character value used to identify the latent inclusion 
+\item{z_alias}{A character value used to identify the latent inclusion 
 indicator used in the model. Default is \code{"z"}.}
 }
 \value{

@@ -4,14 +4,14 @@
 #' coordinates and an Extent object from the \code{raster} package as a 
 #' state-space.
 #'
-#' @param X either a matrix or array representing the coordinates of traps in
+#' @param X Either a matrix or array representing the coordinates of traps in
 #' UTMs. An array is used when traps are clustered over a survey area.
-#' @param crs_ the UTM coordinate reference system (EPSG code) used for your
+#' @param crs_ The UTM coordinate reference system (EPSG code) used for your
 #' location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).
-#' @param buff the distance (m or km) that the traps should be
+#' @param buff The distance (m or km) that the traps should be
 #' buffered by as an integer. This is typically 3 times the sigma parameter.
-#' @param res the grid cell resolution for the state-space.
-#' @return a list of a matrix or array of grid coordinates \code{grid} and an
+#' @param res The grid cell resolution for the state-space.
+#' @return A list of a matrix or array of grid coordinates \code{grid} and an
 #' extent object \code{ext}. Note that a matrix object is returned if the 
 #' coordinates of the traps are a matrix (i.e., 2D), otherwise an array object
 #' is returned when trap coordinates are in a 3D array.
@@ -82,7 +82,7 @@ grid_classic <- function(X, crs_, buff, res){
                         dim(X)[2:3])) # convert to array
     }
   return(list(grid = gridOut, ext = ext))
-} # end 'grid_classic' function
+} # End 'grid_classic' function
 
 
 
@@ -91,31 +91,31 @@ grid_classic <- function(X, crs_, buff, res){
 #' @description Returns a list of simulated data including the encounter
 #' history, binary sex indicator, activity centers, and site identifier.
 #'
-#' @param X either a matrix or array object representing the coordinates of traps in
+#' @param X Either a matrix or array object representing the coordinates of traps in
 #' UTMs. An array is used when traps are clustered over a survey area.
-#' @param ext an \code{Extent} object from the \code{raster} package. This is 
+#' @param ext An \code{Extent} object from the \code{raster} package. This is 
 #' returned from \code{\link{grid_classic}}.
-#' @param crs_ the UTM coordinate reference system (EPSG code) used for your
+#' @param crs_ The UTM coordinate reference system (EPSG code) used for your
 #' location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).
-#' @param N simulated total abundance as an integer. 
-#' @param sigma_ the scaling parameter of the bivariate normal kernel either
+#' @param N Simulated total abundance as an integer. 
+#' @param sigma_ The scaling parameter of the bivariate normal kernel either
 #' in meters or kilometers as an integer.
-#' @param prop_sex the portion of females or males as a numeric value. This
+#' @param prop_sex The portion of females or males as a numeric value. This
 #' will depend upon the indicator coding scheme used (e.g., females = 1 and
 #' males = 0; then proportion of females in the simulation). Must be a numeric
 #' value between 0 and 1. Note that 0 or 1 can be used if a non-sex-specific 
 #' sigma is desired.
-#' @param K the number of sampling occasions desired as an integer.
-#' @param base_encounter the baseline encounter probability or rate as a numeric
+#' @param K The number of sampling occasions desired as an integer.
+#' @param base_encounter The baseline encounter probability or rate as a numeric
 #' value. Note that a probabilty is given for a \code{"binomial"} observation
 #' distribution while a rate is given for a \code{"poisson"} distribution.
-#' @param enc_dist either \code{"binomial"} or \code{"poisson"}. Default is
+#' @param enc_dist Either \code{"binomial"} or \code{"poisson"}. Default is
 #' \code{"binomial"}.
-#' @param hab_mask either \code{FALSE} (the default) or a matrix or arrary output from \code{\link{mask_polygon}}
+#' @param hab_mask Either \code{FALSE} (the default) or a matrix or arrary output from \code{\link{mask_polygon}}
 #' or \code{\link{mask_raster}} functions.
-#' @param setSeed the random number generater seed as an integer used in
+#' @param setSeed The random number generater seed as an integer used in
 #' simulations to obtain repeatable data simulations. Default is 500.
-#' @return a list of a matrix or array of encounter histories \code{y}, a
+#' @return A list of a matrix or array of encounter histories \code{y}, a
 #' vector or matrix of 0's and 1's for \code{sex}, a batrix of simulated activity
 #' centers \code{s}, and when a 3-dimensional trap array is given, a vector
 #' for the site identifier \code{site}.
@@ -316,7 +316,7 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter,
       dataList <- list(y=Y4d,sex=sex,site=site,s=s)
     }
   return(dataList)
-} # end 'sim_encounter' function
+} # End 'sim_encounter' function
 
 
 
@@ -324,17 +324,17 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter,
 #'
 #' @description Creates model code using the \code{\link[nimble]{nimbleCode}} function.
 #'
-#' @param dim_y an integer of either 2 (the default) or that defines what 
+#' @param dim_y An integer of either 2 (the default) or that defines what 
 #' dimensional format the encounter history data are in.
-#' @param enc_dist either \code{"binomial"} or \code{"poisson"}. Default is
+#' @param enc_dist Either \code{"binomial"} or \code{"poisson"}. Default is
 #' \code{"binomial"}.
-#' @param sex_sigma a logical value indicating whether the scaling parameter 
+#' @param sex_sigma A logical value indicating whether the scaling parameter 
 #' ('sigma') is sex-specific
-#' @param hab_mask a logical value indicating whether a habitat mask will be 
+#' @param hab_mask A logical value indicating whether a habitat mask will be 
 #' used. Default is \code{FALSE}.
-#' @param trapsClustered a logical value indicating if traps are clustered in 
+#' @param trapsClustered A logical value indicating if traps are clustered in 
 #' arrays across the sampling area.
-#' @return a \code{nimbleCode} object from the \code{nimble} package.
+#' @return A \code{nimbleCode} object from the \code{nimble} package.
 #' @details This function provides templates that could be copied and easily 
 #' modified to include further model complexity such as covariates explaining 
 #' detection probability. The models include different encounter probability 
@@ -1438,14 +1438,14 @@ return(scrcode)
 #' @description Generate a matrix of intial starting locations, possibly accounting 
 #' for habitat mask.
 #'
-#' @param y either a matrix or array of encounter history data, possiblity 
+#' @param y Either a matrix or array of encounter history data, possiblity 
 #' from \code{sim_classic()}.
-#' @param M an integer of the total augmented population size (i.e., detected 
+#' @param M An integer of the total augmented population size (i.e., detected 
 #' and augmented individuals). UTMs. An array is used when traps are clustered 
 #' over a survey area.
-#' @param X either a matrix or array representing the coordinates of traps in
+#' @param X Either a matrix or array representing the coordinates of traps in
 #' UTMs. An array is used when traps are clustered over a survey area.
-#' @param buff the distance (m or km) that the traps should be
+#' @param buff The distance (m or km) that the traps should be
 #' buffered by as an integer. This is typically 3 times the sigma parameter.
 #' @param site Either \code{NULL} (if a 2D trap array is used) or a vector of 
 #' integers denoting which trap array an individual (either detected or 
@@ -1453,13 +1453,13 @@ return(scrcode)
 #' \code{\link{sim_classic}} when a 3D trap array is used. However, this
 #'  \code{site} variable must be correctly augmented based on the total 
 #'  augmented population size (i.e., \code{M}).
-#' @param hab_mask either \code{FALSE} (the default) or a matrix or array output
+#' @param hab_mask Either \code{FALSE} (the default) or a matrix or array output
 #'  from \code{\link{mask_polygon}} or \code{\link{mask_raster}} functions.
-#' @param all_random logical. If \code{TRUE}, then encounter data \code{y} are 
+#' @param all_random Logical. If \code{TRUE}, then encounter data \code{y} are 
 #' ignored and all initial activity center starting locations are randomly chosen.
 #' If \code{FALSE} (the default), then initial values will be the mean capture 
 #' location for detected individuals and random locations for augmented individuals. 
-#' @return a matrix of initial activity center coordinates with \code{M} rows 
+#' @return A matrix of initial activity center coordinates with \code{M} rows 
 #' and 2 columns.
 #' @details This function generates initial activity center locations based 
 #' on encounter histories, augmented population size, state-space buffer, 
@@ -1740,11 +1740,11 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask, all_random = FALSE
 #'
 #' @description Rescale inputs to prepare data for habitat mask to be used.
 #'
-#' @param X either a matrix or array representing the coordinates of traps in
+#' @param X Either a matrix or array representing the coordinates of traps in
 #' UTMs. An array is used when traps are clustered over a survey area.
-#' @param ext an \code{Extent} object from the \code{raster} package. This is 
+#' @param ext An \code{Extent} object from the \code{raster} package. This is 
 #' returned from \code{\link{grid_classic}}.
-#' @param s.st a matrix of starting activity center coordinates. This is 
+#' @param s.st A matrix of starting activity center coordinates. This is 
 #' returned from \code{\link{initialize_classic}}
 #' buffered by as an integer. This is typically 3 times the sigma parameter.
 #' @param site Either \code{NULL} (if a 2D trap array is used) or a vector of 
@@ -1753,9 +1753,9 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask, all_random = FALSE
 #' \code{\link{sim_classic}} when a 3D trap array is used. However, this 
 #' \code{site} variable must be correctly augmented based on the total 
 #' augmented population size (i.e., \code{M}).
-#' @param hab_mask a matrix or arary output from \code{\link{mask_polygon}} or
+#' @param hab_mask A matrix or arary output from \code{\link{mask_polygon}} or
 #'  \code{\link{mask_raster}} functions.
-#' @return a list of rescaled trap coordinates, grid extents, and starting 
+#' @return A list of rescaled trap coordinates, grid extents, and starting 
 #' activity center coordinates.
 #' @details This function is only meant to be used when habitat masking is 
 #' incorporated into the model. The functions properly rescales inputs based on 
@@ -1868,17 +1868,17 @@ if(length(dim(X))==3){
 #' @description Creates a matrix or array to use as a habitat mask to account for unsuitable 
 #' habitat.
 #'
-#' @param poly a polygon created using the \code{sf} package of class 
+#' @param poly A polygon created using the \code{sf} package of class 
 #' \code{"sfc_POLYGON"}
-#' @param grid a matrix or array object of the the state-space grid. This 
+#' @param grid A matrix or array object of the the state-space grid. This 
 #' is returned from \code{\link{grid_classic}}.
-#' @param crs_ the UTM coordinate reference system (EPSG code) used for your
+#' @param crs_ The UTM coordinate reference system (EPSG code) used for your
 #' location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).
-#' @param prev_mask either \code{NULL} or a previously created habitat mask 
+#' @param prev_mask Either \code{NULL} or a previously created habitat mask 
 #' matrix or array from \code{\link{mask_polygon}} or \code{\link{mask_raster}}. 
 #' This allows for habitat masks to be combined to account for different 
 #' spatial features.
-#' @return a matrix or array of 0's and 1's denoting unsuitable and suitable 
+#' @return A matrix or array of 0's and 1's denoting unsuitable and suitable 
 #' habitat respectively.
 #' @details This function creates a habitat matrix or array depending upon 
 #' whether a 2D (former) or 3D (latter) trap array is used. This matrix can be 
@@ -2022,18 +2022,18 @@ return(habitat_mask)
 #' @description Creates a matrix or array to use as a habitat mask to account for unsuitable 
 #' habitat.
 #'
-#' @param rast a raster layer created using the \code{raster} package of class 
+#' @param rast A raster layer created using the \code{raster} package of class 
 #' \code{"RasterLayer"}
-#' @param FUN a function that defines the criteria for suitable habitat.
-#' @param grid a matrix or array object of the the state-space grid. This is 
+#' @param FUN A function that defines the criteria for suitable habitat.
+#' @param grid A matrix or array object of the the state-space grid. This is 
 #' returned from \code{\link{grid_classic}}.
-#' @param crs_ the UTM coordinate reference system (EPSG code) used for your
+#' @param crs_ The UTM coordinate reference system (EPSG code) used for your
 #' location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).
-#' @param prev_mask either \code{NULL} or a previously created habitat mask 
+#' @param prev_mask Either \code{NULL} or a previously created habitat mask 
 #' matrix or array from \code{\link{mask_polygon}} or \code{\link{mask_raster}}. 
 #' This allows for habitat masks to be combined to account for different spatial
 #'  features.
-#' @return a matrix or array of 0's and 1's denoting unsuitable and suitable
+#' @return A matrix or array of 0's and 1's denoting unsuitable and suitable
 #'  habitat respectively.
 #' @details This function creates a habitat matrix or array depending upon 
 #' whether a 2D (former) or 3D (latter) trap array is used. This matrix can be 
@@ -2182,31 +2182,31 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
 #' @description A wrapper function to conduct Markov Chain Monte Carlo (MCMC) sampling using
 #'  nimble.
 #'
-#' @param model \code{nimbleCode} used to define model in \code{nimble} package,
+#' @param model The \code{nimbleCode} used to define model in \code{nimble} package,
 #'  possibly generated from \code{\link{get_classic}}.
-#' @param data a list of data inputs needed to run SCR models in \code{nimble}.
-#' @param constants a list of constants needed to run SCR models in \code{nimble}.
-#' @param inits starting values for stochastic parameters to begin MCMC sampling.
-#' @param params a vector of character strings that define the parameters to 
+#' @param data A list of data inputs needed to run SCR models in \code{nimble}.
+#' @param constants A list of constants needed to run SCR models in \code{nimble}.
+#' @param inits Starting values for stochastic parameters to begin MCMC sampling.
+#' @param params A vector of character strings that define the parameters to 
 #' trace in the MCMC simulation.
-#' @param niter an integer value of the total number of MCMC iterations to run 
+#' @param niter An integer value of the total number of MCMC iterations to run 
 #' per chain.
-#' @param nburnin an integer value of the number of MCMC iterations to discard 
+#' @param nburnin An integer value of the number of MCMC iterations to discard 
 #' as 'burnin'.
-#' @param thin an integer value of the amount of thinning of the chain. For 
+#' @param thin An integer value of the amount of thinning of the chain. For 
 #' example, \code{thin=2} would retain every other MCMC sample.
-#' @param nchains an integer value for the number of MCMC chains to run
-#' @param parallel a logical value indicating whether MCMC chains shoud be run 
+#' @param nchains An integer value for the number of MCMC chains to run
+#' @param parallel A logical value indicating whether MCMC chains shoud be run 
 #' in parallel processing. Default is \code{FALSE}.
-#' @param RNGseed an integer value specifying the random number generating seed 
+#' @param RNGseed An integer value specifying the random number generating seed 
 #' using in parallel processing. 
 #' This ensures that the MCMC samples will be the same during each run using the
 #'  same data, etc. Default is \code{NULL}.
-#' @param s_alias a character value used to identify the latent activity center
+#' @param s_alias A character value used to identify the latent activity center
 #'  coordinates used in the model. Default is \code{"s"}. Note that the length
 #'  of \code{s_alias} must be either 1 (e.g., \code{"s"}) or 2 
 #'  (e.g., \code{c("s","su")}).
-#' @return a list of MCMC samples for each parameter traced with length equal to
+#' @return A list of MCMC samples for each parameter traced with length equal to
 #'  the number of chains run.
 #' @details This function provides a wrapper to easily run Bayesian SCR models
 #'  using \code{nimble}.
@@ -2431,21 +2431,21 @@ run_classic <- function(model, data, constants, inits, params,
 #'
 #' @description Summarizes lists of MCMC chain output from nimble
 #'
-#' @param d a list of MCMC samples from each chain returned from 
+#' @param d A list of MCMC samples from each chain returned from 
 #' \code{\link{run_classic}}.
-#' @param trace a logical value indicating whether or not traces of MCMC samples
+#' @param trace A logical value indicating whether or not traces of MCMC samples
 #'  should be plotted. Default is \code{FALSE}.
-#' @param plot_all a logical value indicating whether or not all parameters 
+#' @param plot_all A logical value indicating whether or not all parameters 
 #' should be included in plots. This assumes that some parameters
 #' are excluded in the summary table (i.e., \code{exclude_params != NULL}). 
 #' Default is \code{FALSE}.
-#' @param exclude_params either \code{NULL} or a scalar or vector containing 
+#' @param exclude_params Either \code{NULL} or a scalar or vector containing 
 #' parameter(s) to exclude from summary. Note that high dimensional parameters 
 #' (e.g., \code{s[1, 1, 1]}) can be excluded by calling \code{exclude_params =  
 #' "s"}. Default is \code{NULL}.
-#' @param digits an integer value indicating how many digits the output should 
+#' @param digits An integer value indicating how many digits the output should 
 #' be rounded to.
-#' @return a dataframe of summary statistics for MCMC samples.
+#' @return A dataframe of summary statistics for MCMC samples.
 #' @details This function summarizes Bayesian SCR models run using \code{nimble} 
 #' including mean and quantiles of samples, as well as effective sample size and
 #'  Rhat statistics. Note that \code{f0} is the proportion of samples that are
@@ -2655,21 +2655,21 @@ if(is.null(exclude_params)){
 #' samples of latent indicator variable (\code{z}) and activity center
 #' coordinates (\code{s})
 #'
-#' @param samples either a matrix (for a single MCMC chain) or list of posterior
+#' @param samples Either a matrix (for a single MCMC chain) or list of posterior
 #' samples from multiple chains from MCMC sampling; possibly returned from 
 #' \code{\link{run_classic}}.
-#' @param grid a matrix or array object of the the state-space grid. This is 
+#' @param grid A matrix or array object of the the state-space grid. This is 
 #' returned from \code{\link{grid_classic}}.
-#' @param crs_ the UTM coordinate reference system (EPSG code) used for your
+#' @param crs_ The UTM coordinate reference system (EPSG code) used for your
 #' location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).
-#' @param site site indentifier variable included for detected and augmented 
+#' @param site Site identifier variable included for detected and augmented 
 #' individuals used as a constant in model runs. 
-#' @param hab_mask either \code{FALSE} (the default) or a matrix or arary 
+#' @param hab_mask Either \code{FALSE} (the default) or a matrix or arary 
 #' output from \code{\link{mask_polygon}}
 #' or \code{\link{mask_raster}} functions.
-#' @param s_alias a character value used to identify the latent activity center 
+#' @param s_alias A character value used to identify the latent activity center 
 #' coordinates used in the model. Default is \code{"s"}.
-#' @param z_alias a character value used to identify the latent inclusion 
+#' @param z_alias A character value used to identify the latent inclusion 
 #' indicator used in the model. Default is \code{"z"}.
 #' @importFrom sp SpatialPoints
 #' @importFrom raster cellFromXY
@@ -2864,21 +2864,21 @@ realized_density <- function(samples, grid, crs_, site, hab_mask,
 #' @description Allows for efficient editing of model code produced by \code{nimbleCode()} 
 #' function
 #'
-#' @param model \code{nimbleCode()} used to define model in \code{nimble} package,
+#' @param model The \code{nimbleCode()} used to define model in \code{nimble} package,
 #' possibly generated from \code{\link{get_classic}} function.
-#' @param append_code either \code{NULL} or model code produced from 
+#' @param append_code Either \code{NULL} or model code produced from 
 #' \code{nimbleCode()}  or \code{\link{get_classic}} function. Note that if
 #' \code{line_remove = NULL}, then code will be appended just after existing model
 #' code; otherwise specify the lines to insert new code into by setting 
 #' \code{line_append}.
-#' @param line_append either \code{NULL} or an integer value as a scalar or vector
+#' @param line_append Either \code{NULL} or an integer value as a scalar or vector
 #' defining which positions to insert new lines of code in the model. Note that
 #' line removal will occur first if \code{line_remove} is set, and then new
 #' lines of code will be inserted at the desired indexing positions. 
-#' @param line_remove either \code{NULL} or an integer value as a scalar or vector
+#' @param line_remove Either \code{NULL} or an integer value as a scalar or vector
 #' defining which lines of code to remove from model. Set to \code{NULL} when only 
 #' appending to and not replacing code in previous model file.
-#' @param write logical. If \code{TRUE}, then a text file is written to the 
+#' @param write Logical. If \code{TRUE}, then a text file is written to the 
 #' working directory called "new_model.txt". Otherwise, model is written to temp
 #' file and then deleted. Default is \code{FALSE}.
 #' @return a model description that can be run in \code{nimble} or using 
@@ -2973,15 +2973,15 @@ customize_model <- function(model,append_code = NULL,line_append = NULL,
 #'
 #' @description Creates model code using the \code{\link[nimble]{nimbleCode}} function.
 #'
-#' @param occ_specific logical. If \code{FALSE}, the encounter rate will
+#' @param occ_specific Logical. If \code{FALSE}, the encounter rate will
 #' not include an occasion-specific loop in the detection function; otherwise, 
 #' the model will include a for loop for occasions (K) in the detection function.
 #' Default is \code{FALSE}.
-#' @param hab_mask a logical value indicating whether a habitat mask will be 
+#' @param hab_mask A logical value indicating whether a habitat mask will be 
 #' used. Default is \code{FALSE}.
-#' @param trapsClustered a logical value indicating if traps are clustered in 
+#' @param trapsClustered A logical value indicating if traps are clustered in 
 #' arrays across the sampling area.
-#' @return model code created from \code{\link[nimble]{nimbleCode}}.
+#' @return Model code created from \code{\link[nimble]{nimbleCode}}.
 #' @details This function provides templates for unmarked models that can be 
 #' easily modified to include further model complexity such as covariates 
 #' explaining detection probability. The models include habitat masking.
@@ -3157,7 +3157,7 @@ for(i in 1:M){
   su[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
   dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
  for(k in 1:K){
- lam[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))*zu[i]
+ lam[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma^2))*zu[i]
   } # k occasions
 } # i marked individuals
   # unmarked spatial count model likelihood

@@ -7,24 +7,24 @@
 mask_raster(rast, FUN, grid, crs_, prev_mask)
 }
 \arguments{
-\item{rast}{a raster layer created using the \code{raster} package of class 
+\item{rast}{A raster layer created using the \code{raster} package of class 
 \code{"RasterLayer"}}
 
-\item{FUN}{a function that defines the criteria for suitable habitat.}
+\item{FUN}{A function that defines the criteria for suitable habitat.}
 
-\item{grid}{a matrix or array object of the the state-space grid. This is 
+\item{grid}{A matrix or array object of the the state-space grid. This is 
 returned from \code{\link{grid_classic}}.}
 
-\item{crs_}{the UTM coordinate reference system (EPSG code) used for your
+\item{crs_}{The UTM coordinate reference system (EPSG code) used for your
 location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).}
 
-\item{prev_mask}{either \code{NULL} or a previously created habitat mask 
+\item{prev_mask}{Either \code{NULL} or a previously created habitat mask 
 matrix or array from \code{\link{mask_polygon}} or \code{\link{mask_raster}}. 
 This allows for habitat masks to be combined to account for different spatial
  features.}
 }
 \value{
-a matrix or array of 0's and 1's denoting unsuitable and suitable
+A matrix or array of 0's and 1's denoting unsuitable and suitable
  habitat respectively.
 }
 \description{

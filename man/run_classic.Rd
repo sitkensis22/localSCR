@@ -21,44 +21,44 @@ run_classic(
 )
 }
 \arguments{
-\item{model}{\code{nimbleCode} used to define model in \code{nimble} package,
+\item{model}{The \code{nimbleCode} used to define model in \code{nimble} package,
 possibly generated from \code{\link{get_classic}}.}
 
-\item{data}{a list of data inputs needed to run SCR models in \code{nimble}.}
+\item{data}{A list of data inputs needed to run SCR models in \code{nimble}.}
 
-\item{constants}{a list of constants needed to run SCR models in \code{nimble}.}
+\item{constants}{A list of constants needed to run SCR models in \code{nimble}.}
 
-\item{inits}{starting values for stochastic parameters to begin MCMC sampling.}
+\item{inits}{Starting values for stochastic parameters to begin MCMC sampling.}
 
-\item{params}{a vector of character strings that define the parameters to 
+\item{params}{A vector of character strings that define the parameters to 
 trace in the MCMC simulation.}
 
-\item{niter}{an integer value of the total number of MCMC iterations to run 
+\item{niter}{An integer value of the total number of MCMC iterations to run 
 per chain.}
 
-\item{nburnin}{an integer value of the number of MCMC iterations to discard 
+\item{nburnin}{An integer value of the number of MCMC iterations to discard 
 as 'burnin'.}
 
-\item{thin}{an integer value of the amount of thinning of the chain. For 
+\item{thin}{An integer value of the amount of thinning of the chain. For 
 example, \code{thin=2} would retain every other MCMC sample.}
 
-\item{nchains}{an integer value for the number of MCMC chains to run}
+\item{nchains}{An integer value for the number of MCMC chains to run}
 
-\item{parallel}{a logical value indicating whether MCMC chains shoud be run 
+\item{parallel}{A logical value indicating whether MCMC chains shoud be run 
 in parallel processing. Default is \code{FALSE}.}
 
-\item{RNGseed}{an integer value specifying the random number generating seed 
+\item{RNGseed}{An integer value specifying the random number generating seed 
 using in parallel processing. 
 This ensures that the MCMC samples will be the same during each run using the
  same data, etc. Default is \code{NULL}.}
 
-\item{s_alias}{a character value used to identify the latent activity center
+\item{s_alias}{A character value used to identify the latent activity center
 coordinates used in the model. Default is \code{"s"}. Note that the length
 of \code{s_alias} must be either 1 (e.g., \code{"s"}) or 2 
 (e.g., \code{c("s","su")}).}
 }
 \value{
-a list of MCMC samples for each parameter traced with length equal to
+A list of MCMC samples for each parameter traced with length equal to
  the number of chains run.
 }
 \description{

@@ -13,25 +13,25 @@ customize_model(
 )
 }
 \arguments{
-\item{model}{\code{nimbleCode()} used to define model in \code{nimble} package,
+\item{model}{The \code{nimbleCode()} used to define model in \code{nimble} package,
 possibly generated from \code{\link{get_classic}} function.}
 
-\item{append_code}{either \code{NULL} or model code produced from 
+\item{append_code}{Either \code{NULL} or model code produced from 
 \code{nimbleCode()}  or \code{\link{get_classic}} function. Note that if
 \code{line_remove = NULL}, then code will be appended just after existing model
 code; otherwise specify the lines to insert new code into by setting 
 \code{line_append}.}
 
-\item{line_append}{either \code{NULL} or an integer value as a scalar or vector
+\item{line_append}{Either \code{NULL} or an integer value as a scalar or vector
 defining which positions to insert new lines of code in the model. Note that
 line removal will occur first if \code{line_remove} is set, and then new
 lines of code will be inserted at the desired indexing positions.}
 
-\item{line_remove}{either \code{NULL} or an integer value as a scalar or vector
+\item{line_remove}{Either \code{NULL} or an integer value as a scalar or vector
 defining which lines of code to remove from model. Set to \code{NULL} when only 
 appending to and not replacing code in previous model file.}
 
-\item{write}{logical. If \code{TRUE}, then a text file is written to the 
+\item{write}{Logical. If \code{TRUE}, then a text file is written to the 
 working directory called "new_model.txt". Otherwise, model is written to temp
 file and then deleted. Default is \code{FALSE}.}
 }

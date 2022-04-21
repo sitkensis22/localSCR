@@ -7,19 +7,19 @@
 get_unmarked(occ_specific = FALSE, hab_mask = FALSE, trapsClustered = FALSE)
 }
 \arguments{
-\item{occ_specific}{logical. If \code{FALSE}, the encounter rate will
+\item{occ_specific}{Logical. If \code{FALSE}, the encounter rate will
 not include an occasion-specific loop in the detection function; otherwise, 
 the model will include a for loop for occasions (K) in the detection function.
 Default is \code{FALSE}.}
 
-\item{hab_mask}{a logical value indicating whether a habitat mask will be 
+\item{hab_mask}{A logical value indicating whether a habitat mask will be 
 used. Default is \code{FALSE}.}
 
-\item{trapsClustered}{a logical value indicating if traps are clustered in 
+\item{trapsClustered}{A logical value indicating if traps are clustered in 
 arrays across the sampling area.}
 }
 \value{
-model code created from \code{\link[nimble]{nimbleCode}}.
+Model code created from \code{\link[nimble]{nimbleCode}}.
 }
 \description{
 Creates model code using the \code{\link[nimble]{nimbleCode}} function.

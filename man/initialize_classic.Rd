@@ -7,17 +7,17 @@
 initialize_classic(y, M, X, buff, site, hab_mask, all_random = FALSE)
 }
 \arguments{
-\item{y}{either a matrix or array of encounter history data, possiblity 
+\item{y}{Either a matrix or array of encounter history data, possiblity 
 from \code{sim_classic()}.}
 
-\item{M}{an integer of the total augmented population size (i.e., detected 
+\item{M}{An integer of the total augmented population size (i.e., detected 
 and augmented individuals). UTMs. An array is used when traps are clustered 
 over a survey area.}
 
-\item{X}{either a matrix or array representing the coordinates of traps in
+\item{X}{Either a matrix or array representing the coordinates of traps in
 UTMs. An array is used when traps are clustered over a survey area.}
 
-\item{buff}{the distance (m or km) that the traps should be
+\item{buff}{The distance (m or km) that the traps should be
 buffered by as an integer. This is typically 3 times the sigma parameter.}
 
 \item{site}{Either \code{NULL} (if a 2D trap array is used) or a vector of 
@@ -27,16 +27,16 @@ augmented) belongs to. Note that \code{site} is provided from
  \code{site} variable must be correctly augmented based on the total 
  augmented population size (i.e., \code{M}).}
 
-\item{hab_mask}{either \code{FALSE} (the default) or a matrix or array output
+\item{hab_mask}{Either \code{FALSE} (the default) or a matrix or array output
 from \code{\link{mask_polygon}} or \code{\link{mask_raster}} functions.}
 
-\item{all_random}{logical. If \code{TRUE}, then encounter data \code{y} are 
+\item{all_random}{Logical. If \code{TRUE}, then encounter data \code{y} are 
 ignored and all initial activity center starting locations are randomly chosen.
 If \code{FALSE} (the default), then initial values will be the mean capture 
 location for detected individuals and random locations for augmented individuals.}
 }
 \value{
-a matrix of initial activity center coordinates with \code{M} rows 
+A matrix of initial activity center coordinates with \code{M} rows 
 and 2 columns.
 }
 \description{

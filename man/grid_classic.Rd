@@ -7,19 +7,19 @@
 grid_classic(X, crs_, buff, res)
 }
 \arguments{
-\item{X}{either a matrix or array representing the coordinates of traps in
+\item{X}{Either a matrix or array representing the coordinates of traps in
 UTMs. An array is used when traps are clustered over a survey area.}
 
-\item{crs_}{the UTM coordinate reference system (EPSG code) used for your
+\item{crs_}{The UTM coordinate reference system (EPSG code) used for your
 location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).}
 
-\item{buff}{the distance (m or km) that the traps should be
+\item{buff}{The distance (m or km) that the traps should be
 buffered by as an integer. This is typically 3 times the sigma parameter.}
 
-\item{res}{the grid cell resolution for the state-space.}
+\item{res}{The grid cell resolution for the state-space.}
 }
 \value{
-a list of a matrix or array of grid coordinates \code{grid} and an
+A list of a matrix or array of grid coordinates \code{grid} and an
 extent object \code{ext}. Note that a matrix object is returned if the 
 coordinates of the traps are a matrix (i.e., 2D), otherwise an array object
 is returned when trap coordinates are in a 3D array.

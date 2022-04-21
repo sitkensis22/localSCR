@@ -8,13 +8,13 @@ center coordinates}
 rescale_classic(X, ext, s.st, site, hab_mask)
 }
 \arguments{
-\item{X}{either a matrix or array representing the coordinates of traps in
+\item{X}{Either a matrix or array representing the coordinates of traps in
 UTMs. An array is used when traps are clustered over a survey area.}
 
-\item{ext}{an \code{Extent} object from the \code{raster} package. This is 
+\item{ext}{An \code{Extent} object from the \code{raster} package. This is 
 returned from \code{\link{grid_classic}}.}
 
-\item{s.st}{a matrix of starting activity center coordinates. This is 
+\item{s.st}{A matrix of starting activity center coordinates. This is 
 returned from \code{\link{initialize_classic}}
 buffered by as an integer. This is typically 3 times the sigma parameter.}
 
@@ -25,11 +25,11 @@ augmented) belongs to. Note that \code{site} is provided from
 \code{site} variable must be correctly augmented based on the total 
 augmented population size (i.e., \code{M}).}
 
-\item{hab_mask}{a matrix or arary output from \code{\link{mask_polygon}} or
+\item{hab_mask}{A matrix or arary output from \code{\link{mask_polygon}} or
 \code{\link{mask_raster}} functions.}
 }
 \value{
-a list of rescaled trap coordinates, grid extents, and starting 
+A list of rescaled trap coordinates, grid extents, and starting 
 activity center coordinates.
 }
 \description{

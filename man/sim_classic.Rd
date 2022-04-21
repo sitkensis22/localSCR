@@ -19,43 +19,43 @@ sim_classic(
 )
 }
 \arguments{
-\item{X}{either a matrix or array object representing the coordinates of traps in
+\item{X}{Either a matrix or array object representing the coordinates of traps in
 UTMs. An array is used when traps are clustered over a survey area.}
 
-\item{ext}{an \code{Extent} object from the \code{raster} package. This is 
+\item{ext}{An \code{Extent} object from the \code{raster} package. This is 
 returned from \code{\link{grid_classic}}.}
 
-\item{crs_}{the UTM coordinate reference system (EPSG code) used for your
+\item{crs_}{The UTM coordinate reference system (EPSG code) used for your
 location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).}
 
-\item{N}{simulated total abundance as an integer.}
+\item{N}{Simulated total abundance as an integer.}
 
-\item{sigma_}{the scaling parameter of the bivariate normal kernel either
+\item{sigma_}{The scaling parameter of the bivariate normal kernel either
 in meters or kilometers as an integer.}
 
-\item{prop_sex}{the portion of females or males as a numeric value. This
+\item{prop_sex}{The portion of females or males as a numeric value. This
 will depend upon the indicator coding scheme used (e.g., females = 1 and
 males = 0; then proportion of females in the simulation). Must be a numeric
 value between 0 and 1. Note that 0 or 1 can be used if a non-sex-specific 
 sigma is desired.}
 
-\item{K}{the number of sampling occasions desired as an integer.}
+\item{K}{The number of sampling occasions desired as an integer.}
 
-\item{base_encounter}{the baseline encounter probability or rate as a numeric
+\item{base_encounter}{The baseline encounter probability or rate as a numeric
 value. Note that a probabilty is given for a \code{"binomial"} observation
 distribution while a rate is given for a \code{"poisson"} distribution.}
 
-\item{enc_dist}{either \code{"binomial"} or \code{"poisson"}. Default is
+\item{enc_dist}{Either \code{"binomial"} or \code{"poisson"}. Default is
 \code{"binomial"}.}
 
-\item{hab_mask}{either \code{FALSE} (the default) or a matrix or arrary output from \code{\link{mask_polygon}}
+\item{hab_mask}{Either \code{FALSE} (the default) or a matrix or arrary output from \code{\link{mask_polygon}}
 or \code{\link{mask_raster}} functions.}
 
-\item{setSeed}{the random number generater seed as an integer used in
+\item{setSeed}{The random number generater seed as an integer used in
 simulations to obtain repeatable data simulations. Default is 500.}
 }
 \value{
-a list of a matrix or array of encounter histories \code{y}, a
+A list of a matrix or array of encounter histories \code{y}, a
 vector or matrix of 0's and 1's for \code{sex}, a batrix of simulated activity
 centers \code{s}, and when a 3-dimensional trap array is given, a vector
 for the site identifier \code{site}.
