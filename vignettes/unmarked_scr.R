@@ -53,6 +53,7 @@ library(localSCR)
 #  
 #  # inspect n[j,k]
 #  str(n)
+#  #> int [1:25, 1:4] 0 3 2 0 1 1 1 1 1 1 ...
 
 ## ---- fig.show='hide',eval=FALSE----------------------------------------------
 #  # simulate a dense, spatially autocorrelated trap array with random positional noise
