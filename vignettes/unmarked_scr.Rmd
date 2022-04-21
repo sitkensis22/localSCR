@@ -724,7 +724,7 @@ Furnas, B. J., R. H. Landers, S. Hill, S. S. Itoga, and B. N. Sacks. 2018. Integ
 
 Milleret, C., P. Dupont, C. Bonenfant, H. Henrik Brøseth, Ø. Flagstad,
 C. Sutherland, and R. Bischof. 2019. A local evaluation of the individual
-state‐space to scale up Bayesian spatial capture‐recapture. Ecology and
+state‐space to scale up Bayesian spatial capture‐recapture. Ecology a
 Evolution 9:352–363.
 
 Turek, D., C. Milleret, T. Ergon, and H. Brøseth 2021. Efficient estimation of large‐scale spatial capture–recapture model. Ecosphere <DOI:10.1002/ecs2.338>5.
