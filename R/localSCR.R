@@ -2883,7 +2883,6 @@ realized_density <- function(samples, grid, crs_, site, hab_mask,
 #' file and then deleted. Default is \code{FALSE}.
 #' @return a model description that can be run in \code{nimble} or using 
 #' \code{\link{run_classic}}. 
-#' @importFrom R.utils insert
 #' @author Daniel Eacker
 #' @examples
 #' # get model
