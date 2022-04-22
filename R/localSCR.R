@@ -2946,16 +2946,16 @@ customize_model <- function(model,append_code = NULL,append_line = NULL,
    append_model[length(append_model)+1] <- "}"
    unlink(unlist(file_list))
    if(is.null(remove_line)){
-    updated_model <- c("{",
+    updated_model <- c("nimble::nimbleCode({",
           main_model[-c(1,length(remove_model))],
           append_model[-c(1,length(append_model))],
-                  "}") 
+                  "})") 
    }else
    if(isFALSE(is.null(remove_line))){ 
-   updated_model <- c("{",
+   updated_model <- c("nimble::nimbleCode({",
           remove_model[-c(1,length(remove_model))],
           append_model[-c(1,length(append_model))],
-                  "}")
+                  "})")
    } # check for line removal
   }else # add new code to specific index position in character vector
   if(isFALSE(is.null(append_code)) & isFALSE(is.null(append_line))){
