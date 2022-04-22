@@ -418,8 +418,6 @@ de Valpine P, C. Paciorek, D. Turek, N. Michaud, C. Anderson-Bergman, F. Obermey
 Filtering, and Programmable Hierarchical Modeling_. doi: 10.5281/zenodo.1211190 (URL:
 <https://doi.org/10.5281/zenodo.1211190>), R package version 0.12.2, URL:<https://cran.r-project.org/package=nimble>.
 
-Furnas, B. J., R. H. Landers, S. Hill, S. S. Itoga, and B. N. Sacks. 2018. Integrated modeling to estimate population size and composition of mule deer. Journal of Wildlife Management 82:1429–1441. 
-
 Milleret, C., P. Dupont, C. Bonenfant, H. Henrik Brøseth, Ø. Flagstad,
 C. Sutherland, and R. Bischof. 2019. A local evaluation of the individual
 state‐space to scale up Bayesian spatial capture‐recapture. Ecology and
