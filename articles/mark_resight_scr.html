@@ -332,7 +332,7 @@ Now lets first simulate some spatial capture-recapture data for our ‘marked’
 <span class="va">params</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sigma"</span>,<span class="st">"psi"</span>,<span class="st">"psiu"</span>,<span class="st">"lam0"</span>,<span class="st">"N"</span>,<span class="st">"Nm"</span>,<span class="st">"Nu"</span>,<span class="st">"D"</span>,<span class="st">"s"</span>,<span class="st">"z"</span>,<span class="st">"su"</span>,<span class="st">"zu"</span><span class="op">)</span>
 
 <span class="co"># get 'classic' SCR model for marked data</span>
-<span class="va">scr_model</span> <span class="op">=</span> <span class="va">scr_model</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_classic.html">get_classic</a></span><span class="op">(</span>dim_y <span class="op">=</span> <span class="fl">2</span>, enc_dist <span class="op">=</span> <span class="st">"poisson"</span>,
+<span class="va">scr_model</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_classic.html">get_classic</a></span><span class="op">(</span>dim_y <span class="op">=</span> <span class="fl">2</span>, enc_dist <span class="op">=</span> <span class="st">"poisson"</span>,
                                sex_sigma <span class="op">=</span> <span class="cn">FALSE</span>,hab_mask<span class="op">=</span><span class="cn">TRUE</span>,
                                 trapsClustered<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 
