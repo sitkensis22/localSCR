@@ -188,7 +188,7 @@ library(localSCR)
 #  
 #  # delete old prior on line 3 and replace with new prior
 #  sc_model_inf = customize_model(model = sc_model, append_code = new_prior,
-#                                 line_append=3,line_remove=3)
+#                                 append_line=3,remove_line=3)
 #  
 #  # inspect model (not run)
 #  # sc_model_inf
@@ -220,7 +220,7 @@ library(localSCR)
 #  
 #  # delete old prior on line 3 and replace with new prior
 #  sc_model_inf2 = customize_model(model = sc_model_inf, append_code = new_prior,
-#                                 line_append=2,line_remove=2)
+#                                 append_line=2,remove_line=2)
 #  
 #  # inspect model (not run)
 #  # sc_model_inf2
@@ -391,8 +391,8 @@ library(localSCR)
 #  })
 #  
 #  # now create new model
-#  sc_model_inf = customize_model(sc_model, add_model, line_append = c(3,4),
-#                                 line_remove = c(3,5))
+#  sc_model_inf = customize_model(sc_model, add_model, append_line = c(3,4),
+#                                 remove_line = c(3,5))
 #  
 #  # inspect model (not run)
 #  # sc_model_inf

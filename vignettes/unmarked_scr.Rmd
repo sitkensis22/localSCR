@@ -160,7 +160,7 @@ We can see the data were transformed from a 3-dimensional array (`y[i,j,k]`) to 
 
 We add on an additional layer of complexity by introducing a habitat mask. After constructing a polygon feature using the 'sf' package, we then use the function `mask_polygon()` to build a habitat mask as a matrix object. The habitat matrix is either '0' (unsuitable) or '1' (suitable). In the habitat matrix the rows represent the y-coordinate ("Northing") of the state-space grid and the columns represent the x-coordinate ("Easting") of the state-space grid. We'll use this habitat matrix as data below in this part of the tutorial.
 
-We also see the use of `initialize_classic()`, which generates plausible starting activity center locations for all individuals. Note that because all individuals are unmarked here, we'll use the `all_random = TRUE` argument in `initialize_classic()` to generate all random locations to initalize the activity center coordinates. Given our simulated population size of 200, we specify the total augmented population size (all augmented individuals) at 400 (`M = 400`).
+We also see the use of `initialize_classic()`, which generates plausible starting activity center locations for all individuals. Note that because all individuals are unmarked here, we'll use the `all_random = TRUE` argument in `initialize_classic()` to generate all random locations to initialize the activity center coordinates. Given our simulated population size of 200, we specify the total augmented population size (all augmented individuals) at 400 (`m = 400`).
 </p>
 <br>
 
@@ -200,10 +200,10 @@ data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs,
 
 
 # total augmented population size 
-M = 500
+m = 500
 
 # get initial activity center starting values
-s.st3d = initialize_classic(y=NULL, M=M, X=traps, buff = 3*max(mysigma), 
+s.st3d = initialize_classic(y=NULL, M=m, X=traps, buff = 3*max(mysigma), 
                             hab_mask = hab_mask, all_random=TRUE)
   
 # make ggplot
@@ -225,9 +225,9 @@ ggplot() + geom_point(data=as.data.frame(Grid$grid),aes(x=x,y=y),color="grey60",
 <p>
 In the figure above we can see the effect of the polygon in creating a habitat mask for the state-space. The `initialize_classic()` function contains the initial activity center locations to within the polygon (note that those points on the edges were in suitable habitat when the continuous location were discretized and checked with the habitat mask). 
 
-We now have most of the components we will need to analyze the simulated data set. However, because we are using a habitat mask in the model (`hab_mask`), we must rescale the traps, grid extent, and initial activity center locations. To run the spatial count model using the template model from `get_unmarked()`, we'll need to change the paramter names `"s"` and `"z"` to `"su"` and `"zu"` in `params` to denote that these are unmarked individuals. We also set the `s_alias = "su"` argument in `run_classic()`. This allows the block updating of x- and y- activity center coordinates to function properly. Additionally, we have the `zu` parameter initialized with `rbinom` rather than separating the data augmentation as in vignette 1 with the marked individuals. 
+We now have most of the components we will need to analyze the simulated data set. However, because we are using a habitat mask in the model (`hab_mask`), we must rescale the traps, grid extent, and initial activity center locations. To run the spatial count model using the template model from `get_unmarked()`, we'll need to change the parameter names `"s"` and `"z"` to `"su"` and `"zu"` in `params` to denote that these are unmarked individuals. We also set the `s_alias = "su"` argument in `run_classic()`. This allows the block updating of x- and y- activity center coordinates to function properly. Additionally, we have the `zu` parameter initialized with `rbinom` rather than separating the data augmentation as in vignette 1 with the marked individuals. 
 
-Because the model uses the Poisson encounter distribution, we also need to intialize the encounter rate `lam0` rather than the encounter probability `p0` as in the binomial likelihood. We also need to add `lam0` to `params` and `lam0_upper` to `constants` given the default uniform distribution used in the model (i.e., `lam0 ~ dunif(0, lam0_upper)`). 
+Because the model uses the Poisson encounter distribution, we also need to initialize the encounter rate `lam0` rather than the encounter probability `p0` as in the binomial likelihood. We also need to add `lam0` to `params` and `lam0_upper` to `constants` given the default uniform distribution used in the model (i.e., `lam0 ~ dunif(0, lam0_upper)`). 
 
 </p>
 <br>
@@ -248,24 +248,24 @@ data = list(n = apply(data3d$y, c(2,3), sum))
 data$X = rescale_list$X
 
 # prepare constants (note get density in activity center/100 m2 rather than activity centers/m2)
-constants = list(M = M,J=dim(data3d$y)[2], K=dim(data3d$y)[3],
+constants = list(m = m,J=dim(data3d$y)[2], K=dim(data3d$y)[3],
 x_lower = ext[1], x_upper = ext[2], y_lower = ext[3], y_upper = ext[4],
 lam0_upper = 1,sigma_upper = 1000, 
 A = (sum(hab_mask)*(pixelWidth/100)^2),pixelWidth=pixelWidth)
 
 # add hab_mask and OK for habitat check
 data$hab_mask = hab_mask
-data$OK = rep(1,constants$M)
+data$OKu = rep(1,constants$m)
 
 # get initial activity center starting values
 s.st = rescale_list$s.st
 
 # define all initial values
-inits = list(sigma = runif(1, 250, 350), su = s.st,psi=runif(1,0.4,0.6),
-lam0 = runif(1, 0.05, 0.15),pOK=data$OK,zu=rbinom(constants$M,1,0.5))
+inits = list(sigma = runif(1, 250, 350), su = s.st,psiu=runif(1,0.4,0.6),
+lam0 = runif(1, 0.05, 0.15),pOKu=data$OKu,zu=rbinom(constants$m,1,0.5))
 
 # parameters to monitor
-params = c("sigma","psi","lam0","N","D","su","zu")
+params = c("sigma","psiu","lam0","N","D","su","zu")
 
 # get spatial count model
 sc_model = get_unmarked(occ_specific = FALSE,
@@ -275,7 +275,7 @@ sc_model = get_unmarked(occ_specific = FALSE,
 library(tictoc)
 tic() # track time elapsed
 out = run_classic(model = sc_model, data=data, constants=constants,
-inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE,
+inits=inits, params = params,niter = 100, nburnin=100, thin=1, nchains=1, parallel=FALSE,
 RNGseed = 500, s_alias="su")
 toc()
 #> 511.62 sec elapsed
@@ -308,7 +308,7 @@ nimSummary(out, exclude_params = c("su","zu"), trace=FALSE)
 #> D         0.234   0.121   0.040   0.221   0.453  1 33.817 1.121
 #> N       250.204 129.023  43.000 237.000 485.000  1 33.817 1.121
 #> lam0      0.385   0.238   0.065   0.357   0.906  1 68.708 1.020
-#> psi       0.500   0.258   0.086   0.475   0.968  1 33.594 1.119
+#> psiu      0.500   0.258   0.086   0.475   0.968  1 33.594 1.119
 #> sigma   344.133 202.596 146.564 270.782 932.274  1 31.582 1.282
 ```
 
@@ -323,7 +323,6 @@ Although we are able to produce estimates, they are not reliable due to the lack
 
 
 ```{r, fig.show='hide',eval=FALSE}
-
 # get from Github and load
 #install_github("austinnam/modeltools",force=TRUE) 
 library(modeltools)

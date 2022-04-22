@@ -12,7 +12,7 @@
 
 <meta name="author" content="Daniel Eacker" />
 
-<meta name="date" content="2022-04-21" />
+<meta name="date" content="2022-04-22" />
 
 <title>Spatial count models: continuous state-space and unmarked individuals</title>
 
@@ -335,7 +335,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Spatial count models: continuous
 state-space and unmarked individuals</h1>
 <h4 class="author">Daniel Eacker</h4>
-<h4 class="date">2022-04-21</h4>
+<h4 class="date">2022-04-22</h4>
 
 
 
@@ -767,7 +767,7 @@ to edit our previously created model. Then, we’ll rerun the model using
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># delete old prior on line 3 and replace with new prior </span></span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>sc_model_inf <span class="ot">=</span> <span class="fu">customize_model</span>(<span class="at">model =</span> sc_model, <span class="at">append_code =</span> new_prior,</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                               <span class="at">line_append=</span><span class="dv">3</span>,<span class="at">line_remove=</span><span class="dv">3</span>)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                               <span class="at">append_line=</span><span class="dv">3</span>,<span class="at">remove_line=</span><span class="dv">3</span>)</span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co"># inspect model (not run)</span></span>
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co"># sc_model_inf</span></span>
@@ -812,7 +812,7 @@ strategy as we did for the scaling parameter ‘sigma’.
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># delete old prior on line 3 and replace with new prior </span></span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>sc_model_inf2 <span class="ot">=</span> <span class="fu">customize_model</span>(<span class="at">model =</span> sc_model_inf, <span class="at">append_code =</span> new_prior,</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                               <span class="at">line_append=</span><span class="dv">2</span>,<span class="at">line_remove=</span><span class="dv">2</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                               <span class="at">append_line=</span><span class="dv">2</span>,<span class="at">remove_line=</span><span class="dv">2</span>)</span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co"># inspect model (not run)</span></span>
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co"># sc_model_inf2</span></span>
@@ -1044,8 +1044,8 @@ very similar to the previous one.
 <span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a>})</span>
 <span id="cb12-87"><a href="#cb12-87" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-88"><a href="#cb12-88" aria-hidden="true" tabindex="-1"></a><span class="co"># now create new model</span></span>
-<span id="cb12-89"><a href="#cb12-89" aria-hidden="true" tabindex="-1"></a>sc_model_inf <span class="ot">=</span> <span class="fu">customize_model</span>(sc_model, add_model, <span class="at">line_append =</span> <span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">4</span>),</span>
-<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a>                               <span class="at">line_remove =</span> <span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">5</span>))</span>
+<span id="cb12-89"><a href="#cb12-89" aria-hidden="true" tabindex="-1"></a>sc_model_inf <span class="ot">=</span> <span class="fu">customize_model</span>(sc_model, add_model, <span class="at">append_line =</span> <span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">4</span>),</span>
+<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a>                               <span class="at">remove_line =</span> <span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">5</span>))</span>
 <span id="cb12-91"><a href="#cb12-91" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-92"><a href="#cb12-92" aria-hidden="true" tabindex="-1"></a><span class="co"># inspect model (not run)</span></span>
 <span id="cb12-93"><a href="#cb12-93" aria-hidden="true" tabindex="-1"></a><span class="co"># sc_model_inf</span></span>

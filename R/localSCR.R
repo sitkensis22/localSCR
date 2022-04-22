@@ -2328,31 +2328,36 @@ run_classic <- function(model, data, constants, inits, params,
     SCRmodelC <- nimble::compileNimble(SCRmodelR) # compile code
     # MCMC configurations
     mcmcspec<-nimble::configureMCMC(SCRmodelR, monitors=params) 
-    # block updating for marked individual activity centers
+    # block updating for individual activity centers
     if(length(s_alias)!=1 & length(s_alias)!=2){
     stop("s_alias must be either a scalar or vector of length 2")
     }  
-    if(length(s_alias)==1){
+    if(length(s_alias)==1  & s_alias == "s"){
     mcmcspec$removeSamplers(s_alias, print = FALSE)
     for(i in 1:constants$M){
       snew = paste(s_alias,"[",i,","," 1:2","]",sep="")
       mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
     }
-    # test out effect of AF_slice sampler to reduce autocorrlation and cross correlation
-    if(s_alias == "su"){
-     mcmcspec$removeSamplers(c("psi","lam0","sigma"))
-     mcmcspec$addSampler(target = c("psi","lam0","sigma"), type = "AF_slice", silent = TRUE)
-    }
     }else
-    if(length(s_alias)==2){ # for  spatial mark-resight model
-    mcmcspec$removeSamplers(s_alias[1], print = FALSE)
+    if(length(s_alias)==1  & s_alias == "su"){ 
+    # test out effect of AF_slice sampler to reduce autocorrlation and cross correlation
     for(i in 1:constants$m){
-      snew = paste(s_alias[1],"[",i,","," 1:2","]",sep="")
+      snew = paste(s_alias,"[",i,","," 1:2","]",sep="")
       mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
     }
-    mcmcspec$removeSamplers(s_alias[2], print = FALSE)
+     mcmcspec$removeSamplers(c("psi","lam0","sigma"))
+     mcmcspec$addSampler(target = c("psi","lam0","sigma"), type = "AF_slice", silent = TRUE)
+    
+    }else
+    if(length(s_alias)==2){ # for  spatial mark-resight model
+    mcmcspec$removeSamplers(s_alias[which(s_alias=="s")], print = FALSE)
     for(i in 1:constants$M){
-      snew = paste(s_alias[2],"[",i,","," 1:2","]",sep="")
+      snew = paste(s_alias[which(s_alias=="s")],"[",i,","," 1:2","]",sep="")
+      mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
+    }
+    mcmcspec$removeSamplers(s_alias[which(s_alias=="su")], print = FALSE)
+    for(i in 1:constants$m){
+      snew = paste(s_alias[which(s_alias=="su")],"[",i,","," 1:2","]",sep="")
       mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
     }
     }
@@ -2366,40 +2371,46 @@ run_classic <- function(model, data, constants, inits, params,
     if(parallel == TRUE){
       run_parallel <- function(seed,data,model,constants,inits, params,
                                niter,nburnin,thin){
-        SCRmodelR <- nimble::nimbleModel(code=model,data=data,
-                constants=constants,inits=inits,check=FALSE,calculate=TRUE)
-        SCRmodelR$initializeInfo()
-        # compile model to C++#
-        SCRmodelC <- nimble::compileNimble(SCRmodelR) # compile code
-        # MCMC configurations
-        mcmcspec<-nimble::configureMCMC(SCRmodelR, monitors=params) 
-        if(length(s_alias)!=1 & length(s_alias)!=2){
-        stop("s_alias must be either a scalar or vector of length 2")
-        }  
-        if(length(s_alias)==1){
-        mcmcspec$removeSamplers(s_alias, print = FALSE)
-        for(i in 1:constants$M){
-          snew = paste(s_alias,"[",i,","," 1:2","]",sep="")
-          mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
-        }
-  # test out effect of AF_slice sampler to reduce autocorrlation and cross correlation
-        if(s_alias == "su"){
-         mcmcspec$removeSamplers(c("psi","lam0","sigma"))
-         mcmcspec$addSampler(target = c("psi","lam0","sigma"), type = "AF_slice", silent = TRUE)
-        }
-        }else
-        if(length(s_alias)==2){ # for  spatial mark-resight model
-        mcmcspec$removeSamplers(s_alias[1], print = FALSE)
-        for(i in 1:constants$m){
-          snew = paste(s_alias[1],"[",i,","," 1:2","]",sep="")
-          mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
-        }
-        mcmcspec$removeSamplers(s_alias[2], print = FALSE)
-        for(i in 1:constants$M){
-          snew = paste(s_alias[2],"[",i,","," 1:2","]",sep="")
-          mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
-        }
-        }
+    SCRmodelR <- nimble::nimbleModel(code=model,data=data,
+            constants=constants,inits=inits,check=FALSE,calculate=TRUE)
+    SCRmodelR$initializeInfo()
+    # compile model to C++#
+    SCRmodelC <- nimble::compileNimble(SCRmodelR) # compile code
+    # MCMC configurations
+    mcmcspec<-nimble::configureMCMC(SCRmodelR, monitors=params) 
+    # block updating for individual activity centers
+    if(length(s_alias)!=1 & length(s_alias)!=2){
+    stop("s_alias must be either a scalar or vector of length 2")
+    }  
+    if(length(s_alias)==1  & s_alias == "s"){
+    mcmcspec$removeSamplers(s_alias, print = FALSE)
+    for(i in 1:constants$M){
+      snew = paste(s_alias,"[",i,","," 1:2","]",sep="")
+      mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
+    }
+    }else
+    if(length(s_alias)==1  & s_alias == "su"){ 
+    # test out effect of AF_slice sampler to reduce autocorrlation and cross correlation
+    for(i in 1:constants$m){
+      snew = paste(s_alias,"[",i,","," 1:2","]",sep="")
+      mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
+    }
+     mcmcspec$removeSamplers(c("psi","lam0","sigma"))
+     mcmcspec$addSampler(target = c("psi","lam0","sigma"), type = "AF_slice", silent = TRUE)
+    
+    }else
+    if(length(s_alias)==2){ # for  spatial mark-resight model
+    mcmcspec$removeSamplers(s_alias[which(s_alias=="s")], print = FALSE)
+    for(i in 1:constants$M){
+      snew = paste(s_alias[which(s_alias=="s")],"[",i,","," 1:2","]",sep="")
+      mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
+    }
+    mcmcspec$removeSamplers(s_alias[which(s_alias=="su")], print = FALSE)
+    for(i in 1:constants$m){
+      snew = paste(s_alias[which(s_alias=="su")],"[",i,","," 1:2","]",sep="")
+      mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
+    }
+    }        
         scrMCMC <- nimble::buildMCMC(mcmcspec)
         CscrMCMC <- nimble::compileNimble(scrMCMC, project = SCRmodelR,
                                           resetFunctions = TRUE)
