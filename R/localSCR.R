@@ -2976,25 +2976,27 @@ customize_model <- function(model,append_code = NULL,append_line = NULL,
                   readLines(file_list[[i]],encoding="UTF-8")
    }
    append_model[length(append_model)+1] <- "}"
+   append_model[c(1,length(append_model))] <-  c("nimble::nimbleCode({","})") 
    unlink(unlist(file_list))
    # check if length(append_line) == length(append_model[-c(1,length(append_model))])
    if(length(append_line) != length(append_model[-c(1,length(append_model))])){
      stop(paste("length of append_line must equal lines of append_code minus outside braces, i.e.,","{","}"))
    }
-      if(is.null(remove_line)){
+   if(is.null(remove_line)){
         updated_model <- character(length(main_model)+length(append_model)-2)
         updated_model[append_line] <- append_model[-c(1,length(append_model))]
         updated_model[(1:(length(updated_model)-1))[-c(1,append_line)]] <- main_model[-c(1,length(main_model))]
         updated_model[c(1,length(updated_model))] <- c("nimble::nimbleCode({","})") 
    }else
    if(isFALSE(is.null(remove_line))){ 
-        updated_model <- character(length(remove_model)+length(append_model)-2)
+        updated_model <- character(length(main_model))
+        updated_model[remove_line] <- NA
         updated_model[append_line] <- append_model[-c(1,length(append_model))]
-        updated_model[(1:(length(updated_model)-1))[-c(1,append_line)]] <- remove_model[-c(1,length(remove_model))]
         updated_model[c(1,length(updated_model))] <- c("nimble::nimbleCode({","})") 
+        updated_model[which(updated_model == "")] <- remove_model[-c(1,length(remove_model))]
+        updated_model <- updated_model[is.na(updated_model)==FALSE]
    } # check for line removal
-    # don't need R.utils!
-  }
+  } # end append_code and append_line = TRUE
     # if nothing is done to code, just return original code
   if(is.null(remove_line) & is.null(append_code) & is.null(append_line)){
     updated_model <- main_model
