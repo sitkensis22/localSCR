@@ -79,6 +79,7 @@ library(localSCR)
 x <- seq(-800, 800, length.out = 5)
 y <- seq(-800, 800, length.out = 5)
 traps <- as.matrix(expand.grid(x = x, y = y))
+set.seed(200)
 traps <- traps + runif(prod(dim(traps)),-20,20) 
 
 mysigma = 300 # simulate sigma of 300 m
@@ -165,6 +166,7 @@ We also see the use of `initialize_classic()`, which generates plausible startin
 x <- seq(-800, 800, length.out = 5)
 y <- seq(-800, 800, length.out = 5)
 traps <- as.matrix(expand.grid(x = x, y = y))
+set.seed(200)
 traps <- traps + runif(prod(dim(traps)),-20,20) 
 
 mysigma = c(220, 300) # simulate sex-specific
@@ -343,6 +345,7 @@ Next we repeat a similar workflow but now we have two trap arrays that are clust
 x <- seq(-800, 800, length.out = 5)
 y <- seq(-800, 800, length.out = 5)
 traps <- as.matrix(expand.grid(x = x, y = y))
+set.seed(200)
 traps <- traps + runif(prod(dim(traps)),-20,20) # add some random noise to locations
 
 mysigma = c(220, 300) # simulate sex-specific

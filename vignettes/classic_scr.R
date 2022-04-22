@@ -13,6 +13,7 @@ library(localSCR)
 #  x <- seq(-800, 800, length.out = 5)
 #  y <- seq(-800, 800, length.out = 5)
 #  traps <- as.matrix(expand.grid(x = x, y = y))
+#  set.seed(200)
 #  traps <- traps + runif(prod(dim(traps)),-20,20)
 #  
 #  mysigma = 300 # simulate sigma of 300 m
@@ -66,6 +67,7 @@ library(localSCR)
 #  x <- seq(-800, 800, length.out = 5)
 #  y <- seq(-800, 800, length.out = 5)
 #  traps <- as.matrix(expand.grid(x = x, y = y))
+#  set.seed(200)
 #  traps <- traps + runif(prod(dim(traps)),-20,20)
 #  
 #  mysigma = c(220, 300) # simulate sex-specific
@@ -210,6 +212,7 @@ library(localSCR)
 #  x <- seq(-800, 800, length.out = 5)
 #  y <- seq(-800, 800, length.out = 5)
 #  traps <- as.matrix(expand.grid(x = x, y = y))
+#  set.seed(200)
 #  traps <- traps + runif(prod(dim(traps)),-20,20) # add some random noise to locations
 #  
 #  mysigma = c(220, 300) # simulate sex-specific

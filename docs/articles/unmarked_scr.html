@@ -54,6 +54,9 @@
       <a href="../articles/classic_scr.html">Classic SCR models: continuous state-space and marked individuals</a>
     </li>
     <li>
+      <a href="../articles/mark_resight_scr.html">Mark-resight models: continuous state-space with both marked and unmarked individuals</a>
+    </li>
+    <li>
       <a href="../articles/unmarked_scr.html">Spatial count models: continuous state-space and unmarked individuals</a>
     </li>
   </ul>
@@ -77,7 +80,7 @@ unmarked individuals</h1>
                         <h4 data-toc-skip class="author">Daniel
 Eacker</h4>
             
-            <h4 data-toc-skip class="date">2022-04-21</h4>
+            <h4 data-toc-skip class="date">2022-04-22</h4>
       
       
       <div class="hidden name"><code>unmarked_scr.Rmd</code></div>
@@ -211,7 +214,8 @@ create state-space<a class="anchor" aria-label="anchor" href="#simulate-a-single
 <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">800</span>, <span class="fl">800</span>, length.out <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
 <span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">800</span>, <span class="fl">800</span>, length.out <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
 <span class="va">traps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/as.matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span>
-<span class="va">traps</span> <span class="op">&lt;-</span> <span class="va">traps</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/prod.html" class="external-link">prod</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/dimensions.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">traps</span><span class="op">)</span><span class="op">)</span>,<span class="op">-</span><span class="fl">20</span>,<span class="fl">20</span><span class="op">)</span> 
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span>
+<span class="va">traps</span> <span class="op">&lt;-</span> <span class="va">traps</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/prod.html" class="external-link">prod</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimDim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">traps</span><span class="op">)</span><span class="op">)</span>,<span class="op">-</span><span class="fl">20</span>,<span class="fl">20</span><span class="op">)</span> 
 
 <span class="va">mysigma</span> <span class="op">=</span> <span class="fl">300</span> <span class="co"># simulate sigma of 300 m</span>
 <span class="va">mycrs</span> <span class="op">=</span> <span class="fl">32608</span> <span class="co"># EPSG for WGS 84 / UTM zone 8N</span>
@@ -310,9 +314,9 @@ generates plausible starting activity center locations for all
 individuals. Note that because all individuals are unmarked here, we’ll
 use the <code>all_random = TRUE</code> argument in
 <code><a href="../reference/initialize_classic.html">initialize_classic()</a></code> to generate all random locations to
-initalize the activity center coordinates. Given our simulated
+initialize the activity center coordinates. Given our simulated
 population size of 200, we specify the total augmented population size
-(all augmented individuals) at 400 (<code>M = 400</code>).
+(all augmented individuals) at 400 (<code>m = 400</code>).
 
 <p><br></p>
 </div>
@@ -325,7 +329,8 @@ distribution and habitat mask using a 2D trap array.<a class="anchor" aria-label
 <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">800</span>, <span class="fl">800</span>, length.out <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
 <span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">800</span>, <span class="fl">800</span>, length.out <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
 <span class="va">traps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/as.matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span>
-<span class="va">traps</span> <span class="op">&lt;-</span> <span class="va">traps</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/prod.html" class="external-link">prod</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/dimensions.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">traps</span><span class="op">)</span><span class="op">)</span>,<span class="op">-</span><span class="fl">20</span>,<span class="fl">20</span><span class="op">)</span> <span class="co"># add some random noise to locations</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span>
+<span class="va">traps</span> <span class="op">&lt;-</span> <span class="va">traps</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/prod.html" class="external-link">prod</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimDim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">traps</span><span class="op">)</span><span class="op">)</span>,<span class="op">-</span><span class="fl">20</span>,<span class="fl">20</span><span class="op">)</span> <span class="co"># add some random noise to locations</span>
 
 <span class="va">mysigma</span> <span class="op">=</span> <span class="fl">300</span> <span class="co"># simulate a single scaling parameter</span>
 <span class="va">mycrs</span> <span class="op">=</span> <span class="fl">32608</span> <span class="co"># EPSG for WGS 84 / UTM zone 8N</span>
@@ -351,10 +356,10 @@ distribution and habitat mask using a 2D trap array.<a class="anchor" aria-label
 
 
 <span class="co"># total augmented population size </span>
-<span class="va">M</span> <span class="op">=</span> <span class="fl">500</span>
+<span class="va">m</span> <span class="op">=</span> <span class="fl">500</span>
 
 <span class="co"># get initial activity center starting values</span>
-<span class="va">s.st3d</span> <span class="op">=</span> <span class="fu"><a href="../reference/initialize_classic.html">initialize_classic</a></span><span class="op">(</span>y<span class="op">=</span><span class="cn">NULL</span>, M<span class="op">=</span><span class="va">M</span>, X<span class="op">=</span><span class="va">traps</span>, buff <span class="op">=</span> <span class="fl">3</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">mysigma</span><span class="op">)</span>, 
+<span class="va">s.st3d</span> <span class="op">=</span> <span class="fu"><a href="../reference/initialize_classic.html">initialize_classic</a></span><span class="op">(</span>y<span class="op">=</span><span class="cn">NULL</span>, M<span class="op">=</span><span class="va">m</span>, X<span class="op">=</span><span class="va">traps</span>, buff <span class="op">=</span> <span class="fl">3</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">mysigma</span><span class="op">)</span>, 
                             hab_mask <span class="op">=</span> <span class="va">hab_mask</span>, all_random<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
   
 <span class="co"># make ggplot</span>
@@ -382,7 +387,7 @@ simulated data set. However, because we are using a habitat mask in the
 model (<code>hab_mask</code>), we must rescale the traps, grid extent,
 and initial activity center locations. To run the spatial count model
 using the template model from <code><a href="../reference/get_unmarked.html">get_unmarked()</a></code>, we’ll need to
-change the paramter names <code>"s"</code> and <code>"z"</code> to
+change the parameter names <code>"s"</code> and <code>"z"</code> to
 <code>"su"</code> and <code>"zu"</code> in <code>params</code> to denote
 that these are unmarked individuals. We also set the
 <code>s_alias = "su"</code> argument in <code><a href="../reference/run_classic.html">run_classic()</a></code>. This
@@ -391,7 +396,7 @@ function properly. Additionally, we have the <code>zu</code> parameter
 initialized with <code>rbinom</code> rather than separating the data
 augmentation as in vignette 1 with the marked individuals.</p>
 <p>Because the model uses the Poisson encounter distribution, we also
-need to intialize the encounter rate <code>lam0</code> rather than the
+need to initialize the encounter rate <code>lam0</code> rather than the
 encounter probability <code>p0</code> as in the binomial likelihood. We
 also need to add <code>lam0</code> to <code>params</code> and
 <code>lam0_upper</code> to <code>constants</code> given the default
@@ -414,24 +419,24 @@ uniform distribution used in the model (i.e.,
 <span class="va">data</span><span class="op">$</span><span class="va">X</span> <span class="op">=</span> <span class="va">rescale_list</span><span class="op">$</span><span class="va">X</span>
 
 <span class="co"># prepare constants (note get density in activity center/100 m2 rather than activity centers/m2)</span>
-<span class="va">constants</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>M <span class="op">=</span> <span class="va">M</span>,J<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/dimensions.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">data3d</span><span class="op">$</span><span class="va">y</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, K<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/dimensions.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">data3d</span><span class="op">$</span><span class="va">y</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>,
+<span class="va">constants</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m <span class="op">=</span> <span class="va">m</span>,J<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimDim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">data3d</span><span class="op">$</span><span class="va">y</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, K<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimDim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">data3d</span><span class="op">$</span><span class="va">y</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>,
 x_lower <span class="op">=</span> <span class="va">ext</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, x_upper <span class="op">=</span> <span class="va">ext</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, y_lower <span class="op">=</span> <span class="va">ext</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>, y_upper <span class="op">=</span> <span class="va">ext</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span>,
 lam0_upper <span class="op">=</span> <span class="fl">1</span>,sigma_upper <span class="op">=</span> <span class="fl">1000</span>, 
 A <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">hab_mask</span><span class="op">)</span><span class="op">*</span><span class="op">(</span><span class="va">pixelWidth</span><span class="op">/</span><span class="fl">100</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>,pixelWidth<span class="op">=</span><span class="va">pixelWidth</span><span class="op">)</span>
 
 <span class="co"># add hab_mask and OK for habitat check</span>
 <span class="va">data</span><span class="op">$</span><span class="va">hab_mask</span> <span class="op">=</span> <span class="va">hab_mask</span>
-<span class="va">data</span><span class="op">$</span><span class="va">OK</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">constants</span><span class="op">$</span><span class="va">M</span><span class="op">)</span>
+<span class="va">data</span><span class="op">$</span><span class="va">OKu</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">constants</span><span class="op">$</span><span class="va">m</span><span class="op">)</span>
 
 <span class="co"># get initial activity center starting values</span>
 <span class="va">s.st</span> <span class="op">=</span> <span class="va">rescale_list</span><span class="op">$</span><span class="va">s.st</span>
 
 <span class="co"># define all initial values</span>
-<span class="va">inits</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">250</span>, <span class="fl">350</span><span class="op">)</span>, su <span class="op">=</span> <span class="va">s.st</span>,psi<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">0.4</span>,<span class="fl">0.6</span><span class="op">)</span>,
-lam0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.05</span>, <span class="fl">0.15</span><span class="op">)</span>,pOK<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">OK</span>,zu<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">constants</span><span class="op">$</span><span class="va">M</span>,<span class="fl">1</span>,<span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>
+<span class="va">inits</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">250</span>, <span class="fl">350</span><span class="op">)</span>, su <span class="op">=</span> <span class="va">s.st</span>,psiu<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">0.4</span>,<span class="fl">0.6</span><span class="op">)</span>,
+lam0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.05</span>, <span class="fl">0.15</span><span class="op">)</span>,pOKu<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">OKu</span>,zu<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">constants</span><span class="op">$</span><span class="va">m</span>,<span class="fl">1</span>,<span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># parameters to monitor</span>
-<span class="va">params</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sigma"</span>,<span class="st">"psi"</span>,<span class="st">"lam0"</span>,<span class="st">"N"</span>,<span class="st">"D"</span>,<span class="st">"su"</span>,<span class="st">"zu"</span><span class="op">)</span>
+<span class="va">params</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sigma"</span>,<span class="st">"psiu"</span>,<span class="st">"lam0"</span>,<span class="st">"N"</span>,<span class="st">"D"</span>,<span class="st">"su"</span>,<span class="st">"zu"</span><span class="op">)</span>
 
 <span class="co"># get spatial count model</span>
 <span class="va">sc_model</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_unmarked.html">get_unmarked</a></span><span class="op">(</span>occ_specific <span class="op">=</span> <span class="cn">FALSE</span>,
@@ -482,7 +487,7 @@ this function is provided with the package and depends partly on the
 <span class="co">#&gt; D         0.234   0.121   0.040   0.221   0.453  1 33.817 1.121</span>
 <span class="co">#&gt; N       250.204 129.023  43.000 237.000 485.000  1 33.817 1.121</span>
 <span class="co">#&gt; lam0      0.385   0.238   0.065   0.357   0.906  1 68.708 1.020</span>
-<span class="co">#&gt; psi       0.500   0.258   0.086   0.475   0.968  1 33.594 1.119</span>
+<span class="co">#&gt; psiu      0.500   0.258   0.086   0.475   0.968  1 33.594 1.119</span>
 <span class="co">#&gt; sigma   344.133 202.596 146.564 270.782 932.274  1 31.582 1.282</span></code></pre></div>
 <br><p>
 Although we are able to produce estimates, they are not reliable due to
@@ -492,7 +497,7 @@ prior information or combine marked and unmarked individuals into a
 spatial mark-resight analysis (the topic of vignette 3). Here, we’ll
 test out the effect of bringing in prior information on the scaling
 parameter; this could occur if we had estimates of <code>sigma</code>
-from a previous study or another data source.We’ll first need to use a
+from a previous study or another data source. We’ll first need to use a
 moment matching function (e.g., normal to gamma moments) from the
 ‘modeltools’ package (add citation) called <code><a href="https://rdrr.io/pkg/modeltools/man/estGammaParam.html" class="external-link">estGammaParam()</a></code>.
 The gamma distribution is appropriate since it has support from 0 to
@@ -507,8 +512,7 @@ value of sigma is 300.
 parameters<a class="anchor" aria-label="anchor" href="#adding-prior-information-on-the-scaling-and-encounter-rate-parameters"></a>
 </h3>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="co"># get from Github and load</span>
+<code class="sourceCode R"><span class="co"># get from Github and load</span>
 <span class="co">#install_github("austinnam/modeltools",force=TRUE) </span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">modeltools</span><span class="op">)</span>
 
@@ -534,7 +538,7 @@ to edit our previously created model. Then, we’ll rerun the model using
 
 <span class="co"># delete old prior on line 3 and replace with new prior </span>
 <span class="va">sc_model_inf</span> <span class="op">=</span> <span class="fu"><a href="../reference/customize_model.html">customize_model</a></span><span class="op">(</span>model <span class="op">=</span> <span class="va">sc_model</span>, append_code <span class="op">=</span> <span class="va">new_prior</span>,
-                               line_append<span class="op">=</span><span class="fl">3</span>,line_remove<span class="op">=</span><span class="fl">3</span><span class="op">)</span>
+                               append_line<span class="op">=</span><span class="fl">3</span>,remove_line<span class="op">=</span><span class="fl">3</span><span class="op">)</span>
 
 <span class="co"># inspect model (not run)</span>
 <span class="co"># sc_model_inf</span>
@@ -565,7 +569,7 @@ Again, we see that convergence is not great despite having prior
 information on sigma, but it’s an improvement and the median estimate of
 N is close to the simulated value of 200. The uncertainty both the
 encounter rate <code>lam0</code> and the augmentation parameter
-<code>psi</code> is still huge, which translates into large uncertainty
+<code>psiu</code> is still huge, which translates into large uncertainty
 in abundance. We can try adding prior information about the encounter
 rate as well and see how this affects the estimates. We’ll use a similar
 strategy as we did for the scaling parameter ‘sigma’.
@@ -579,7 +583,7 @@ strategy as we did for the scaling parameter ‘sigma’.
 
 <span class="co"># delete old prior on line 3 and replace with new prior </span>
 <span class="va">sc_model_inf2</span> <span class="op">=</span> <span class="fu"><a href="../reference/customize_model.html">customize_model</a></span><span class="op">(</span>model <span class="op">=</span> <span class="va">sc_model_inf</span>, append_code <span class="op">=</span> <span class="va">new_prior</span>,
-                               line_append<span class="op">=</span><span class="fl">2</span>,line_remove<span class="op">=</span><span class="fl">2</span><span class="op">)</span>
+                               append_line<span class="op">=</span><span class="fl">2</span>,remove_line<span class="op">=</span><span class="fl">2</span><span class="op">)</span>
 
 <span class="co"># inspect model (not run)</span>
 <span class="co"># sc_model_inf2</span>
@@ -678,6 +682,7 @@ trap<a class="anchor" aria-label="anchor" href="#workflow-for-spatial-count-mode
 <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">800</span>, <span class="fl">800</span>, length.out <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
 <span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">800</span>, <span class="fl">800</span>, length.out <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
 <span class="va">traps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/as.matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span>
 <span class="va">traps</span> <span class="op">&lt;-</span> <span class="va">traps</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/prod.html" class="external-link">prod</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/dimensions.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">traps</span><span class="op">)</span><span class="op">)</span>,<span class="op">-</span><span class="fl">20</span>,<span class="fl">20</span><span class="op">)</span> 
 
 <span class="va">mysigma</span> <span class="op">=</span> <span class="fl">300</span> <span class="co"># simulate single scaling parameter</span>
@@ -714,12 +719,12 @@ trap<a class="anchor" aria-label="anchor" href="#workflow-for-spatial-count-mode
 <img src="../reference/figures/vignette_02/Fig8.png" style="width:70%"></p>
 <br><p>
 In the figure we can see our two spatially separated trapping grids and
-that the polgon overlaps some of the gridded area. The area outside the
+that the polygon overlaps some of the gridded area. The area outside the
 polygon will be considered unsuitable when the habitat matrix is
 created. Note that the <code>site</code> variable will be only as long
 as the simulated population size (here, 200) and thus, we will need to
 augment the variable to have the length equal to the total augmented
-population size (i.e., <code>M = 400</code>). Otherwise the workflow is
+population size (i.e., <code>m = 400</code>). Otherwise the workflow is
 very similar to the previous one.
 </p>
 <p><br></p>
@@ -739,13 +744,13 @@ very similar to the previous one.
           <span class="va">data4d</span><span class="op">$</span><span class="va">y</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">which</a></span><span class="op">(</span><span class="va">data4d</span><span class="op">$</span><span class="va">site</span><span class="op">==</span><span class="fl">2</span><span class="op">)</span>,,<span class="op">]</span>, along <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>
 
 <span class="co"># total augmented population size </span>
-<span class="va">M</span> <span class="op">=</span> <span class="fl">400</span>
+<span class="va">m</span> <span class="op">=</span> <span class="fl">400</span>
 
 <span class="co"># augment site identifier</span>
 <span class="va">site</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">200</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">200</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># get initial activity center starting values </span>
-<span class="va">s.st4d</span> <span class="op">=</span> <span class="fu"><a href="../reference/initialize_classic.html">initialize_classic</a></span><span class="op">(</span>y<span class="op">=</span><span class="cn">NULL</span>, M<span class="op">=</span><span class="va">M</span>, X<span class="op">=</span><span class="va">Xarray</span>, buff <span class="op">=</span> <span class="fl">3</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">mysigma</span><span class="op">)</span>, 
+<span class="va">s.st4d</span> <span class="op">=</span> <span class="fu"><a href="../reference/initialize_classic.html">initialize_classic</a></span><span class="op">(</span>y<span class="op">=</span><span class="cn">NULL</span>, M<span class="op">=</span><span class="va">m</span>, X<span class="op">=</span><span class="va">Xarray</span>, buff <span class="op">=</span> <span class="fl">3</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">mysigma</span><span class="op">)</span>, 
                       site <span class="op">=</span> <span class="va">site</span>, hab_mask <span class="op">=</span> <span class="va">hab_mask</span>,all_random <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="co"># rescale inputs</span>
@@ -764,16 +769,16 @@ very similar to the previous one.
 <span class="va">data</span><span class="op">$</span><span class="va">hab_mask</span> <span class="op">=</span> <span class="va">hab_mask</span>
 <span class="co"># need to adjust proportion of habitat available</span>
 <span class="va">data</span><span class="op">$</span><span class="va">prop.habitat</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">hab_mask</span>,<span class="fl">3</span>,<span class="va">mean</span><span class="op">)</span> 
-<span class="va">data</span><span class="op">$</span><span class="va">OK</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">constants</span><span class="op">$</span><span class="va">M</span><span class="op">)</span>
+<span class="va">data</span><span class="op">$</span><span class="va">OK</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">constants</span><span class="op">$</span><span class="va">m</span><span class="op">)</span>
 
 <span class="co"># prepare constants (note get density in activity center/100 m2)</span>
-<span class="va">constants</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>M <span class="op">=</span> <span class="va">M</span>,J<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/dimensions.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">data4d</span><span class="op">$</span><span class="va">y</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,
+<span class="va">constants</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>m <span class="op">=</span> <span class="va">m</span>,J<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/dimensions.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">data4d</span><span class="op">$</span><span class="va">y</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,
  K<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/dimensions.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">data4d</span><span class="op">$</span><span class="va">y</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>, sigma_upper <span class="op">=</span> <span class="fl">1000</span>, A <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">hab_mask</span><span class="op">)</span><span class="op">*</span><span class="op">(</span><span class="va">pixelWidth</span><span class="op">/</span><span class="fl">100</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>,
 pixelWidth<span class="op">=</span><span class="va">pixelWidth</span>,nSites<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/dimensions.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">Xarray</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>,site <span class="op">=</span> <span class="va">site</span><span class="op">)</span>
 
 <span class="co"># add indexes for sites and individuals</span>
-<span class="va">constants</span><span class="op">$</span><span class="va">site_indexL</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">M</span>,<span class="fl">200</span><span class="op">)</span>
-<span class="va">constants</span><span class="op">$</span><span class="va">site_indexU</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">200</span>,<span class="va">M</span>,<span class="fl">200</span><span class="op">)</span>
+<span class="va">constants</span><span class="op">$</span><span class="va">site_indexL</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>,<span class="va">m</span>,<span class="fl">200</span><span class="op">)</span>
+<span class="va">constants</span><span class="op">$</span><span class="va">site_indexU</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">200</span>,<span class="va">m</span>,<span class="fl">200</span><span class="op">)</span>
           
 <span class="co"># priors for sigma: 'alpha' and 'beta' </span>
 <span class="va">constants</span><span class="op">$</span><span class="va">alpha</span> <span class="op">=</span> <span class="va">gparam</span><span class="op">$</span><span class="va">alpha</span>
@@ -787,19 +792,11 @@ pixelWidth<span class="op">=</span><span class="va">pixelWidth</span>,nSites<spa
 <span class="va">s.st</span> <span class="op">=</span> <span class="va">rescale_list</span><span class="op">$</span><span class="va">s.st</span>
 
 <span class="co"># define all initial values</span>
-<span class="va">inits</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">250</span>, <span class="fl">350</span><span class="op">)</span>, su <span class="op">=</span> <span class="va">s.st</span>,psi<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">0.4</span>,<span class="fl">0.6</span><span class="op">)</span>,
-lam0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.1</span>, <span class="fl">0.3</span><span class="op">)</span>,pOK<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">OK</span>,zu<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">constants</span><span class="op">$</span><span class="va">M</span>,<span class="fl">1</span>,<span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># get initial activity center starting values</span>
-<span class="va">s.st</span> <span class="op">=</span> <span class="va">rescale_list</span><span class="op">$</span><span class="va">s.st</span>
-
-<span class="co"># define all initial values</span>
-<span class="va">inits</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">250</span>, <span class="fl">350</span><span class="op">)</span>, su <span class="op">=</span> <span class="va">s.st</span>, psi<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">0.2</span>,<span class="fl">0.3</span><span class="op">)</span>,
-lam0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/dimensions.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span><span class="op">)</span>,
-pOK<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">OK</span>,z<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">M</span>,<span class="fl">1</span>,<span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>
+<span class="va">inits</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">250</span>, <span class="fl">350</span><span class="op">)</span>,su <span class="op">=</span> <span class="va">s.st</span>,psiu<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">0.4</span>,<span class="fl">0.6</span><span class="op">)</span>,
+lam0 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.1</span>, <span class="fl">0.3</span><span class="op">)</span>,pOKu<span class="op">=</span><span class="va">data</span><span class="op">$</span><span class="va">OKu</span>,zu<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">constants</span><span class="op">$</span><span class="va">m</span>,<span class="fl">1</span>,<span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># parameters to monitor</span>
-<span class="va">params</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sigma"</span>,<span class="st">"psi"</span>,<span class="st">"lam0"</span>,<span class="st">"N"</span>,<span class="st">"D"</span>,<span class="st">"su"</span>,<span class="st">"zu"</span><span class="op">)</span>
+<span class="va">params</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sigma"</span>,<span class="st">"psiu"</span>,<span class="st">"lam0"</span>,<span class="st">"N"</span>,<span class="st">"D"</span>,<span class="st">"su"</span>,<span class="st">"zu"</span><span class="op">)</span>
 
 <span class="co"># get model</span>
 <span class="va">sc_model</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_unmarked.html">get_unmarked</a></span><span class="op">(</span>occ_specific <span class="op">=</span> <span class="cn">FALSE</span>, hab_mask <span class="op">=</span> <span class="cn">TRUE</span>, 
@@ -812,8 +809,8 @@ pOK<span class="op">=</span><span class="va">data</span><span class="op">$</span
 <span class="op">}</span><span class="op">)</span>
 
 <span class="co"># now create new model</span>
-<span class="va">sc_model_inf</span> <span class="op">=</span> <span class="fu"><a href="../reference/customize_model.html">customize_model</a></span><span class="op">(</span><span class="va">sc_model</span>, <span class="va">add_model</span>, line_append <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">4</span><span class="op">)</span>,
-                               line_remove <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">5</span><span class="op">)</span><span class="op">)</span>
+<span class="va">sc_model_inf</span> <span class="op">=</span> <span class="fu"><a href="../reference/customize_model.html">customize_model</a></span><span class="op">(</span><span class="va">sc_model</span>, <span class="va">add_model</span>, append_line <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">4</span><span class="op">)</span>,
+                               remove_line <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">5</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># inspect model (not run)</span>
 <span class="co"># sc_model_inf</span>
@@ -834,7 +831,7 @@ parallel<span class="op">=</span><span class="cn">TRUE</span>, RNGseed <span cla
 <span class="co">#&gt; N         228.569  49.067 149.000 223.000 342.000  1  270.831 1.008</span>
 <span class="co">#&gt; lam0[1]     0.295   0.027   0.247   0.294   0.352  1 3595.823 1.002</span>
 <span class="co">#&gt; lam0[2]     0.299   0.027   0.249   0.298   0.355  1 2805.852 1.001</span>
-<span class="co">#&gt; psi         0.581   0.125   0.376   0.569   0.865  1  305.124 1.007</span>
+<span class="co">#&gt; psiu         0.581   0.125   0.376   0.569   0.865  1  305.124 1.007</span>
 <span class="co">#&gt; sigma     295.497  27.822 243.024 295.005 352.028  1  319.216 1.002</span></code></pre></div>
 <br><p>
 These results are similar to our model run in part 4 with the

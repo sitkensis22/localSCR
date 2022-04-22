@@ -35,6 +35,9 @@
       <a href="../articles/classic_scr.html">Classic SCR models: continuous state-space and marked individuals</a>
     </li>
     <li>
+      <a href="../articles/mark_resight_scr.html">Mark-resight models: continuous state-space with both marked and unmarked individuals</a>
+    </li>
+    <li>
       <a href="../articles/unmarked_scr.html">Spatial count models: continuous state-space and unmarked individuals</a>
     </li>
   </ul></li>
@@ -101,23 +104,23 @@ explaining detection probability. The models include habitat masking.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> {</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     lam0 ~ dunif(0, lam0_upper)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     sigma ~ dunif(0, sigma_upper)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     psi ~ dunif(0, 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     for (i in 1:M) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         zu[i] ~ dbern(psi)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     psiu ~ dunif(0, 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     for (i in 1:m) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         zu[i] ~ dbern(psiu)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         su[i, 1] ~ dunif(x_lower, x_upper)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         su[i, 2] ~ dunif(y_lower, y_upper)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         dist[i, 1:J] &lt;- sqrt((su[i, 1] - X[1:J, 1])^2 + (su[i, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         distu[i, 1:J] &lt;- sqrt((su[i, 1] - X[1:J, 1])^2 + (su[i, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             2] - X[1:J, 2])^2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         lam[i, 1:J] &lt;- lam0 * exp(-dist[i, 1:J]^2/(2 * sigma^2)) * </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         lamu[i, 1:J] &lt;- lam0 * exp(-distu[i, 1:J]^2/(2 * sigma^2)) * </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             zu[i]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     for (j in 1:J) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         bigLambda[j] &lt;- sum(lam[1:M, j])</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         bigLambda[j] &lt;- sum(lamu[1:m, j])</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         for (k in 1:K) {</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             n[j, k] ~ dpois(bigLambda[j])</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     N &lt;- sum(zu[1:M])</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     N &lt;- sum(zu[1:m])</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     D &lt;- N/A</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
 </code></pre></div>

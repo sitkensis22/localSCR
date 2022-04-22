@@ -13,6 +13,7 @@ library(localSCR)
 #  x <- seq(-800, 800, length.out = 5)
 #  y <- seq(-800, 800, length.out = 5)
 #  traps <- as.matrix(expand.grid(x = x, y = y))
+#  set.seed(200)
 #  traps <- traps + runif(prod(dim(traps)),-20,20)
 #  
 #  mysigma = 300 # simulate sigma of 300 m
@@ -60,6 +61,7 @@ library(localSCR)
 #  x <- seq(-800, 800, length.out = 5)
 #  y <- seq(-800, 800, length.out = 5)
 #  traps <- as.matrix(expand.grid(x = x, y = y))
+#  set.seed(200)
 #  traps <- traps + runif(prod(dim(traps)),-20,20) # add some random noise to locations
 #  
 #  mysigma = 300 # simulate a single scaling parameter
@@ -145,7 +147,7 @@ library(localSCR)
 #  library(tictoc)
 #  tic() # track time elapsed
 #  out = run_classic(model = sc_model, data=data, constants=constants,
-#  inits=inits, params = params,niter = 100, nburnin=100, thin=1, nchains=1, parallel=FALSE,
+#  inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE,
 #  RNGseed = 500, s_alias="su")
 #  toc()
 #  #> 511.62 sec elapsed
@@ -268,6 +270,7 @@ library(localSCR)
 #  x <- seq(-800, 800, length.out = 5)
 #  y <- seq(-800, 800, length.out = 5)
 #  traps <- as.matrix(expand.grid(x = x, y = y))
+#  set.seed(200)
 #  traps <- traps + runif(prod(dim(traps)),-20,20)
 #  
 #  mysigma = 300 # simulate single scaling parameter
@@ -317,13 +320,13 @@ library(localSCR)
 #            data4d$y[which(data4d$site==2),,], along = 4)
 #  
 #  # total augmented population size
-#  M = 400
+#  m = 400
 #  
 #  # augment site identifier
 #  site = c(rep(1,200),rep(2,200))
 #  
 #  # get initial activity center starting values
-#  s.st4d = initialize_classic(y=NULL, M=M, X=Xarray, buff = 3*max(mysigma),
+#  s.st4d = initialize_classic(y=NULL, M=m, X=Xarray, buff = 3*max(mysigma),
 #                        site = site, hab_mask = hab_mask,all_random = TRUE)
 #  
 #  # rescale inputs
@@ -342,16 +345,16 @@ library(localSCR)
 #  data$hab_mask = hab_mask
 #  # need to adjust proportion of habitat available
 #  data$prop.habitat=apply(hab_mask,3,mean)
-#  data$OK = rep(1,constants$M)
+#  data$OK = rep(1,constants$m)
 #  
 #  # prepare constants (note get density in activity center/100 m2)
-#  constants = list(M = M,J=dim(data4d$y)[2],
+#  constants = list(m = m,J=dim(data4d$y)[2],
 #   K=dim(data4d$y)[3], sigma_upper = 1000, A = (sum(hab_mask)*(pixelWidth/100)^2),
 #  pixelWidth=pixelWidth,nSites=dim(Xarray)[3],site = site)
 #  
 #  # add indexes for sites and individuals
-#  constants$site_indexL = seq(1,M,200)
-#  constants$site_indexU = seq(200,M,200)
+#  constants$site_indexL = seq(1,m,200)
+#  constants$site_indexU = seq(200,m,200)
 #  
 #  # priors for sigma: 'alpha' and 'beta'
 #  constants$alpha = gparam$alpha
@@ -365,19 +368,11 @@ library(localSCR)
 #  s.st = rescale_list$s.st
 #  
 #  # define all initial values
-#  inits = list(sigma = runif(1, 250, 350), su = s.st,psi=runif(1,0.4,0.6),
-#  lam0 = runif(1, 0.1, 0.3),pOK=data$OK,zu=rbinom(constants$M,1,0.5))
-#  
-#  # get initial activity center starting values
-#  s.st = rescale_list$s.st
-#  
-#  # define all initial values
-#  inits = list(sigma = runif(1, 250, 350), su = s.st, psi=runif(1,0.2,0.3),
-#  lam0 = runif(dim(data$X)[3], 0.1, 0.2),
-#  pOK=data$OK,z=rbinom(M,1,0.5))
+#  inits = list(sigma = runif(1, 250, 350),su = s.st,psiu=runif(1,0.4,0.6),
+#  lam0 = runif(1, 0.1, 0.3),pOKu=data$OKu,zu=rbinom(constants$m,1,0.5))
 #  
 #  # parameters to monitor
-#  params = c("sigma","psi","lam0","N","D","su","zu")
+#  params = c("sigma","psiu","lam0","N","D","su","zu")
 #  
 #  # get model
 #  sc_model = get_unmarked(occ_specific = FALSE, hab_mask = TRUE,
@@ -412,7 +407,7 @@ library(localSCR)
 #  #> N         228.569  49.067 149.000 223.000 342.000  1  270.831 1.008
 #  #> lam0[1]     0.295   0.027   0.247   0.294   0.352  1 3595.823 1.002
 #  #> lam0[2]     0.299   0.027   0.249   0.298   0.355  1 2805.852 1.001
-#  #> psi         0.581   0.125   0.376   0.569   0.865  1  305.124 1.007
+#  #> psiu         0.581   0.125   0.376   0.569   0.865  1  305.124 1.007
 #  #> sigma     295.497  27.822 243.024 295.005 352.028  1  319.216 1.002
 
 ## ---- fig.show='hide',eval=FALSE----------------------------------------------
