@@ -2332,14 +2332,14 @@ run_classic <- function(model, data, constants, inits, params,
     if(length(s_alias)!=1 & length(s_alias)!=2){
     stop("s_alias must be either a scalar or vector of length 2")
     }  
-    if(length(s_alias)==1  & s_alias == "s"){
+    if(length(s_alias)==1 && s_alias == "s"){
     mcmcspec$removeSamplers(s_alias, print = FALSE)
     for(i in 1:constants$M){
       snew = paste(s_alias,"[",i,","," 1:2","]",sep="")
       mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
     }
     }else
-    if(length(s_alias)==1  & s_alias == "su"){ 
+    if(length(s_alias)==1 && s_alias == "su"){ 
     # test out effect of AF_slice sampler to reduce autocorrlation and cross correlation
     for(i in 1:constants$m){
       snew = paste(s_alias,"[",i,","," 1:2","]",sep="")
@@ -2382,14 +2382,14 @@ run_classic <- function(model, data, constants, inits, params,
     if(length(s_alias)!=1 & length(s_alias)!=2){
     stop("s_alias must be either a scalar or vector of length 2")
     }  
-    if(length(s_alias)==1  & s_alias == "s"){
+    if(length(s_alias)==1 && s_alias == "s"){
     mcmcspec$removeSamplers(s_alias, print = FALSE)
     for(i in 1:constants$M){
       snew = paste(s_alias,"[",i,","," 1:2","]",sep="")
       mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
     }
     }else
-    if(length(s_alias)==1  & s_alias == "su"){ 
+    if(length(s_alias)==1 && s_alias == "su"){ 
     # test out effect of AF_slice sampler to reduce autocorrlation and cross correlation
     for(i in 1:constants$m){
       snew = paste(s_alias,"[",i,","," 1:2","]",sep="")
