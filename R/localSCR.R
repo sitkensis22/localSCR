@@ -3018,6 +3018,7 @@ customize_model <- function(model,append_code = NULL,append_line = NULL,
     local.path <- paste0(getwd(),"/new_model.txt")
     writeLines(updated_model,local.path,useBytes = FALSE) 
   }
+  txtPath1 <- tempfile(fileext = ".txt")
   writeLines(updated_model,txtPath1,useBytes = FALSE) 
   on.exit(unlink(txtPath1))
   return(source(txtPath1)$value)
