@@ -2976,7 +2976,6 @@ customize_model <- function(model,append_code = NULL,append_line = NULL,
    }
    append_model[length(append_model)+1] <- "}"
    unlink(unlist(file_list))
-  # updated_model <- character(length(main_model))
    # check if length(append_line) == length(append_model[-c(1,length(append_model))])
    if(length(append_line) != length(append_model[-c(1,length(append_model))])){
      stop(paste("length of append_line must equal lines of append_code minus outside braces, i.e.,","{","}"))
@@ -2985,18 +2984,19 @@ customize_model <- function(model,append_code = NULL,append_line = NULL,
         updated_model <- character(length(main_model)+length(append_model)-2)
         updated_model[append_line] <- append_model[-c(1,length(append_model))]
         updated_model[(1:(length(updated_model)-1))[-c(1,append_line)]] <- main_model[-c(1,length(main_model))]
-        updated_model[c(1,length(updated_model))] <- c("{","}") 
+        updated_model[c(1,length(updated_model))] <- c("nimble::nimbleCode({","})") 
    }else
    if(isFALSE(is.null(remove_line))){ 
         updated_model <- character(length(remove_model)+length(append_model)-2)
         updated_model[append_line] <- append_model[-c(1,length(append_model))]
         updated_model[(1:(length(updated_model)-1))[-c(1,append_line)]] <- remove_model[-c(1,length(remove_model))]
-        updated_model[c(1,length(updated_model))] <- c("{","}") 
+        updated_model[c(1,length(updated_model))] <- c("nimble::nimbleCode({","})") 
    } # check for line removal
     # don't need R.utils!
   }
-     # if nothing is done to code, just return original code
+    # if nothing is done to code, just return original code
   if(is.null(remove_line) & is.null(append_code) & is.null(append_line)){
+    main_model[c(1,length(main_model))] <- c("nimble::nimbleCode({","})") 
     updated_model <- main_model
      warning("Returning same model code as input into function")
   }
@@ -3005,10 +3005,6 @@ customize_model <- function(model,append_code = NULL,append_line = NULL,
     local.path <- paste0(getwd(),"/new_model.txt")
     writeLines(updated_model,local.path,useBytes = FALSE) 
   }
-  txtPath1 <- tempfile(fileext = ".txt")
-  sink(txtPath1)
-  print(updated_model)
-  sink()
   writeLines(updated_model,txtPath1,useBytes = FALSE) 
   on.exit(unlink(txtPath1))
   return(source(txtPath1)$value)
