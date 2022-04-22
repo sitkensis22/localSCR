@@ -2329,7 +2329,7 @@ run_classic <- function(model, data, constants, inits, params,
     # MCMC configurations
     mcmcspec<-nimble::configureMCMC(SCRmodelR, monitors=params) 
     # block updating for marked individual activity centers
-    if(length(s_alias)!=1 & length(s_alias!=2)){
+    if(length(s_alias)!=1 & length(s_alias)!=2){
     stop("s_alias must be either a scalar or vector of length 2")
     }  
     if(length(s_alias)==1){
