@@ -151,7 +151,7 @@ library(localSCR)
 #  params = c("sigma","psi","psiu","lam0","N","Nm","Nu","D","s","z","su","zu")
 #  
 #  # get 'classic' SCR model for marked data
-#  scr_model = scr_model = get_classic(dim_y = 2, enc_dist = "poisson",
+#  scr_model = get_classic(dim_y = 2, enc_dist = "poisson",
 #                                 sex_sigma = FALSE,hab_mask=TRUE,
 #                                  trapsClustered=FALSE)
 #  
