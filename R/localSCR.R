@@ -3012,6 +3012,10 @@ customize_model <- function(model,append_code = NULL,append_line = NULL,
   if(is.null(remove_line) & is.null(append_code) & is.null(append_line)){
     updated_model <- main_model
      warning("Returning same model code as input into function")
+  }else
+   # if only removal of lines
+  if(isFALSE(is.null(remove_line)) & is.null(append_code) & is.null(append_line)){
+    updated_model <- remove_model
   }
   # if write to file
   if(write){
