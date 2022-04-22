@@ -3044,8 +3044,8 @@ customize_model <- function(model,append_code = NULL,append_line = NULL,
 #' @export
 get_unmarked <- function(occ_specific = FALSE,
                         hab_mask = FALSE,trapsClustered = FALSE){
-      M <- J <- su <- X <- sigma <- n0 <- zu <- A <- lam0 <- K <- 
-      nSites <-  site <- pixelWidth <- psi <- prop.habitat <- site_indexL <-
+      m <- J <- su <- X <- sigma <- n0 <- zu <- A <- lam0 <- K <- 
+      nSites <-  site <- pixelWidth <- psiu <- prop.habitat <- site_indexL <-
       site_indexU <- NULL
  if(trapsClustered == FALSE){    
   if(isFALSE(hab_mask)){ # determine if hab_mask is included
@@ -3053,22 +3053,22 @@ get_unmarked <- function(occ_specific = FALSE,
           scrcode <- nimble::nimbleCode({
             lam0 ~ dunif(0,lam0_upper) # baseline encounter probability
             sigma ~ dunif(0, sigma_upper) # scaling parameter
-            psi ~ dunif(0, 1) # inclusion prob
-            for(i in 1:M){ 
-              zu[i]~dbern(psi)
+            psiu ~ dunif(0, 1) # inclusion prob
+            for(i in 1:m){ 
+              zu[i]~dbern(psiu)
               su[i,1] ~ dunif(x_lower, x_upper)
               su[i,2] ~ dunif(y_lower, y_upper)
               dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
-              lam[i,1:J] <- lam0*exp(-dist[i,1:J]^2/(2*sigma^2))*zu[i]
+              lamu[i,1:J] <- lam0*exp(-dist[i,1:J]^2/(2*sigma^2))*zu[i]
             } # i individuals
             # unmarked spatial count model likelihood
             for(j in 1:J){
-              bigLambda[j] <- sum(lam[1:M,j])
+              bigLambda[j] <- sum(lamu[1:m,j])
             for(k in 1:K){
               n[j,k] ~ dpois(bigLambda[j])
             } # k occasions
            } # j traps
-            N <- sum(zu[1:M])
+            N <- sum(zu[1:m])
             D <- N/A
           })
       return(scrcode)
@@ -3077,24 +3077,24 @@ get_unmarked <- function(occ_specific = FALSE,
             scrcode <- nimble::nimbleCode({
               lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
               sigma ~ dunif(0, sigma_upper) # scaling parameter
-              psi ~ dunif(0, 1) # inclusion prob
-              for(i in 1:M){
-                zu[i]~dbern(psi)
+              psiu ~ dunif(0, 1) # inclusion prob
+              for(i in 1:m){
+                zu[i]~dbern(psiu)
                 su[i,1] ~ dunif(x_lower, x_upper)
                 su[i,2] ~ dunif(y_lower, y_upper)
                 dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
                 for(k in 1:K){
-                  lam[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma^2))*zu[i]
+                  lamu[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma^2))*zu[i]
                 } # k occasions
               } # i individuals
               # unmarked spatial count model likelihood
               for(j in 1:J){
-                bigLambda[j] <- sum(lam[1:M,j,1:K]) 
+                bigLambda[j] <- sum(lamu[1:m,j,1:K]) 
               for(k in 1:K){
                 n[j,k] ~ dpois(bigLambda[j])
                } # k occasions
               } # j traps
-              N <- sum(zu[1:M])
+              N <- sum(zu[1:m])
               D <- N/A
             })
         return(scrcode)
@@ -3106,24 +3106,24 @@ if(hab_mask==TRUE){
       lam0 ~ dunif(0,lam0_upper) # baseline encounter probability
       sigma ~ dunif(0, sigma_upper) # scaling parameter
       sigma.pixel <- sigma / pixelWidth # scaled for habitat mask
-      psi ~ dunif(0, 1) # inclusion prob
-    for(i in 1:M){
-      zu[i]~dbern(psi)
+      psiu ~ dunif(0, 1) # inclusion prob
+    for(i in 1:m){
+      zu[i]~dbern(psiu)
       su[i,1] ~ dunif(x_lower, x_upper)
       su[i,2] ~ dunif(y_lower, y_upper)
-      pOK[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1)] # habitat check
-      OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
+      pOKu[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1)] # habitat check
+      OKu[i] ~ dbern(pOKu[i]) # OKu[i] <- 1, the ones trick
       dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
-      lam[i,1:J] <- lam0*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
+      lamu[i,1:J] <- lam0*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
     } # i individuals
           # unmarked spatial count model likelihood
           for(j in 1:J){
-            bigLambda[j] <- sum(lam[1:M,j]) 
+            bigLambda[j] <- sum(lamu[1:m,j]) 
           for(k in 1:K){
             n[j,k] ~ dpois(bigLambda[j])
            } # k occasions
           } # j traps
-          N <- sum(zu[1:M])
+          N <- sum(zu[1:m])
           D <- N/A
         })
   return(scrcode)
@@ -3133,26 +3133,26 @@ if(hab_mask==TRUE){
           lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
           sigma ~ dunif(0, sigma_upper) # scaling parameter
           sigma.pixel <- sigma / pixelWidth # scaled for habitat mask
-          psi ~ dunif(0, 1) # inclusion prob
-        for(i in 1:M){
-          zu[i]~dbern(psi)
+          psiu ~ dunif(0, 1) # inclusion prob
+        for(i in 1:m){
+          zu[i]~dbern(psiu)
           su[i,1] ~ dunif(x_lower, x_upper)
           su[i,2] ~ dunif(y_lower, y_upper)
-          pOK[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1)] # habitat check
-          OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
+          pOKu[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1)] # habitat check
+          OKu[i] ~ dbern(pOKu[i]) # OKu[i] <- 1, the ones trick
           dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
         for(k in 1:K){
-          lam[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
+          lamu[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
         } # k occasions
       } # i individuals
         # unmarked spatial count model likelihood
         for(j in 1:J){
-          bigLambda[j] <- sum(lam[1:M,j,1:K]) 
+          bigLambda[j] <- sum(lamu[1:m,j,1:K]) 
         for(k in 1:K){
           n[j,k] ~ dpois(bigLambda[j])
          } # k occasions
         } # j traps
-        N <- sum(zu[1:M])
+        N <- sum(zu[1:m])
         D <- N/A
       })
    return(scrcode)
@@ -3167,24 +3167,24 @@ if(hab_mask==TRUE){
     lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
   }
     sigma ~ dunif(0, sigma_upper) # scaling parameter
-    psi ~ dunif(0, 1) # inclusion prob
-  for(i in 1:M){
-   zu[i]~dbern(psi)
+    psiu ~ dunif(0, 1) # inclusion prob
+  for(i in 1:m){
+   zu[i]~dbern(psiu)
    su[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
    su[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
    dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
-   lam[i,1:J] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma^2))*zu[i]
+   lamu[i,1:J] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma^2))*zu[i]
   } # i individuals
   # unmarked spatial count model likelihood
   for(g in 1:nSites){
   for(j in 1:J){
-    bigLambda[j,g] <- sum(lam[site_indexL[g]:site_indexU[g],j]) 
+    bigLambda[j,g] <- sum(lamu[site_indexL[g]:site_indexU[g],j]) 
   for(k in 1:K){
     n[j,k,g] ~ dpois(bigLambda[j,g])
    } # k occasions
   } # j traps
   } # g sites
-  N <- sum(zu[1:M])
+  N <- sum(zu[1:m])
   D <- N/A
   })
   return(scrcode)
@@ -3192,29 +3192,29 @@ if(hab_mask==TRUE){
 if(isFALSE(occ_specific)==FALSE){ # occasion-specific models
 scrcode <- nimble::nimbleCode({
 sigma ~ dunif(0, sigma_upper) # scaling parameter
-psi ~ dunif(0, 1) # inclusion prob
+psiu ~ dunif(0, 1) # inclusion prob
 for(g in 1:nSites){
   lam0[g] ~ dunif(0,lam0_upper) # site-specific baseline encounter rate
 } # g sites
-for(i in 1:M){
-  zu[i]~dbern(psi)
+for(i in 1:m){
+  zu[i]~dbern(psiu)
   su[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
   su[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
   dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
  for(k in 1:K){
- lam[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma^2))*zu[i]
+ lamu[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma^2))*zu[i]
   } # k occasions
 } # i marked individuals
   # unmarked spatial count model likelihood
   for(g in 1:nSites){
   for(j in 1:J){
-    bigLambda[j,g] <- sum(lam[site_indexL[g]:site_indexU[g],j,1:K]) 
+    bigLambda[j,g] <- sum(lamu[site_indexL[g]:site_indexU[g],j,1:K]) 
   for(k in 1:K){
     n[j,k,g] ~ dpois(bigLambda[j,g])
    } # k occasions
   } # j traps
   } # g sites
- N <- sum(zu[1:M])
+ N <- sum(zu[1:m])
  D <- N/A
 })
 return(scrcode)
@@ -3228,28 +3228,28 @@ lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
 }
 sigma ~ dunif(0, sigma_upper) # scaling parameter
 sigma.pixel <- sigma / pixelWidth # scaled for habitat mask
-psi ~ dunif(0, 1) # inclusion prob
-for(i in 1:M){
-zu[i]~dbern(psim[i])
-# adjust psi for the proportion of available habitat at each site
-psim[i] <- (1-(1-psi)^prop.habitat[site[i]]) 
+psiu ~ dunif(0, 1) # inclusion prob
+for(i in 1:m){
+zu[i]~dbern(psiuu[i])
+# adjust psiu for the proportion of available habitat at each site
+psiuu[i] <- (1-(1-psiu)^prop.habitat[site[i]]) 
 su[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
 su[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
-pOK[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1),site[i]] # habitat check
-OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
+pOKu[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1),site[i]] # habitat check
+OKu[i] ~ dbern(pOKu[i]) # OKu[i] <- 1, the ones trick
 dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
-lam[i,1:J] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
+lamu[i,1:J] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
 } # i individuals
 # unmarked spatial count model likelihood
 for(g in 1:nSites){
 for(j in 1:J){
-  bigLambda[j,g] <- sum(lam[site_indexL[g]:site_indexU[g],j]) 
+  bigLambda[j,g] <- sum(lamu[site_indexL[g]:site_indexU[g],j]) 
 for(k in 1:K){
   n[j,k,g] ~ dpois(bigLambda[j,g])
  } # k occasions
 } # j traps
 } # g sites
-N <- sum(zu[1:M])
+N <- sum(zu[1:m])
 D <- N/A
 })
 return(scrcode)
@@ -3258,33 +3258,33 @@ if(isFALSE(occ_specific)==FALSE){
 scrcode <- nimble::nimbleCode({
   sigma ~ dunif(0, sigma_upper) # scaling parameter
   sigma.pixel <- sigma / pixelWidth # scaled for habitat mask
-  psi ~ dunif(0, 1) # inclusion prob
+  psiu ~ dunif(0, 1) # inclusion prob
   for(g in 1:nSites){
     lam0[g] ~ dunif(0,lam0_upper) # site-specific baseline encounter rate
   } # g sites
-  for(i in 1:M){
-    zu[i]~dbern(psim[i])
-   # adjust psi for the proportion of available habitat at each site
-  psim[i] <- (1-(1-psi)^prop.habitat[site[i]]) 
+  for(i in 1:m){
+    zu[i]~dbern(psiuu[i])
+   # adjust psiu for the proportion of available habitat at each site
+  psiuu[i] <- (1-(1-psiu)^prop.habitat[site[i]]) 
   su[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
   su[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
-  pOK[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1),site[i]] # habitat check
-  OK[i] ~ dbern(pOK[i]) # OK[i] <- 1, the ones trick
+  pOKu[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1),site[i]] # habitat check
+  OKu[i] ~ dbern(pOKu[i]) # OKu[i] <- 1, the ones trick
   dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
     for(k in 1:K){
-      lam[i,1:J,k] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
+      lamu[i,1:J,k] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
     } # k occasions
   } # i individuals
 # unmarked spatial count model likelihood
 for(g in 1:nSites){
 for(j in 1:J){
-  bigLambda[j,g] <- sum(lam[site_indexL[g]:site_indexU[g],j,1:K]) 
+  bigLambda[j,g] <- sum(lamu[site_indexL[g]:site_indexU[g],j,1:K]) 
 for(k in 1:K){
   n[j,k,g] ~ dpois(bigLambda[j,g])
  } # k occasions
 } # j traps
 } # g sites
-N <- sum(zu[1:M])
+N <- sum(zu[1:m])
 D <- N/A
 })
 return(scrcode)
