@@ -86,10 +86,10 @@ library(localSCR)
 #  
 #  
 #  # total augmented population size
-#  M = 500
+#  m = 500
 #  
 #  # get initial activity center starting values
-#  s.st3d = initialize_classic(y=NULL, M=M, X=traps, buff = 3*max(mysigma),
+#  s.st3d = initialize_classic(y=NULL, M=m, X=traps, buff = 3*max(mysigma),
 #                              hab_mask = hab_mask, all_random=TRUE)
 #  
 #  # make ggplot
@@ -118,24 +118,24 @@ library(localSCR)
 #  data$X = rescale_list$X
 #  
 #  # prepare constants (note get density in activity center/100 m2 rather than activity centers/m2)
-#  constants = list(M = M,J=dim(data3d$y)[2], K=dim(data3d$y)[3],
+#  constants = list(m = m,J=dim(data3d$y)[2], K=dim(data3d$y)[3],
 #  x_lower = ext[1], x_upper = ext[2], y_lower = ext[3], y_upper = ext[4],
 #  lam0_upper = 1,sigma_upper = 1000,
 #  A = (sum(hab_mask)*(pixelWidth/100)^2),pixelWidth=pixelWidth)
 #  
 #  # add hab_mask and OK for habitat check
 #  data$hab_mask = hab_mask
-#  data$OK = rep(1,constants$M)
+#  data$OKu = rep(1,constants$m)
 #  
 #  # get initial activity center starting values
 #  s.st = rescale_list$s.st
 #  
 #  # define all initial values
-#  inits = list(sigma = runif(1, 250, 350), su = s.st,psi=runif(1,0.4,0.6),
-#  lam0 = runif(1, 0.05, 0.15),pOK=data$OK,zu=rbinom(constants$M,1,0.5))
+#  inits = list(sigma = runif(1, 250, 350), su = s.st,psiu=runif(1,0.4,0.6),
+#  lam0 = runif(1, 0.05, 0.15),pOKu=data$OKu,zu=rbinom(constants$m,1,0.5))
 #  
 #  # parameters to monitor
-#  params = c("sigma","psi","lam0","N","D","su","zu")
+#  params = c("sigma","psiu","lam0","N","D","su","zu")
 #  
 #  # get spatial count model
 #  sc_model = get_unmarked(occ_specific = FALSE,
@@ -145,7 +145,7 @@ library(localSCR)
 #  library(tictoc)
 #  tic() # track time elapsed
 #  out = run_classic(model = sc_model, data=data, constants=constants,
-#  inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE,
+#  inits=inits, params = params,niter = 100, nburnin=100, thin=1, nchains=1, parallel=FALSE,
 #  RNGseed = 500, s_alias="su")
 #  toc()
 #  #> 511.62 sec elapsed
@@ -164,11 +164,10 @@ library(localSCR)
 #  #> D         0.234   0.121   0.040   0.221   0.453  1 33.817 1.121
 #  #> N       250.204 129.023  43.000 237.000 485.000  1 33.817 1.121
 #  #> lam0      0.385   0.238   0.065   0.357   0.906  1 68.708 1.020
-#  #> psi       0.500   0.258   0.086   0.475   0.968  1 33.594 1.119
+#  #> psiu      0.500   0.258   0.086   0.475   0.968  1 33.594 1.119
 #  #> sigma   344.133 202.596 146.564 270.782 932.274  1 31.582 1.282
 
 ## ---- fig.show='hide',eval=FALSE----------------------------------------------
-#  
 #  # get from Github and load
 #  #install_github("austinnam/modeltools",force=TRUE)
 #  library(modeltools)

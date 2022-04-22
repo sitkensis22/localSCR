@@ -2345,8 +2345,8 @@ run_classic <- function(model, data, constants, inits, params,
       snew = paste(s_alias,"[",i,","," 1:2","]",sep="")
       mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
     }
-     mcmcspec$removeSamplers(c("psi","lam0","sigma"))
-     mcmcspec$addSampler(target = c("psi","lam0","sigma"), type = "AF_slice", silent = TRUE)
+     mcmcspec$removeSamplers(c("psiu","lam0","sigma"))
+     mcmcspec$addSampler(target = c("psiu","lam0","sigma"), type = "AF_slice", silent = TRUE)
     
     }else
     if(length(s_alias)==2){ # for  spatial mark-resight model
@@ -2395,8 +2395,8 @@ run_classic <- function(model, data, constants, inits, params,
       snew = paste(s_alias,"[",i,","," 1:2","]",sep="")
       mcmcspec$addSampler(target = snew, type = 'RW_block', silent = TRUE)
     }
-     mcmcspec$removeSamplers(c("psi","lam0","sigma"))
-     mcmcspec$addSampler(target = c("psi","lam0","sigma"), type = "AF_slice", silent = TRUE)
+     mcmcspec$removeSamplers(c("psiu","lam0","sigma"))
+     mcmcspec$addSampler(target = c("psiu","lam0","sigma"), type = "AF_slice", silent = TRUE)
     
     }else
     if(length(s_alias)==2){ # for  spatial mark-resight model
