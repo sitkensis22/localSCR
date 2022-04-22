@@ -37,6 +37,9 @@ computer (including installing rtools): <https://r-nimble.org/download>.
     SCR models: continuous state-space and marked individuals</a>
 -   <a href="https://sitkensis22.github.io/localSCR/articles/unmarked_scr.html">Spatial
     count models: continuous state-space and unmarked individuals</a>
+-   <a href="https://sitkensis22.github.io/localSCR/articles/mark_resight_scr.html">Mark-resight
+    models: continuous state-space with both marked and unmarked
+    individuals</a>
 
 ## References
 
