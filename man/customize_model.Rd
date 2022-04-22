@@ -23,21 +23,22 @@ code; otherwise specify the lines to insert new code into by setting
 \code{append_line}.}
 
 \item{append_line}{Either \code{NULL} or an integer value as a scalar or vector
-defining which positions to insert new lines of code in the model. Note that
-line removal will occur first if \code{remove_line} is set, and then new
-lines of code will be inserted at the desired indexing positions.}
+defining which positions to insert new lines of code in the model. Note that if multiple 
+lines of new code are to be inserted on the same line, then just use \code{rep(44,3)} for 
+example if the new code had 3 lines to insert (not counting "{" and "}"). The lines
+to append to should be based on the original model given to \code{model}.
+is to be inserted on the same line, then just repeat the}
 
 \item{remove_line}{Either \code{NULL} or an integer value as a scalar or vector
-defining which lines of code to remove from model. Set to \code{NULL} when only 
-appending to and not replacing code in previous model file.}
+defining which lines of code to remove from the original model. Set to \code{NULL} when only 
+appending to and not replacing code in previous model file (i.e., \code{model}).}
 
 \item{write}{Logical. If \code{TRUE}, then a text file is written to the 
 working directory called "new_model.txt". Otherwise, model is written to temp
 file and then deleted. Default is \code{FALSE}.}
 }
 \value{
-a model description that can be run in \code{nimble} or using 
-\code{\link{run_classic}}.
+A model description that can be run  using \code{\link{run_classic}}.
 }
 \description{
 Allows for efficient editing of model code produced by \code{nimbleCode()} 
