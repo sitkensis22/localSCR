@@ -2921,6 +2921,7 @@ customize_model <- function(model,append_code = NULL,append_line = NULL,
                   readLines(file_list[[i]],encoding="UTF-8")
    }
    main_model[length(main_model)+1] <- "}"
+   main_model[c(1,length(main_model))] <-  c("nimble::nimbleCode({","})") 
    unlink(unlist(file_list)) # unlink temp files
   # check for removal of lines and do this first
   if(isFALSE(is.null(remove_line))){
@@ -2947,7 +2948,7 @@ customize_model <- function(model,append_code = NULL,append_line = NULL,
    unlink(unlist(file_list))
    if(is.null(remove_line)){
     updated_model <- c("nimble::nimbleCode({",
-          main_model[-c(1,length(remove_model))],
+          main_model[-c(1,length(main_model))],
           append_model[-c(1,length(append_model))],
                   "})") 
    }else
@@ -2996,7 +2997,6 @@ customize_model <- function(model,append_code = NULL,append_line = NULL,
   }
     # if nothing is done to code, just return original code
   if(is.null(remove_line) & is.null(append_code) & is.null(append_line)){
-    main_model[c(1,length(main_model))] <- c("nimble::nimbleCode({","})") 
     updated_model <- main_model
      warning("Returning same model code as input into function")
   }
