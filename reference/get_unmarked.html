@@ -106,9 +106,9 @@ explaining detection probability. The models include habitat masking.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         zu[i] ~ dbern(psiu)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         su[i, 1] ~ dunif(x_lower, x_upper)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         su[i, 2] ~ dunif(y_lower, y_upper)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         dist[i, 1:J] &lt;- sqrt((su[i, 1] - X[1:J, 1])^2 + (su[i, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         distu[i, 1:J] &lt;- sqrt((su[i, 1] - X[1:J, 1])^2 + (su[i, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             2] - X[1:J, 2])^2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         lamu[i, 1:J] &lt;- lam0 * exp(-dist[i, 1:J]^2/(2 * sigma^2)) * </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         lamu[i, 1:J] &lt;- lam0 * exp(-distu[i, 1:J]^2/(2 * sigma^2)) * </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             zu[i]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     for (j in 1:J) {</span>
