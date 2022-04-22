@@ -2895,6 +2895,7 @@ realized_density <- function(samples, grid, crs_, site, hab_mask,
 #' @return a model description that can be run in \code{nimble} or using 
 #' \code{\link{run_classic}}. 
 #' @author Daniel Eacker
+#' @importFrom R.utils insert
 #' @examples
 #' # get model
 #' scr_model = get_classic(dim_y = 2, enc_dist = "binomial",sex_sigma = TRUE,
@@ -3002,24 +3003,17 @@ customize_model <- function(model,append_code = NULL,append_line = NULL,
    if(isFALSE(is.null(remove_line))){ 
         updated_model <- character(length(main_model))
         updated_model[(1:length(main_model))[-remove_line]] <- remove_model
-        # if max of append_line equal to length model
-        if(max(append_line) == length(main_model)){
-        updated_model[length(updated_model)] <- ""
-        updated_model <- c(updated_model,"})")
-        updated_model[append_line] <- append_model[-c(1,length(append_model))]
+        if(min(append_line) <= length(main_model)){
+        updated_model <- R.utils::insert(updated_model, ats = append_line, 
+                                        append_model[-c(1,length(append_model))])
         updated_model <- updated_model[which(updated_model!="")]
         }else
-        # if max of append_line equal to length model
-        if(max(append_line) < length(main_model)){
-        updated_model[append_line] <- append_model[-c(1,length(append_model))]
-        updated_model <- updated_model[which(updated_model!="")]
-        }else
-        # if max of append_line greater to length model
-        if(max(append_line) > length(main_model)){
+        if(min(append_line) > length(main_model)){
         updated_model <- c(updated_model[-length(updated_model)],
-                          rep("",max(append_line)-length(main_model)+1),"})")
-        updated_model[append_line] <- append_model[-c(1,length(append_model))]
-        updated_model <- updated_model[which(updated_model!="")] 
+                      rep("",min(append_line) - length(main_model)),"})")
+        updated_model <- R.utils::insert(updated_model, ats = append_line, 
+                                        append_model[-c(1,length(append_model))])
+        updated_model <- updated_model[which(updated_model!="")]  
         }
    } # check for line removal
   } else # end append_code and append_line = TRUE
