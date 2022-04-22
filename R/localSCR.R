@@ -3069,8 +3069,8 @@ get_unmarked <- function(occ_specific = FALSE,
               zu[i]~dbern(psiu)
               su[i,1] ~ dunif(x_lower, x_upper)
               su[i,2] ~ dunif(y_lower, y_upper)
-              dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
-              lamu[i,1:J] <- lam0*exp(-dist[i,1:J]^2/(2*sigma^2))*zu[i]
+              distu[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
+              lamu[i,1:J] <- lam0*exp(-distu[i,1:J]^2/(2*sigma^2))*zu[i]
             } # i individuals
             # unmarked spatial count model likelihood
             for(j in 1:J){
@@ -3093,9 +3093,9 @@ get_unmarked <- function(occ_specific = FALSE,
                 zu[i]~dbern(psiu)
                 su[i,1] ~ dunif(x_lower, x_upper)
                 su[i,2] ~ dunif(y_lower, y_upper)
-                dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
+                distu[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
                 for(k in 1:K){
-                  lamu[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma^2))*zu[i]
+                  lamu[i,1:J,k] <- lam0*exp(-distu[i,1:J]^2/(2*sigma^2))*zu[i]
                 } # k occasions
               } # i individuals
               # unmarked spatial count model likelihood
@@ -3124,8 +3124,8 @@ if(hab_mask==TRUE){
       su[i,2] ~ dunif(y_lower, y_upper)
       pOKu[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1)] # habitat check
       OKu[i] ~ dbern(pOKu[i]) # OKu[i] <- 1, the ones trick
-      dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
-      lamu[i,1:J] <- lam0*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
+      distu[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
+      lamu[i,1:J] <- lam0*exp(-distu[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
     } # i individuals
           # unmarked spatial count model likelihood
           for(j in 1:J){
@@ -3151,9 +3151,9 @@ if(hab_mask==TRUE){
           su[i,2] ~ dunif(y_lower, y_upper)
           pOKu[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1)] # habitat check
           OKu[i] ~ dbern(pOKu[i]) # OKu[i] <- 1, the ones trick
-          dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
+          distu[i,1:J] <- sqrt((su[i,1]-X[1:J,1])^2 + (su[i,2]-X[1:J,2])^2)
         for(k in 1:K){
-          lamu[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
+          lamu[i,1:J,k] <- lam0*exp(-distu[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
         } # k occasions
       } # i individuals
         # unmarked spatial count model likelihood
@@ -3183,8 +3183,8 @@ if(hab_mask==TRUE){
    zu[i]~dbern(psiu)
    su[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
    su[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
-   dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
-   lamu[i,1:J] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma^2))*zu[i]
+   distu[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
+   lamu[i,1:J] <- lam0[site[i]]*exp(-distu[i,1:J]^2/(2*sigma^2))*zu[i]
   } # i individuals
   # unmarked spatial count model likelihood
   for(g in 1:nSites){
@@ -3211,9 +3211,9 @@ for(i in 1:m){
   zu[i]~dbern(psiu)
   su[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
   su[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
-  dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
+  distu[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
  for(k in 1:K){
- lamu[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma^2))*zu[i]
+ lamu[i,1:J,k] <- lam0*exp(-distu[i,1:J]^2/(2*sigma^2))*zu[i]
   } # k occasions
 } # i marked individuals
   # unmarked spatial count model likelihood
@@ -3248,8 +3248,8 @@ su[i,1] ~ dunif(x_lower[site[i]], x_upper[site[i]])
 su[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
 pOKu[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1),site[i]] # habitat check
 OKu[i] ~ dbern(pOKu[i]) # OKu[i] <- 1, the ones trick
-dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
-lamu[i,1:J] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
+distu[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
+lamu[i,1:J] <- lam0[site[i]]*exp(-distu[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
 } # i individuals
 # unmarked spatial count model likelihood
 for(g in 1:nSites){
@@ -3281,9 +3281,9 @@ scrcode <- nimble::nimbleCode({
   su[i,2] ~ dunif(y_lower[site[i]], y_upper[site[i]])
   pOKu[i] <- hab_mask[(trunc(su[i,2])+1),(trunc(su[i,1])+1),site[i]] # habitat check
   OKu[i] ~ dbern(pOKu[i]) # OKu[i] <- 1, the ones trick
-  dist[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
+  distu[i,1:J] <- sqrt((su[i,1]-X[1:J,1,site[i]])^2 + (su[i,2]-X[1:J,2,site[i]])^2)
     for(k in 1:K){
-      lamu[i,1:J,k] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
+      lamu[i,1:J,k] <- lam0[site[i]]*exp(-distu[i,1:J]^2/(2*sigma.pixel^2))*zu[i]
     } # k occasions
   } # i individuals
 # unmarked spatial count model likelihood

@@ -275,7 +275,7 @@ sc_model = get_unmarked(occ_specific = FALSE,
 library(tictoc)
 tic() # track time elapsed
 out = run_classic(model = sc_model, data=data, constants=constants,
-inits=inits, params = params,niter = 100, nburnin=100, thin=1, nchains=1, parallel=FALSE,
+inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE,
 RNGseed = 500, s_alias="su")
 toc()
 #> 511.62 sec elapsed
@@ -314,7 +314,7 @@ nimSummary(out, exclude_params = c("su","zu"), trace=FALSE)
 
 <br>
 <p>
-Although we are able to produce estimates, they are not reliable due to the lack of convergence and huge uncertainty. This will be the case for many spatial count modeling problems and thus, it is common to include prior information or combine marked and unmarked individuals into a spatial mark-resight analysis (the topic of vignette 3). Here, we'll test out the effect of bringing in prior information on the scaling parameter; this could occur if we had estimates of `sigma` from a previous study or another data source.We'll first need to use a moment matching function (e.g., normal to gamma moments) from the 'modeltools' package (add citation) called `estGammaParam()`. The gamma distribution is appropriate since it has support from 0 to infinity. For this example, we'll just grab some estimates of posterior standard error from part 3 of vignette 1. We know the 'true' simulated value of sigma is 300. 
+Although we are able to produce estimates, they are not reliable due to the lack of convergence and huge uncertainty. This will be the case for many spatial count modeling problems and thus, it is common to include prior information or combine marked and unmarked individuals into a spatial mark-resight analysis (the topic of vignette 3). Here, we'll test out the effect of bringing in prior information on the scaling parameter; this could occur if we had estimates of `sigma` from a previous study or another data source. We'll first need to use a moment matching function (e.g., normal to gamma moments) from the 'modeltools' package (add citation) called `estGammaParam()`. The gamma distribution is appropriate since it has support from 0 to infinity. For this example, we'll just grab some estimates of posterior standard error from part 3 of vignette 1. We know the 'true' simulated value of sigma is 300. 
 </p>
 <br>
 
@@ -383,7 +383,7 @@ abline(v=200, col="red") # add line for simulated abundance
 <br>
 
 <p>
-Again, we see that convergence is not great despite having prior information on sigma, but it's an improvement and the median estimate of N is close to the simulated value of 200. The uncertainty both the encounter rate `lam0` and the augmentation parameter `psi` is still huge, which translates into large uncertainty in abundance. We can try adding prior information about the encounter rate as well and see how this affects the estimates. We'll use a similar strategy as we did for the scaling parameter 'sigma'. 
+Again, we see that convergence is not great despite having prior information on sigma, but it's an improvement and the median estimate of N is close to the simulated value of 200. The uncertainty both the encounter rate `lam0` and the augmentation parameter `psiu` is still huge, which translates into large uncertainty in abundance. We can try adding prior information about the encounter rate as well and see how this affects the estimates. We'll use a similar strategy as we did for the scaling parameter 'sigma'. 
 </p>
 
 <br>
@@ -514,7 +514,7 @@ ggplot() + geom_point(data=as.data.frame(GridX$grid[,,1]),aes(x=V1,y=V2),
 </p>
 <br>
 <p>
-In the figure we can see our two spatially separated trapping grids and that the polgon overlaps some of the gridded area. The area outside the polygon will be considered unsuitable when the habitat matrix is created. Note that the `site` variable will be only as long as the simulated population size (here, 200) and thus, we will need to augment the variable to have the length equal to the total augmented population size (i.e., `M = 400`). Otherwise the workflow is very similar to the previous one. 
+In the figure we can see our two spatially separated trapping grids and that the polygon overlaps some of the gridded area. The area outside the polygon will be considered unsuitable when the habitat matrix is created. Note that the `site` variable will be only as long as the simulated population size (here, 200) and thus, we will need to augment the variable to have the length equal to the total augmented population size (i.e., `m = 400`). Otherwise the workflow is very similar to the previous one. 
 </p>
 <br>
 
@@ -534,13 +534,13 @@ y = abind(data4d$y[which(data4d$site==1),,],
           data4d$y[which(data4d$site==2),,], along = 4)
 
 # total augmented population size 
-M = 400
+m = 400
 
 # augment site identifier
 site = c(rep(1,200),rep(2,200))
 
 # get initial activity center starting values 
-s.st4d = initialize_classic(y=NULL, M=M, X=Xarray, buff = 3*max(mysigma), 
+s.st4d = initialize_classic(y=NULL, M=m, X=Xarray, buff = 3*max(mysigma), 
                       site = site, hab_mask = hab_mask,all_random = TRUE)
 
 # rescale inputs
@@ -559,16 +559,16 @@ data = list(n = apply(y, c(2,3,4), sum),x_lower = ext[,1],
 data$hab_mask = hab_mask
 # need to adjust proportion of habitat available
 data$prop.habitat=apply(hab_mask,3,mean) 
-data$OK = rep(1,constants$M)
+data$OK = rep(1,constants$m)
 
 # prepare constants (note get density in activity center/100 m2)
-constants = list(M = M,J=dim(data4d$y)[2],
+constants = list(m = m,J=dim(data4d$y)[2],
  K=dim(data4d$y)[3], sigma_upper = 1000, A = (sum(hab_mask)*(pixelWidth/100)^2),
 pixelWidth=pixelWidth,nSites=dim(Xarray)[3],site = site)
 
 # add indexes for sites and individuals
-constants$site_indexL = seq(1,M,200)
-constants$site_indexU = seq(200,M,200)
+constants$site_indexL = seq(1,m,200)
+constants$site_indexU = seq(200,m,200)
           
 # priors for sigma: 'alpha' and 'beta' 
 constants$alpha = gparam$alpha
@@ -582,19 +582,11 @@ constants$beta_lam0 = lam0_param$beta
 s.st = rescale_list$s.st
 
 # define all initial values
-inits = list(sigma = runif(1, 250, 350), su = s.st,psi=runif(1,0.4,0.6),
-lam0 = runif(1, 0.1, 0.3),pOK=data$OK,zu=rbinom(constants$M,1,0.5))
-
-# get initial activity center starting values
-s.st = rescale_list$s.st
-
-# define all initial values
-inits = list(sigma = runif(1, 250, 350), su = s.st, psi=runif(1,0.2,0.3),
-lam0 = runif(dim(data$X)[3], 0.1, 0.2),
-pOK=data$OK,z=rbinom(M,1,0.5))
+inits = list(sigma = runif(1, 250, 350),su = s.st,psiu=runif(1,0.4,0.6),
+lam0 = runif(1, 0.1, 0.3),pOKu=data$OKu,zu=rbinom(constants$m,1,0.5))
 
 # parameters to monitor
-params = c("sigma","psi","lam0","N","D","su","zu")
+params = c("sigma","psiu","lam0","N","D","su","zu")
 
 # get model
 sc_model = get_unmarked(occ_specific = FALSE, hab_mask = TRUE, 
@@ -629,7 +621,7 @@ nimSummary(out, exclude_params = c("su","zu"))
 #> N         228.569  49.067 149.000 223.000 342.000  1  270.831 1.008
 #> lam0[1]     0.295   0.027   0.247   0.294   0.352  1 3595.823 1.002
 #> lam0[2]     0.299   0.027   0.249   0.298   0.355  1 2805.852 1.001
-#> psi         0.581   0.125   0.376   0.569   0.865  1  305.124 1.007
+#> psiu         0.581   0.125   0.376   0.569   0.865  1  305.124 1.007
 #> sigma     295.497  27.822 243.024 295.005 352.028  1  319.216 1.002
 ```
 
