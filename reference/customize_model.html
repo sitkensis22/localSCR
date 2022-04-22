@@ -117,44 +117,11 @@ file and then deleted. Default is <code>FALSE</code>.</p></dd>
 <span class="r-in"><span class="co"># replace line 3 of old model code with 'p0_prior' </span></span>
 <span class="r-in"><span class="va">new_model</span> <span class="op">=</span> <span class="fu">customize_model</span><span class="op">(</span>model <span class="op">=</span> <span class="va">scr_model</span>, append_code <span class="op">=</span> <span class="va">p0_prior</span>, </span>
 <span class="r-in">                                   append_line <span class="op">=</span> <span class="fl">3</span>, remove_line <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in writeLines(updated_model, txtPath1, useBytes = FALSE):</span> object 'updated_model' not found</span>
 <span class="r-in">                                   </span>
 <span class="r-in"><span class="co"># inspect new model code</span></span>
 <span class="r-in"><span class="va">new_model</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     for (g in 1:nSites) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         p0[g] ~ dbeta(1, 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     psi_sex ~ dunif(0, 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     sigma[1] ~ dunif(0, sigma_upper)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     sigma[2] ~ dunif(0, sigma_upper)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     sigma.pixel[1] &lt;- sigma[1]/pixelWidth</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     sigma.pixel[2] &lt;- sigma[2]/pixelWidth</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     psi ~ dunif(0, 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     for (i in 1:M) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         sex[i] ~ dbern(psi_sex)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         sx[i] &lt;- sex[i] + 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         z[i] ~ dbern(psim[i])</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         psim[i] &lt;- (1 - (1 - psi)^prop.habitat[site[i]])</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         s[i, 1] ~ dunif(x_lower[site[i]], x_upper[site[i]])</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         s[i, 2] ~ dunif(y_lower[site[i]], y_upper[site[i]])</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         pOK[i] &lt;- hab_mask[(trunc(s[i, 2]) + 1), (trunc(s[i, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             1]) + 1), site[i]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         OK[i] ~ dbern(pOK[i])</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         dist[i, 1:J] &lt;- sqrt((s[i, 1] - X[1:J, 1, site[i]])^2 + </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             (s[i, 2] - X[1:J, 2, site[i]])^2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         p[i, 1:J] &lt;- p0[site[i]] * exp(-dist[i, 1:J]^2/(2 * sigma.pixel[sx[i]]^2))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     for (i in 1:n0) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         for (j in 1:J) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             y[i, j] ~ dbin(p[i, j], K)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     for (i in (n0 + 1):M) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         zeros[i] ~ dbern((1 - prod(1 - p[i, 1:J])^K) * z[i])</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     N &lt;- sum(z[1:M])</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     D &lt;- N/A</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'new_model' not found</span>
 </code></pre></div>
     </div>
   </div>
