@@ -81,13 +81,14 @@ code; otherwise specify the lines to insert new code into by setting
 <code>append_line</code>.</p></dd>
 <dt>append_line</dt>
 <dd><p>Either <code>NULL</code> or an integer value as a scalar or vector
-defining which positions to insert new lines of code in the model. Note that
-line removal will occur first if <code>remove_line</code> is set, and then new
-lines of code will be inserted at the desired indexing positions.</p></dd>
+defining which positions to insert new lines of code in the model. Note that if multiple 
+lines of new code are to be inserted on the same line, then just use <code>rep(44,3)</code> for 
+example if the new code had 3 lines to insert (not counting "" and ""). The lines
+to append to should be based on the original model given to <code>model</code>.</p></dd>
 <dt>remove_line</dt>
 <dd><p>Either <code>NULL</code> or an integer value as a scalar or vector
-defining which lines of code to remove from model. Set to <code>NULL</code> when only 
-appending to and not replacing code in previous model file.</p></dd>
+defining which lines of code to remove from the original model. Set to <code>NULL</code> when only 
+appending to and not replacing code in previous model file (i.e., <code>model</code>).</p></dd>
 <dt>write</dt>
 <dd><p>Logical. If <code>TRUE</code>, then a text file is written to the 
 working directory called "new_model.txt". Otherwise, model is written to temp
@@ -95,8 +96,7 @@ file and then deleted. Default is <code>FALSE</code>.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>a model description that can be run in <code>nimble</code> or using 
-<code><a href="run_classic.html">run_classic</a></code>.</p>
+    <p>A model description that can be run  using <code><a href="run_classic.html">run_classic</a></code>.</p>
     </div>
     <div id="author">
     <h2>Author</h2>
