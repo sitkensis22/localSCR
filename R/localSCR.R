@@ -2885,7 +2885,7 @@ realized_density <- function(samples, grid, crs_, site, hab_mask,
 #' @param append_line Either \code{NULL} or an integer value as a scalar or vector
 #' defining which positions to insert new lines of code in the model. Note that if multiple 
 #' lines of new code are to be inserted on the same line, then just use \code{rep(44,3)} for 
-#' example if the new code had 3 lines to insert (not counting "{" and "}"). The lines
+#' example if the new code had 3 lines to insert (not counting \code{"{"} and \code{"}"}). The lines
 #' to append to should be based on the original model given to \code{model}.
 #' @param remove_line Either \code{NULL} or an integer value as a scalar or vector
 #' defining which lines of code to remove from the original model. Set to \code{NULL} when only 
