@@ -6,12 +6,11 @@ Authors@R: person("Daniel", "Eacker",email = "daniel.eacker@alaska.gov", role = 
 Maintainer: Daniel Eacer <daniel.eacker@alaska.gov>
 Description: Functionality for recent developments in computation for Bayesian spatial capture-recapture (SCR) modeling. The package currently supports 'classic' (continuous state-space) SCR models for marked and unmarked individuals including functions to generate state-space grids, simulate data, build habitat masks, and more. The user-friendly design keeps all objects in simple native R classes such as matrices and arrays for simplicity. The package is still in developments but functionality is coming for discrete state-space models as well as localized approaches that further reduce computational runtime.
 Depends:
-    R (>= 4.0)
+    R (>= 4.0), nimble
 Imports:
     coda,
     crayon,
     methods,
-    nimble,
     raster,
     scales,
     sf,

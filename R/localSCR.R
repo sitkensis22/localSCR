@@ -340,7 +340,6 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter,
 #' detection probability. The models include different encounter probability 
 #' distributions, sex-specific scaling parameters, and habitat masking.
 #' @author Daniel Eacker
-#' @importFrom nimble nimbleCode
 #' @examples
 #' # get model for 2D encounter data, binomial encounter distribution, 
 #' # non-sex-specific scaling parameter, and no habitat mask
@@ -3056,7 +3055,6 @@ customize_model <- function(model,append_code = NULL,append_line = NULL,
 #' easily modified to include further model complexity such as covariates 
 #' explaining detection probability. The models include habitat masking.
 #' @author Daniel Eacker
-#' @importFrom nimble nimbleCode
 #' @examples
 #' # get spatial count model with non-occasion-specific detection
 #' # function, single scaling parameter, no habitat mask, and no clustering
