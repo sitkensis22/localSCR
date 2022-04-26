@@ -3485,7 +3485,7 @@ discretize_classic <- function(X = traps, grid, s.st = s.st,
 #' @examples
 #' # get discrete model for 2D encounter data, binomial encounter distribution, 
 #' # non-sex-specific scaling parameter, and no clustering of traps
-#' discrete_model = get_classic(dim_y = 2,enc_dist = "binomial",
+#' discrete_model = get_discrete(dim_y = 2,enc_dist = "binomial",
 #'                          sex_sigma = FALSE, trapsClustered = FALSE)
 #'
 #' # inspect model
