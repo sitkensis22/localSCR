@@ -3461,3 +3461,682 @@ discretize_classic <- function(X = traps, grid, s.st = s.st,
   } # end dimension 3
      return(list(X=X_discrete,s.st=s.st_discrete))
 } # End 'discretize_classic' function
+
+
+#' Function to retrieve nimbleCode for discrete spatial capture-recapture models
+#'
+#' @description Creates model code using the \code{\link[nimble]{nimbleCode}} function.
+#'
+#' @param dim_y An integer of either 2 (the default) or that defines what 
+#' dimensional format the encounter history data are in.
+#' @param enc_dist Either \code{"binomial"} or \code{"poisson"}. Default is
+#' \code{"binomial"}.
+#' @param sex_sigma A logical value indicating whether the scaling parameter 
+#' ('sigma') is sex-specific
+#' @param trapsClustered A logical value indicating if traps are clustered in 
+#' arrays across the sampling area.
+#' @return A \code{nimbleCode} object from the \code{nimble} package.
+#' @details This function provides templates that could be copied and easily 
+#' modified to include further model complexity such as covariates explaining 
+#' detection probability. These discrete models include different encounter 
+#' probability distributions and sex-specific scaling parameters for marked
+#' data sets.
+#' @author Daniel Eacker
+#' @examples
+#' # get discrete model for 2D encounter data, binomial encounter distribution, 
+#' # non-sex-specific scaling parameter, and no clustering of traps
+#' discrete_model = get_classic(dim_y = 2,enc_dist = "binomial",
+#'                          sex_sigma = FALSE, trapsClustered = FALSE)
+#'
+#' # inspect model
+#' discrete_model
+#' @name get_discrete
+#' @export
+get_discrete <- function(dim_y, enc_dist = "binomial",
+                        sex_sigma = FALSE, trapsClustered = FALSE){
+    M <- J <- s <- X <- p0 <- sigma <- n0 <- z <- A <- lam0 <- K <- sex <- 
+      nSites <-  site <- pixelWidth <- psi <- prop.habitat <-
+      EN <- alpha0 <- mu <- x0g <- y0g <- probs <-
+      grid <- nPix <- pixArea <- NULL
+  if(dim_y !=2 & dim_y!=3){
+    stop("dim_y must be either 2 or 3")
+  }
+  if(enc_dist != "poisson" & enc_dist != "binomial"){
+    stop("Encounter distribution has to be either binomial or poisson")
+  }
+ if(trapsClustered == FALSE){    
+    if(dim_y == 2){
+      if(enc_dist == "binomial" & sex_sigma  == FALSE){
+        scrcode <- nimble::nimbleCode({
+          for(j in 1:nPix){
+            probs[j] <- mu[j]/EN
+            mu[j] <- exp(alpha0) * pixArea
+          }
+          alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+          EN <- sum(mu[1:nPix]) # expected abundance
+          ED <- log(alpha0) # expected average density
+          psi <- EN/M # derived inclusion prob
+          p0 ~ dunif(0,1) # baseline encounter probability
+          sigma ~ dunif(0, sigma_upper) # scaling parameter
+          for(i in 1:M){
+            z[i]~dbern(psi)
+            s[i] ~ dcat(probs[1:npix])
+            x0g[i] <- grid[s[i],1] # x-coordinate of state-space grid
+            y0g[i] <- grid[s[i],2] # y-coordinate of state-space grid
+            dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1])^2 + (y0g[i]-X[1:J,2])^2)
+            p[i,1:J] <- p0*exp(-dist[i,1:J]^2/(2*sigma^2))
+          } # i individuals
+          # use zeros trick for detected individuals to speed up the computation
+          for(i in 1:n0){
+            for(j in 1:J){
+              y[i,j] ~ dbin(p[i,j],K)
+            } # i individuals
+          } # j traps
+          for(i in (n0+1):M){
+            zeros[i] ~ dbern((1 - prod(1 - p[i,1:J])^K)*z[i])
+          } # i individuals
+          N <- sum(z[1:M])
+          D <- N/A
+        })
+      } else
+        if(enc_dist == "poisson" & sex_sigma  == FALSE){
+          scrcode <- nimble::nimbleCode({
+            for(j in 1:nPix){
+              probs[j] <- mu[j]/EN
+              mu[j] <- exp(alpha0) * pixArea
+            }
+            alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+            EN <- sum(mu[1:nPix]) # expected abundance
+            ED <- log(alpha0) # expected average density  
+            psi <- EN/M # derived inclusion prob
+            lam0 ~ dunif(0,lam0_upper) # baseline encounter probability
+            sigma ~ dunif(0, sigma_upper) # scaling parameter
+            for(i in 1:M){
+             z[i]~dbern(psi)
+             s[i] ~ dcat(probs[1:npix])
+             x0g[i] <- grid[s[i],1] # x-coordinate of state-space grid
+             y0g[i] <- grid[s[i],2] # y-coordinate of state-space grid
+             dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1])^2 + (y0g[i]-X[1:J,2])^2)
+             lam[i,1:J] <- lam0*K*exp(-dist[i,1:J]^2/(2*sigma^2))
+            } # i individuals
+            # use zeros trick for individuals to speed up the computation
+            for(i in 1:n0){
+              for(j in 1:J){
+                y[i,j] ~ dpois(lam[i,j])
+              } # i individuals
+            } # j traps
+            for(i in (n0+1):M){
+              zeros[i] ~ dpois(sum(lam[i,1:J])*z[i])
+            }
+            N <- sum(z[1:M])
+            D <- N/A
+          })
+        }else
+          if(enc_dist == "binomial" & sex_sigma  == TRUE){
+            scrcode <- nimble::nimbleCode({
+             for(j in 1:nPix){
+              probs[j] <- mu[j]/EN
+              mu[j] <- exp(alpha0) * pixArea
+             }
+              alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+              EN <- sum(mu[1:nPix]) # expected abundance
+              ED <- log(alpha0) # expected average density
+              psi <- EN/M # derived inclusion prob
+              p0 ~ dunif(0,1) # baseline encounter probability
+              psi_sex ~ dunif(0,1) # probability sex = 1
+              sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+              sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+              psi ~ dunif(0, 1) # inclusion prob
+              for(i in 1:M){
+               z[i]~dbern(psi)
+               sex[i] ~ dbern(psi_sex)
+               sx[i] <- sex[i] + 1
+               s[i] ~ dcat(probs[1:npix])
+               x0g[i] <- grid[s[i],1] # x-coordinate of state-space grid
+               y0g[i] <- grid[s[i],2] # y-coordinate of state-space grid
+               dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1])^2 + (y0g[i]-X[1:J,2])^2)
+               p[i,1:J] <- p0*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
+              } # i individuals
+              # use zeros trick for individuals to speed up the computation
+              for(i in 1:n0){
+                for(j in 1:J){
+                  y[i,j] ~ dbin(p[i,j],K)
+                } # i individuals
+              } # j traps
+              for(i in (n0+1):M){
+                zeros[i] ~ dbern((1 - prod(1 - p[i,1:J])^K)*z[i])
+              } # i individuals
+              N <- sum(z[1:M])
+              D <- N/A
+            })
+          } else
+            if(enc_dist == "poisson" & sex_sigma  == TRUE){
+              scrcode <- nimble::nimbleCode({
+               for(j in 1:nPix){
+                probs[j] <- mu[j]/EN
+                mu[j] <- exp(alpha0) * pixArea
+               }
+                alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+                EN <- sum(mu[1:nPix]) # expected abundance
+                ED <- log(alpha0) # expected average density
+                psi <- EN/M # derived inclusion prob
+                lam0 ~ dunif(0,lam0_upper) # baseline encounter probability
+                psi_sex ~ dunif(0,1) # probability sex = 1
+                sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+                sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+                for(i in 1:M){
+                  z[i]~dbern(psi)
+                  sex[i] ~ dbern(psi_sex)
+                  sx[i] <- sex[i] + 1
+                  s[i] ~ dcat(probs[1:npix])
+                  x0g[i] <- grid[s[i],1] # x-coordinate of state-space grid
+                  y0g[i] <- grid[s[i],2] # y-coordinate of state-space grid
+                  dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1])^2 + (y0g[i]-X[1:J,2])^2)
+                  lam[i,1:J] <- lam0*K*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
+                } # i individuals
+                # use zeros trick for individuals to speed up the computation
+                for(i in 1:n0){
+                  for(j in 1:J){
+                    y[i,j] ~ dpois(lam[i,j])
+                  } # i individuals
+                } # j traps
+                for(i in (n0+1):M){
+                  zeros[i] ~ dpois(sum(lam[i,1:J])*z[i])
+                }
+                N <- sum(z[1:M])
+                D <- N/A
+              })
+            }
+      return(scrcode)
+    } else    # End 2D models
+      if(dim_y == 3){
+        if(enc_dist == "binomial" & sex_sigma  == FALSE){
+          scrcode <- nimble::nimbleCode({
+            for(j in 1:nPix){
+            probs[j] <- mu[j]/EN
+            mu[j] <- exp(alpha0) * pixArea
+           }
+            alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+            EN <- sum(mu[1:nPix]) # expected abundance
+            ED <- log(alpha0) # expected average density
+            psi <- EN/M # derived inclusion prob
+            p0 ~ dunif(0,1) # baseline encounter probability
+            sigma ~ dunif(0, sigma_upper) # scaling parameter
+            for(i in 1:M){
+              z[i]~dbern(psi)
+              s[i] ~ dcat(probs[1:npix])
+              x0g[i] <- grid[s[i],1] # x-coordinate of state-space grid
+              y0g[i] <- grid[s[i],2] # y-coordinate of state-space grid
+              dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1])^2 + (y0g[i]-X[1:J,2])^2)
+              for(k in 1:K){
+                p[i,1:J,k] <- p0*exp(-dist[i,1:J]^2/(2*sigma^2))
+              }
+            } # i individuals
+            # use zeros trick for individuals to speed up the computation
+            for(i in 1:n0){
+              for(j in 1:J){
+                for(k in 1:K){
+                  y[i,j,k] ~ dbin(p[i,j,k],1)
+                } # k occasions
+              } # j traps
+            } # i individuals
+            for(i in (n0+1):M){
+              zeros[i] ~ dbern((1 - prod(1 - p[i,1:J,1:K]))*z[i])
+            } # i individuals
+            N <- sum(z[1:M])
+            D <- N/A
+          })
+        } else
+          if(enc_dist == "poisson" & sex_sigma  == FALSE){
+            scrcode <- nimble::nimbleCode({
+              for(j in 1:nPix){
+              probs[j] <- mu[j]/EN
+              mu[j] <- exp(alpha0) * pixArea
+             }
+              alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+              EN <- sum(mu[1:nPix]) # expected abundance
+              ED <- log(alpha0) # expected average density
+              psi <- EN/M # derived inclusion prob
+              p0 ~ dunif(0,1) # baseline encounter probability
+              lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
+              sigma ~ dunif(0, sigma_upper) # scaling parameter
+              for(i in 1:M){
+                z[i]~dbern(psi)
+                s[i] ~ dcat(probs[1:npix])
+                x0g[i] <- grid[s[i],1] # x-coordinate of state-space grid
+                y0g[i] <- grid[s[i],2] # y-coordinate of state-space grid
+                dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1])^2 + (y0g[i]-X[1:J,2])^2)
+                for(k in 1:K){
+                  lam[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma^2))
+                } # k occasions
+              } # i individuals
+              # use zeros trick for individuals to speed up the computation
+              for(i in 1:n0){
+                for(j in 1:J){
+                  for(k in 1:K){
+                    y[i,j,k] ~ dpois(lam[i,j,k])
+                  } # occasions
+                } # j traps
+              } # i individuals
+              for(i in (n0+1):M){
+                zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
+              }
+              N <- sum(z[1:M])
+              D <- N/A
+            })
+          }else
+            if(enc_dist == "binomial" & sex_sigma  == TRUE){
+              scrcode <- nimble::nimbleCode({
+                for(j in 1:nPix){
+                probs[j] <- mu[j]/EN
+                mu[j] <- exp(alpha0) * pixArea
+               }
+                alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+                EN <- sum(mu[1:nPix]) # expected abundance
+                ED <- log(alpha0) # expected average density
+                psi <- EN/M # derived inclusion prob
+                p0 ~ dunif(0,1) # baseline encounter probability
+                psi_sex ~ dunif(0,1) # probability sex = 1
+                sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+                sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+                for(i in 1:M){
+                  z[i]~dbern(psi)
+                  sex[i] ~ dbern(psi_sex)
+                  sx[i] <- sex[i] + 1
+                  s[i] ~ dcat(probs[1:npix])
+                  x0g[i] <- grid[s[i],1] # x-coordinate of state-space grid
+                  y0g[i] <- grid[s[i],2] # y-coordinate of state-space grid
+                  dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1])^2 + (y0g[i]-X[1:J,2])^2)
+                  for(k in 1:K){
+                    p[i,1:J,k] <- p0*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
+                  } # k occasions
+                } # i individuals
+                # use zeros trick for individuals to speed up the computation
+                for(i in 1:n0){
+                  for(j in 1:J){
+                    for(k in 1:K){
+                      y[i,j,k] ~ dbin(p[i,j,k],1)
+                    } # k occasions
+                  } # j traps
+                } # i individuals
+                for(i in (n0+1):M){
+                  zeros[i] ~ dbern((1 - prod(1 - p[i,1:J,1:K]))*z[i])
+                } # i individuals
+                N <- sum(z[1:M])
+                D <- N/A
+              })
+            } else
+              if(enc_dist == "poisson" & sex_sigma  == TRUE){
+                scrcode <- nimble::nimbleCode({
+                  for(j in 1:nPix){
+                  probs[j] <- mu[j]/EN
+                  mu[j] <- exp(alpha0) * pixArea
+                 }
+                  alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+                  EN <- sum(mu[1:nPix]) # expected abundance
+                  ED <- log(alpha0) # expected average density
+                  psi <- EN/M # derived inclusion prob
+                  lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
+                  psi_sex ~ dunif(0,1) # probability sex = 1
+                  sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+                  sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+                for(i in 1:M){
+                  z[i]~dbern(psi)
+                  sex[i] ~ dbern(psi_sex)
+                  sx[i] <- sex[i] + 1
+                  s[i] ~ dcat(probs[1:npix])
+                  x0g[i] <- grid[s[i],1] # x-coordinate of state-space grid
+                  y0g[i] <- grid[s[i],2] # y-coordinate of state-space grid
+                  dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1])^2 + (y0g[i]-X[1:J,2])^2)
+                   for(k in 1:K){
+                    lam[i,1:J,k] <- lam0*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
+                    } # k occasions
+                  } # i marked individuals
+        # use zeros trick for marked individuals to speed up the computation
+                  for(i in 1:n0){
+                    for(j in 1:J){
+                      for(k in 1:K){
+                        y[i,j,k] ~ dpois(lam[i,j,k])
+                      } # occasions
+                    } # j traps
+                  } # i individuals
+                  for(i in (n0+1):M){
+                    zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
+                  }
+                  N <- sum(z[1:M])
+                  D <- N/A
+                })
+              }
+        return(scrcode)
+      }  # End 3D models
+ }else # trapsClustered 
+ if(trapsClustered){
+  if(dim_y == 2){
+   if(enc_dist == "binomial" & sex_sigma  == FALSE){
+      scrcode <- nimble::nimbleCode({
+      alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+      EN <- sum(EN_site[1:nSites])
+      ED <- log(alpha0) # expected average density
+      psi <- EN/M # derived inclusion prob 
+     for(g in 1:nSites){  
+      EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
+      for(j in 1:nPix[g]){
+      probs[j,g] <- mu[j,g]/EN
+      mu[j,g] <- exp(alpha0) * pixArea
+     } # j pixels
+      p0[g] ~ dunif(0,1) # baseline encounter probability
+    } # g sites
+     sigma ~ dunif(0, sigma_upper) # scaling parameter
+ for(i in 1:M){
+  z[i]~dbern(psi)
+  s[i] ~ dcat(probs[1:npix[site[i]],site[i]])
+  x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
+  y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid
+  dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
+  p[i,1:J] <- p0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma^2))
+  } # i individuals
+  # use zeros trick for individuals to speed up the computation
+  for(i in 1:n0){
+    for(j in 1:J){
+       y[i,j] ~ dbin(p[i,j],K)
+    } # j traps
+  } # i individuals
+  for(i in (n0+1):M){
+    zeros[i] ~ dbern((1 - prod(1 - p[i,1:J])^K)*z[i])
+  } # i individuals
+    N <- sum(z[1:M])
+    D <- N/A
+    })
+ } else
+ if(enc_dist == "poisson" & sex_sigma  == FALSE){
+   scrcode <- nimble::nimbleCode({
+      alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+      EN <- sum(EN_site[1:nSites])
+      ED <- log(alpha0) # expected average density
+      psi <- EN/M # derived inclusion prob 
+     for(g in 1:nSites){  
+      EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
+      for(j in 1:nPix[g]){
+      probs[j,g] <- mu[j,g]/EN
+      mu[j,g] <- exp(alpha0) * pixArea
+     } # j pixels
+    lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
+  } # g sites
+    sigma ~ dunif(0, sigma_upper) # scaling parameter
+  for(i in 1:M){
+   z[i]~dbern(psi)
+   s[i] ~ dcat(probs[1:npix[site[i]],site[i]])
+   x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
+   y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid
+   dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
+   lam[i,1:J] <- lam0[site[i]]*K*exp(-dist[i,1:J]^2/(2*sigma^2))
+  } # i individuals
+  # use zeros trick for individuals to speed up the computation
+  for(i in 1:n0){
+    for(j in 1:J){
+        y[i,j] ~ dpois(lam[i,j])
+    } # j traps
+  } # i individuals
+  for(i in (n0+1):M){
+    zeros[i] ~ dpois(sum(lam[i,1:J])*z[i])
+  } # individuals
+  N <- sum(z[1:M])
+  D <- N/A
+  })
+}else
+if(enc_dist == "binomial" & sex_sigma  == TRUE){
+ scrcode <- nimble::nimbleCode({
+      alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+      EN <- sum(EN_site[1:nSites])
+      ED <- log(alpha0) # expected average density
+      psi <- EN/M # derived inclusion prob 
+     for(g in 1:nSites){  
+      EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
+      for(j in 1:nPix[g]){
+      probs[j,g] <- mu[j,g]/EN
+      mu[j,g] <- exp(alpha0) * pixArea
+     } # j pixels
+      p0[g] ~ dunif(0,1) # baseline encounter probability
+    } # g sites
+    psi_sex ~ dunif(0,1) # probability sex = 1
+    sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+    sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+ for(i in 1:M){
+  z[i]~dbern(psi)
+  sex[i] ~ dbern(psi_sex)
+  sx[i] <- sex[i] + 1
+   s[i] ~ dcat(probs[1:npix[site[i]],site[i]])
+   x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
+   y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid
+   dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
+  p[i,1:J] <- p0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
+  } # i individuals
+  # use zeros trick for individuals to speed up the computation
+ for(i in 1:n0){
+  for(j in 1:J){
+   y[i,j] ~ dbin(p[i,j],K)
+  } # j traps
+ } # i individuals
+ for(i in (n0+1):M){
+  zeros[i] ~ dbern((1 - prod(1 - p[i,1:J])^K)*z[i])
+ } # i individuals
+  N <- sum(z[1:M])
+  D <- N/A
+ })
+} else
+ if(enc_dist == "poisson" & sex_sigma  == TRUE){
+  scrcode <- nimble::nimbleCode({
+      alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+      EN <- sum(EN_site[1:nSites])
+      ED <- log(alpha0) # expected average density
+      psi <- EN/M # derived inclusion prob 
+     for(g in 1:nSites){  
+      EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
+      for(j in 1:nPix[g]){
+      probs[j,g] <- mu[j,g]/EN
+      mu[j,g] <- exp(alpha0) * pixArea
+     } # j pixels
+    lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
+  } # g sites
+   psi_sex ~ dunif(0,1) # probability sex = 1
+   sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+   sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+   psi ~ dunif(0, 1) # inclusion prob
+  for(i in 1:M){
+   z[i]~dbern(psi)
+   sex[i] ~ dbern(psi_sex)
+   sx[i] <- sex[i] + 1
+   s[i] ~ dcat(probs[1:npix[site[i]],site[i]])
+   x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
+   y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid
+   dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
+   lam[i,1:J,k] <- lam0[site[i]]*K*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
+  } # i marked individuals
+ # use zeros trick for marked individuals to speed up the computation
+  for(i in 1:n0){
+    for(j in 1:J){
+      y[i,j] ~ dpois(lam[i,j])
+    } # j traps
+  } # i individuals
+  for(i in (n0+1):M){
+     zeros[i] ~ dpois(sum(lam[i,1:J])*z[i])
+  } # individuals
+    N <- sum(z[1:M])
+    D <- N/A
+  })
+}
+  return(scrcode)
+} else  # End 2D models
+if(dim_y == 3){
+  if(enc_dist == "binomial" & sex_sigma  == FALSE){
+scrcode <- nimble::nimbleCode({
+sigma ~ dunif(0, sigma_upper) # scaling parameter
+alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+EN <- sum(EN_site[1:nSites])
+ED <- log(alpha0) # expected average density
+psi <- EN/M # derived inclusion prob 
+for(g in 1:nSites){  
+EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
+for(j in 1:nPix[g]){
+probs[j,g] <- mu[j,g]/EN
+mu[j,g] <- exp(alpha0) * pixArea
+} # j pixels
+p0[g] ~ dunif(0,1) # baseline encounter probability
+} # g sites
+for(i in 1:M){
+z[i]~dbern(psi)
+s[i] ~ dcat(probs[1:npix[site[i]],site[i]])
+x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
+y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid
+dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
+for(k in 1:K){
+  p[i,1:J,k] <- p0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma^2))
+}
+} # i individuals
+# use zeros trick for marked individuals to speed up the computation
+for(i in 1:n0){
+  for(j in 1:J){
+    for(k in 1:K){
+      y[i,j,k] ~ dbin(p[i,j,k],1)
+    } # k occasions
+  } # j traps
+} # i individuals
+for(i in (n0+1):M){
+zeros[i] ~ dbern((1 - prod(1 - p[i,1:J,1:K]))*z[i])
+} # i individuals
+N <- sum(z[1:M])
+D <- N/A
+})
+} else
+if(enc_dist == "poisson" & sex_sigma  == FALSE){
+scrcode <- nimble::nimbleCode({
+sigma ~ dunif(0, sigma_upper) # scaling parameter
+alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+EN <- sum(EN_site[1:nSites])
+ED <- log(alpha0) # expected average density
+psi <- EN/M # derived inclusion prob 
+for(g in 1:nSites){  
+EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
+for(j in 1:nPix[g]){
+probs[j,g] <- mu[j,g]/EN
+mu[j,g] <- exp(alpha0) * pixArea
+} # j pixels
+lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
+} # g sites
+for(i in 1:M){
+  z[i]~dbern(psi)
+  s[i] ~ dcat(probs[1:npix[site[i]],site[i]])
+  x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
+  y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid 
+  dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
+  for(k in 1:K){
+    lam[i,1:J,k] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma^2))
+  } # k occasions
+} # i individuals
+# use zeros trick for marked individuals to speed up the computation
+  for(i in 1:n0){
+    for(j in 1:J){
+      for(k in 1:K){
+        y[i,j,k] ~ dpois(lam[i,j,k])
+      } # occasions
+    } # j traps
+  } # i individuals
+ for(i in (n0+1):M){
+  zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
+ } # i individuals
+N <- sum(z[1:M])
+D <- N/A
+})
+}else
+if(enc_dist == "binomial" & sex_sigma  == TRUE){
+scrcode <- nimble::nimbleCode({
+  psi_sex ~ dunif(0,1) # probability sex = 1
+  sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+  sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+  alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+  EN <- sum(EN_site[1:nSites])
+  ED <- log(alpha0) # expected average density
+  psi <- EN/M # derived inclusion prob 
+  for(g in 1:nSites){  
+  EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
+  for(j in 1:nPix[g]){
+  probs[j,g] <- mu[j,g]/EN
+  mu[j,g] <- exp(alpha0) * pixArea
+  } # j pixels
+  p0[g] ~ dunif(0,1) # baseline encounter probability
+  } # g sites
+  for(i in 1:M){
+    z[i]~dbern(psi)
+    sex[i] ~ dbern(psi_sex)
+    sx[i] <- sex[i] + 1
+    s[i] ~ dcat(probs[1:npix[site[i]],site[i]])
+    x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
+    y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid 
+    dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
+    for(k in 1:K){
+      p[i,1:J,k] <- p0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
+    } # k occasions
+  } # i marked individuals
+  # use zeros trick for marked individuals to speed up the computation
+    for(i in 1:n0){
+      for(j in 1:J){
+        for(k in 1:K){
+          y[i,j,k] ~ dbin(p[i,j,k],1)
+        } # k occasions
+      } # j traps
+    } # i individuals
+   for(i in (n0+1):M){
+    zeros[i] ~ dbern((1 - prod(1 - p[i,1:J,1:K]))*z[i])
+   } # i individuals
+  N <- sum(z[1:M])
+  D <- N/A
+})
+} else
+if(enc_dist == "poisson" & sex_sigma  == TRUE){
+  scrcode <- nimble::nimbleCode({
+alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+EN <- sum(EN_site[1:nSites])
+ED <- log(alpha0) # expected average density
+psi <- EN/M # derived inclusion prob 
+for(g in 1:nSites){  
+EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
+for(j in 1:nPix[g]){
+probs[j,g] <- mu[j,g]/EN
+mu[j,g] <- exp(alpha0) * pixArea
+} # j pixels
+lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
+} # g sites
+psi_sex ~ dunif(0,1) # probability sex = 1
+sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
+sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
+for(i in 1:M){
+  z[i]~dbern(psi)
+  sex[i] ~ dbern(psi_sex)
+  sx[i] <- sex[i] + 1
+  s[i] ~ dcat(probs[1:npix[site[i]],site[i]])
+  x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
+  y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid 
+  dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
+  for(k in 1:K){
+    lam[i,1:J,k] <- lam0[site[i]]*exp(-dist[i,1:J]^2/(2*sigma[sx[i]]^2))
+  } # k occasions
+} # i individuals
+    # use zeros trick for marked individuals to speed up the computation
+      for(i in 1:n0){
+        for(j in 1:J){
+          for(k in 1:K){
+            y[i,j,k] ~ dpois(lam[i,j,k])
+          } # occasions
+        } # j traps
+      } # i individuals
+     for(i in (n0+1):M){
+      zeros[i] ~ dpois(sum(lam[i,1:J,1:K])*z[i])
+     } # i individuals
+    N <- sum(z[1:M])
+    D <- N/A
+  })
+}
+return(scrcode)
+} # end 3D model
+} # end trapsClustered
+} # End function 'get_discrete"

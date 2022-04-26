@@ -3,6 +3,7 @@
 export(customize_model)
 export(discretize_classic)
 export(get_classic)
+export(get_discrete)
 export(get_unmarked)
 export(grid_classic)
 export(initialize_classic)
