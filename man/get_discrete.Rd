@@ -17,7 +17,8 @@ get_discrete(
 (the default) or \code{"unmarked"} data sources.}
 
 \item{dim_y}{An integer of either 2 (the default) or that defines what 
-dimensional format the encounter history data are in.}
+dimensional format the encounter history data are in. Note that this input
+is not used when \code{type = "unmarked"}.}
 
 \item{enc_dist}{Either \code{"binomial"} or \code{"poisson"}. Default is
 \code{"binomial"}.}

@@ -3463,6 +3463,7 @@ discretize_classic <- function(X = traps, grid, s.st = s.st,
 } # End 'discretize_classic' function
 
 
+
 #' Function to retrieve nimbleCode for discrete spatial capture-recapture models
 #'
 #' @description Creates model code using the \code{\link[nimble]{nimbleCode}} 
@@ -3471,7 +3472,8 @@ discretize_classic <- function(X = traps, grid, s.st = s.st,
 #' @param type Specifies the type of discrete model for either \code{"marked"}
 #' (the default) or \code{"unmarked"} data sources.
 #' @param dim_y An integer of either 2 (the default) or that defines what 
-#' dimensional format the encounter history data are in.
+#' dimensional format the encounter history data are in. Note that this input
+#' is not used when \code{type = "unmarked"}. 
 #' @param enc_dist Either \code{"binomial"} or \code{"poisson"}. Default is
 #' \code{"binomial"}.
 #' @param sex_sigma A logical value indicating whether the scaling parameter 
