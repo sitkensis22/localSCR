@@ -3315,3 +3315,147 @@ return(scrcode)
     } # end models with hab_mask
   } # end trapsClustered
 } # End function 'get_unmarked"
+
+
+
+#' Function to discretize traps and initial activity centers
+#'
+#' @description Convert traps and initial activity center locations to 
+#' prepare for using in discrete SCR model. 
+#'
+#' @param X Either a matrix or array representing the coordinates of traps in
+#' UTMs. An array is used when traps are clustered over a survey area.
+#' @param grid A matrix or array object of the the state-space grid. This is 
+#' returned from \code{\link{grid_classic}}.
+#' @param s.st A matrix of starting activity center coordinates. This is 
+#' returned from \code{\link{initialize_classic}}
+#' @param crs_ The UTM coordinate reference system (EPSG code) used for your
+#' location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).
+#' @param site Either \code{NULL} (if a 2D trap array is used) or a vector of 
+#' integers denoting which trap array an individual (either detected or 
+#' augmented) belongs to. Note that \code{site} is provided from 
+#' \code{\link{sim_classic}} when a 3D trap array is used. However, this
+#'  \code{site} variable must be correctly augmented based on the total 
+#'  augmented population size (i.e., \code{M}).
+#' @param hab_mask Either \code{NULL} (the default) or a matrix or array output
+#'  from \code{\link{mask_polygon}} or \code{\link{mask_raster}} functions.
+#' @return A list of discretized traps as a matrix or array \code{X} and indices
+#' for initial activity center locations. Note that the latter relates
+#' to the rows of \code{grid} provided as an input.
+#' @details This function prepares the trap coordinates and initial activity
+#' center coordinates for use in a discrete spatial capture-recapture model. 
+#' @importFrom purrr map
+#' @author Daniel Eacker
+#' @examples
+#' # simulate a single trap array with random positional noise
+#' x <- seq(-800, 800, length.out = 5)
+#' y <- seq(-800, 800, length.out = 5)
+#' traps <- as.matrix(expand.grid(x = x, y = y))
+#' set.seed(200)
+#' traps <- traps + runif(prod(dim(traps)),-20,20) 
+#' 
+#' mysigma = 300 # simulate sigma of 300 m
+#' mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
+#'
+#' # create state-space
+#' Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = 100)
+#' 
+#' # get discretized traps and initial activity center grid indices
+#' discrete_list <- discretize_classic_t(X = traps, grid=Grid$grid, 
+#'                      s.st = s.st, crs_= mycrs,site=site,hab_mask=NULL)
+#' 
+#' str(discretize_list)
+#' @name discretize_classic
+#' @export
+discretize_classic <- function(X = traps, grid, s.st = s.st, 
+                               crs_,site,hab_mask=NULL){
+   # need to determine if X is 2 or 3 dimensional (stop if not)
+   if(length(dim(X))!=2 & length(dim(X))!=3){
+    stop("Trapping grid must be only 2 or 3 dimensions")
+   }
+  # for dim of length 2
+  if(length(dim(X))==2){
+   if(is.null(hab_mask)){
+   # 1) discretize traps (snap to grid)
+   X_dist <- sf::st_distance(sf::st_cast(sf::st_sfc(sf::st_multipoint(X),crs =  crs_),"POINT"),
+          sf::st_cast(sf::st_sfc(sf::st_multipoint(grid),crs =  crs_),"POINT"))
+    # just take the first trap (unless it's already represented)
+   grid_index <- unlist(lapply(apply(X_dist, 1, function(x) which(x==min(x))),function(x) x[1]))
+   # just take the first trap (unless it's already represented)
+   X_discrete <- grid[grid_index,]
+   # 2) discrete starting activity center locations
+   s.st_dist <- sf::st_distance(sf::st_cast(sf::st_sfc(sf::st_multipoint(s.st),crs =  crs_),"POINT"),
+          sf::st_cast(sf::st_sfc(sf::st_multipoint(grid),crs =  crs_),"POINT"))
+    # get the cell indices; just take the first trap (unless it's already represented)
+   s.st_discrete <- unlist(lapply(apply(s.st_dist, 1, function(x) which(x==min(x))),function(x) x[1]))
+  }else
+   # with habitat mask
+   if(isFALSE(is.null(hab_mask))){
+   # first remove grid rows that are unsuitable
+     hab_vec <-  as.vector(t(apply(hab_mask,2,rev)))
+     grid <- grid[which(hab_vec==1),]
+        X_dist <- sf::st_distance(sf::st_cast(sf::st_sfc(sf::st_multipoint(X),crs =  crs_),"POINT"),
+          sf::st_cast(sf::st_sfc(sf::st_multipoint(grid),crs =  crs_),"POINT"))
+    # just take the first trap (unless it's already represented)
+   grid_index <- unlist(lapply(apply(X_dist, 1, function(x) which(x==min(x))),function(x) x[1]))
+   # just take the first trap (unless it's already represented)
+   X_discrete <- grid[grid_index,]
+   # 2) discrete starting activity center locations
+   s.st_dist <- sf::st_distance(sf::st_cast(sf::st_sfc(sf::st_multipoint(s.st),crs =  crs_),"POINT"),
+          sf::st_cast(sf::st_sfc(sf::st_multipoint(grid),crs =  crs_),"POINT"))
+    # get the cell indicies; just take the first trap (unless it's already represented)
+   s.st_discrete <- unlist(lapply(apply(s.st_dist, 1, function(x) which(x==min(x))),function(x) x[1]))
+   } # end hab_mask
+  }else # end dimension 2
+   # for dim of length 2
+  if(length(dim(X))==3){ 
+       if(length(site)!=nrow(s.st)){
+       stop("Include 'site' variable with length equal to number of rows of s.st")
+       }
+    if(is.null(hab_mask)){
+      multi2singlePoint <- function(x)(sf::st_cast(sf::st_sfc(sf::st_multipoint(x),crs =  crs_),"POINT"))
+      # first get discretized trap coordinates
+      Xlist <- purrr::map(apply(X, 3, function(x) list(x)[[1]], simplify = FALSE),multi2singlePoint)
+      gridlist <- purrr::map(apply(grid, 3, function(x) list(x)[[1]], simplify = FALSE),multi2singlePoint)
+      X_dist <- array(mapply(sf::st_distance, Xlist, gridlist),dim=c(length(Xlist[[1]]),
+                          length(gridlist[[1]]),length(Xlist)))
+      X_dist2 <- apply(X_dist,c(1,3),function(x) which(x==min(x))[1])
+      Xlist_index <- lapply(apply(X_dist2, 2,function(x) list(x)),function(x) x[[1]])
+      gridlist_index <- lapply(gridlist, sf::st_coordinates)
+      X_discrete <- array(mapply(function(x,y){y[x,]},Xlist_index,gridlist_index),
+                          dim=c(length(Xlist[[1]]),2,length(Xlist)))
+      # now discretize starting activity center locations
+      s.st_dist <- array(mapply(sf::st_distance, list(multi2singlePoint(s.st)), gridlist),
+                         dim=c(nrow(s.st),length(gridlist[[1]]),length(Xlist)))
+      s.st_dist2 <- apply(s.st_dist,c(1,3),function(x) which(x==min(x))[1])
+      s.st_discrete <- numeric(nrow(s.st))
+      for(i in 1:nrow(s.st)){
+        s.st_discrete[i] <- s.st_dist2[site[i]][[1]][i]
+      }
+     }else  
+     # with habitat mask
+     if(isFALSE(is.null(hab_mask))){    
+        hab_vec <-  apply(hab_mask, 3, function(x) as.vector(t(apply(x,2,rev))))
+        hab_vec <- apply(hab_vec, 2, function(x) list(x)[[1]], simplify = FALSE)
+        gridlist1 <- apply(grid, 3, function(x) list(x)[[1]], simplify = FALSE)
+        gridlist2 <- mapply(function(x,y){y[which(x==1),]},hab_vec,gridlist1)
+             multi2singlePoint <- function(x)(sf::st_cast(sf::st_sfc(sf::st_multipoint(x),crs =  crs_),"POINT"))
+      # first get discretized trap coordinates
+      Xlist <- purrr::map(apply(X, 3, function(x) list(x)[[1]], simplify = FALSE),multi2singlePoint)
+      gridlist <- lapply(gridlist2, multi2singlePoint)
+      X_dist <- mapply(sf::st_distance, Xlist, gridlist)
+      Xlist_index <- lapply(X_dist,function(x) apply(x, 1,function(y) which(y==min(y))[1]))
+      gridlist_index <- lapply(gridlist, sf::st_coordinates)
+      X_discrete <- array(mapply(function(x,y){y[x,]},Xlist_index,gridlist_index),
+                          dim=c(length(Xlist[[1]]),2,length(Xlist)))
+      # now discretize starting activity center locations
+      s.st_dist <- mapply(sf::st_distance, list(multi2singlePoint(s.st)), gridlist)
+      s.st_dist2 <- lapply(s.st_dist, function(x) apply(x, 1, function(y) which(y==min(y))[1]))
+      s.st_discrete <- numeric(nrow(s.st))
+      for(i in 1:nrow(s.st)){
+        s.st_discrete[i] <- s.st_dist2[site[i]][[1]][i]
+      }
+     } # end habitat mask
+  } # end dimension 3
+     return(list(X=X_discrete,s.st=s.st_discrete))
+} # End 'discretize_classic' function
