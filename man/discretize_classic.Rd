@@ -40,7 +40,9 @@ prepare for using in discrete SCR model.
 }
 \details{
 This function prepares the trap coordinates and initial activity
-center coordinates for use in a discrete spatial capture-recapture model.
+center coordinates for use in a discrete spatial capture-recapture model. Note
+that the number of rows in the state-space grid coordinate matrix will be 
+reduced and this object will need to be adjusted before being used in the model.
 }
 \examples{
 # simulate a single trap array with random positional noise

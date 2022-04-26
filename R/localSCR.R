@@ -3343,7 +3343,9 @@ return(scrcode)
 #' for initial activity center locations. Note that the latter relates
 #' to the rows of \code{grid} provided as an input.
 #' @details This function prepares the trap coordinates and initial activity
-#' center coordinates for use in a discrete spatial capture-recapture model. 
+#' center coordinates for use in a discrete spatial capture-recapture model. Note
+#' that the number of rows in the state-space grid coordinate matrix will be 
+#' reduced and this object will need to be adjusted before being used in the model.
 #' @importFrom purrr map
 #' @author Daniel Eacker
 #' @examples
