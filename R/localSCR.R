@@ -3465,8 +3465,11 @@ discretize_classic <- function(X = traps, grid, s.st = s.st,
 
 #' Function to retrieve nimbleCode for discrete spatial capture-recapture models
 #'
-#' @description Creates model code using the \code{\link[nimble]{nimbleCode}} function.
+#' @description Creates model code using the \code{\link[nimble]{nimbleCode}} 
+#' function.
 #'
+#' @param type Specifies the type of discrete model for either \code{"marked"}
+#' (the default) or \code{"unmarked"} data sources.
 #' @param dim_y An integer of either 2 (the default) or that defines what 
 #' dimensional format the encounter history data are in.
 #' @param enc_dist Either \code{"binomial"} or \code{"poisson"}. Default is
@@ -3479,31 +3482,43 @@ discretize_classic <- function(X = traps, grid, s.st = s.st,
 #' @details This function provides templates that could be copied and easily 
 #' modified to include further model complexity such as covariates explaining 
 #' detection probability. These discrete models include different encounter 
-#' probability distributions and sex-specific scaling parameters for marked
-#' data sets.
+#' probability distributions and sex-specific scaling parameters for marked and
+#' unmarked data sets.
 #' @author Daniel Eacker
 #' @examples
-#' # get discrete model for 2D encounter data, binomial encounter distribution, 
-#' # non-sex-specific scaling parameter, and no clustering of traps
-#' discrete_model = get_discrete(dim_y = 2,enc_dist = "binomial",
+#' # get discrete model for 2D marked encounter data, binomial encounter 
+#' # distribution, non-sex-specific scaling parameter, and no clustering of traps
+#' discrete_model_m = get_discrete(type="marked", dim_y = 2,enc_dist = "binomial",
+#'                       sex_sigma = FALSE, trapsClustered = FALSE)
+#'
+#' # inspect model
+#' discrete_model_m
+#' 
+#' # get discrete model for unmarked encounter data, binomial encounter 
+#' # distribution, non-sex-specific scaling parameter, and no clustering of traps
+#' discrete_model_u = get_classic(type="unmarked",enc_dist = "binomial",
 #'                          sex_sigma = FALSE, trapsClustered = FALSE)
 #'
 #' # inspect model
-#' discrete_model
+#' discrete_model_u
 #' @name get_discrete
 #' @export
-get_discrete <- function(dim_y, enc_dist = "binomial",
+get_discrete <- function(type = "marked", dim_y, enc_dist = "binomial",
                         sex_sigma = FALSE, trapsClustered = FALSE){
-    M <- J <- s <- X <- p0 <- sigma <- n0 <- z <- A <- lam0 <- K <- sex <- 
-      nSites <-  site <- pixelWidth <- psi <- prop.habitat <-
-      EN <- alpha0 <- mu <- x0g <- y0g <- probs <-
-      grid <- nPix <- pixArea <- NULL
+           M <- J <- s <- X <- p0 <- sigma <- n0 <- z <- 
+           A <- lam0 <- K <- sex <- 
+           nSites <-  site <- pixelWidth <- psi <- prop.habitat <-
+           EN <- ED <- alpha0 <- mu <- x0g <- y0g <- probs <-
+           grid <- nPix <- pixArea <- x0gu <- y0gu <- 
+           m <- su <- s <- zu <-  psiu <-  
+           site_indexL <-  site_indexU <- NULL
   if(dim_y !=2 & dim_y!=3){
     stop("dim_y must be either 2 or 3")
   }
   if(enc_dist != "poisson" & enc_dist != "binomial"){
     stop("Encounter distribution has to be either binomial or poisson")
   }
+if(type=="marked"){    
  if(trapsClustered == FALSE){    
     if(dim_y == 2){
       if(enc_dist == "binomial" & sex_sigma  == FALSE){
@@ -4139,4 +4154,153 @@ for(i in 1:M){
 return(scrcode)
 } # end 3D model
 } # end trapsClustered
+}else # end marked models
+if(type == "unmarked"){
+ if(trapsClustered == FALSE){    
+    if(isFALSE(occ_specific)){
+          scrcode <- nimble::nimbleCode({
+            for(j in 1:nPix){
+              probs[j] <- mu[j]/EN
+              mu[j] <- exp(alpha0) * pixArea
+            }
+            alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+            EN <- sum(mu[1:nPix]) # expected abundance
+            ED <- log(alpha0) # expected average density  
+            psiu <- EN/m # derived inclusion prob
+            lam0 ~ dunif(0,lam0_upper) # baseline encounter probability
+            sigma ~ dunif(0, sigma_upper) # scaling parameter
+            for(i in 1:m){ 
+             zu[i]~dbern(psiu)
+             su[i] ~ dcat(probs[1:npix])
+             x0gu[i] <- grid[su[i],1] # x-coordinate of state-space grid
+             y0gu[i] <- grid[su[i],2] # y-coordinate of state-space grid
+             distu[i,1:J] <- sqrt((x0gu[i]-X[1:J,1])^2 + (y0gu[i]-X[1:J,2])^2)
+             lamu[i,1:J] <- lam0*exp(-distu[i,1:J]^2/(2*sigma^2))*zu[i]
+            } # i individuals
+            # unmarked spatial count model likelihood
+            for(j in 1:J){
+              bigLambda[j] <- sum(lamu[1:m,j])
+            for(k in 1:K){
+              n[j,k] ~ dpois(bigLambda[j])
+            } # k occasions
+           } # j traps
+            N <- sum(zu[1:m])
+            D <- N/A
+          })
+      return(scrcode)
+    } else    # End occ_specific = FALSE
+      if(isFALSE(occ_specific)==FALSE){
+            scrcode <- nimble::nimbleCode({
+            for(j in 1:nPix){
+              probs[j] <- mu[j]/EN
+              mu[j] <- exp(alpha0) * pixArea
+            }
+            alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+            EN <- sum(mu[1:nPix]) # expected abundance
+            ED <- log(alpha0) # expected average density  
+            psiu <- EN/m # derived inclusion prob
+            lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
+            sigma ~ dunif(0, sigma_upper) # scaling parameter
+            for(i in 1:m){
+               zu[i]~dbern(psiu)
+               su[i] ~ dcat(probs[1:npix])
+               x0gu[i] <- grid[su[i],1] # x-coordinate of state-space grid
+               y0gu[i] <- grid[su[i],2] # y-coordinate of state-space grid
+               distu[i,1:J] <- sqrt((x0gu[i]-X[1:J,1])^2 + (y0gu[i]-X[1:J,2])^2)
+              for(k in 1:K){
+                  lamu[i,1:J,k] <- lam0*exp(-distu[i,1:J]^2/(2*sigma^2))*zu[i]
+              } # k occasions
+            } # i individuals
+              # unmarked spatial count model likelihood
+              for(j in 1:J){
+                bigLambda[j] <- sum(lamu[1:m,j,1:K]) 
+              for(k in 1:K){
+                n[j,k] ~ dpois(bigLambda[j])
+               } # k occasions
+              } # j traps
+              N <- sum(zu[1:m])
+              D <- N/A
+            })
+        return(scrcode)
+      } # end occasion-specific
+ }else # end trapsClustered == FALSE
+ if(trapsClustered){
+ if(isFALSE(occ_specific)){
+   scrcode <- nimble::nimbleCode({
+      alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+      EN <- sum(EN_site[1:nSites])
+      ED <- log(alpha0) # expected average density
+      psiu <- EN/m # derived inclusion prob 
+     for(g in 1:nSites){  
+      EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
+      for(j in 1:nPix[g]){
+      probs[j,g] <- mu[j,g]/EN
+      mu[j,g] <- exp(alpha0) * pixArea
+     } # j pixels
+      lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
+  } # g sites
+    sigma ~ dunif(0, sigma_upper) # scaling parameter
+  for(i in 1:m){
+ zu[i]~dbern(psiu)
+ su[i] ~ dcat(probs[1:npix[site[i]],site[i]])
+ x0gu[i] <- grid[su[i],1,site[i]] # x-coordinate of state-space grid
+ y0gu[i] <- grid[su[i],2,site[i]] # y-coordinate of state-space grid 
+ distu[i,1:J] <- sqrt((x0gu[i]-X[1:J,1,site[i]])^2 + (y0gu[i]-X[1:J,2,site[i]])^2)
+ lamu[i,1:J] <- lam0[site[i]]*exp(-distu[i,1:J]^2/(2*sigma^2))*zu[i]
+  } # i individuals
+  # unmarked spatial count model likelihood
+  for(g in 1:nSites){
+  for(j in 1:J){
+    bigLambda[j,g] <- sum(lamu[site_indexL[g]:site_indexU[g],j]) 
+  for(k in 1:K){
+    n[j,k,g] ~ dpois(bigLambda[j,g])
+   } # k occasions
+  } # j traps
+  } # g sites
+  N <- sum(zu[1:m])
+  D <- N/A
+  })
+  return(scrcode)
+} else # end occasion-specific == FALSE
+if(isFALSE(occ_specific)==FALSE){ # occasion-specific models
+scrcode <- nimble::nimbleCode({
+sigma ~ dunif(0, sigma_upper) # scaling parameter
+alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+EN <- sum(EN_site[1:nSites])
+ED <- log(alpha0) # expected average density
+psiu <- EN/m # derived inclusion prob 
+for(g in 1:nSites){  
+EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
+for(j in 1:nPix[g]){
+probs[j,g] <- mu[j,g]/EN
+mu[j,g] <- exp(alpha0) * pixArea
+} # j pixels
+lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
+} # g sites
+for(i in 1:m){
+ zu[i]~dbern(psiu)
+ su[i] ~ dcat(probs[1:npix[site[i]],site[i]])
+ x0gu[i] <- grid[su[i],1,site[i]] # x-coordinate of state-space grid
+ y0gu[i] <- grid[su[i],2,site[i]] # y-coordinate of state-space grid 
+ distu[i,1:J] <- sqrt((x0gu[i]-X[1:J,1,site[i]])^2 + (y0gu[i]-X[1:J,2,site[i]])^2)
+ for(k in 1:K){
+ lamu[i,1:J,k] <- lam0*exp(-distu[i,1:J]^2/(2*sigma^2))*zu[i]
+  } # k occasions
+} # i marked individuals
+  # unmarked spatial count model likelihood
+  for(g in 1:nSites){
+  for(j in 1:J){
+    bigLambda[j,g] <- sum(lamu[site_indexL[g]:site_indexU[g],j,1:K]) 
+  for(k in 1:K){
+    n[j,k,g] ~ dpois(bigLambda[j,g])
+   } # k occasions
+  } # j traps
+  } # g sites
+ N <- sum(zu[1:m])
+ D <- N/A
+})
+return(scrcode)
+} # end occasion-specific models
+} # end trapsClustered
+} # end unmarked models 
 } # End function 'get_discrete"

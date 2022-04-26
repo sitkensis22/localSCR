@@ -5,6 +5,7 @@
 \title{Function to retrieve nimbleCode for discrete spatial capture-recapture models}
 \usage{
 get_discrete(
+  type = "marked",
   dim_y,
   enc_dist = "binomial",
   sex_sigma = FALSE,
@@ -12,6 +13,9 @@ get_discrete(
 )
 }
 \arguments{
+\item{type}{Specifies the type of discrete model for either \code{"marked"}
+(the default) or \code{"unmarked"} data sources.}
+
 \item{dim_y}{An integer of either 2 (the default) or that defines what 
 dimensional format the encounter history data are in.}
 
@@ -28,23 +32,32 @@ arrays across the sampling area.}
 A \code{nimbleCode} object from the \code{nimble} package.
 }
 \description{
-Creates model code using the \code{\link[nimble]{nimbleCode}} function.
+Creates model code using the \code{\link[nimble]{nimbleCode}} 
+function.
 }
 \details{
 This function provides templates that could be copied and easily 
 modified to include further model complexity such as covariates explaining 
 detection probability. These discrete models include different encounter 
-probability distributions and sex-specific scaling parameters for marked
-data sets.
+probability distributions and sex-specific scaling parameters for marked and
+unmarked data sets.
 }
 \examples{
-# get discrete model for 2D encounter data, binomial encounter distribution, 
-# non-sex-specific scaling parameter, and no clustering of traps
-discrete_model = get_discrete(dim_y = 2,enc_dist = "binomial",
+# get discrete model for 2D marked encounter data, binomial encounter 
+# distribution, non-sex-specific scaling parameter, and no clustering of traps
+discrete_model_m = get_discrete(type="marked", dim_y = 2,enc_dist = "binomial",
+                      sex_sigma = FALSE, trapsClustered = FALSE)
+
+# inspect model
+discrete_model_m
+
+# get discrete model for unmarked encounter data, binomial encounter 
+# distribution, non-sex-specific scaling parameter, and no clustering of traps
+discrete_model_u = get_classic(type="unmarked",enc_dist = "binomial",
                          sex_sigma = FALSE, trapsClustered = FALSE)
 
 # inspect model
-discrete_model
+discrete_model_u
 }
 \author{
 Daniel Eacker
