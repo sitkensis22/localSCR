@@ -1434,7 +1434,7 @@ return(scrcode)
 
 #' Function to generate starting locations for activity centers
 #'
-#' @description Generate a matrix of intial starting locations, possibly accounting 
+#' @description Generate a matrix of initial starting locations, possibly accounting 
 #' for habitat mask.
 #'
 #' @param y Either a matrix or array of encounter history data, possiblity 

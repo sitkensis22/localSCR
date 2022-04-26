@@ -40,7 +40,7 @@ A matrix of initial activity center coordinates with \code{M} rows
 and 2 columns.
 }
 \description{
-Generate a matrix of intial starting locations, possibly accounting 
+Generate a matrix of initial starting locations, possibly accounting 
 for habitat mask.
 }
 \details{
