@@ -4339,3 +4339,45 @@ return(scrcode)
 } # end trapsClustered
 } # end unmarked models 
 } # End function 'get_discrete"
+
+
+
+#' Function to display row indices for model used in 'nimble'  
+#'
+#' @description Prints model created with \code{nimbleCode()}to show row indices. 
+#'
+#' @param model The \code{nimbleCode()} used to define model in \code{nimble} package,
+#' possibly generated from \code{\link{get_classic}} function.
+#' @return A vector of characters with each row representing a line of the model. This
+#' function is meant to help with using \code{\link{customize_model}}.  
+#' @author Daniel Eacker
+#' @examples
+#' # get model
+#' scr_model = get_classic(dim_y = 2, enc_dist = "binomial",sex_sigma = TRUE,
+#' hab_mask=TRUE,trapsClustered = TRUE)
+#' 
+#' print_model(scr_model)
+#' @name print_model
+#' @export 
+print_model <- function(model){
+  # read in main model
+     model_list <- as.list(model)
+     file_list <- list()
+     length_lines <- numeric(length(model_list))
+   for(i in 1:length(model_list)){
+     tmodel <- strsplit(as.character(model[i]),"\n")[[1]]
+     file_list[[i]] <- tempfile(fileext = ".txt")
+     writeLines(tmodel, file_list[[i]])
+     length_lines[i] <- length(readLines(file_list[[i]],encoding="UTF-8"))
+   }
+   main_model <- character(sum(length_lines))
+   for(i in 1:length(model_list)){
+    main_model[which(main_model=="")[1]:ifelse(length_lines[i]==1,(which(main_model=="")[1]),
+                  (which(main_model=="")[1])+length_lines[i]-1)] =
+                  readLines(file_list[[i]],encoding="UTF-8")
+   }
+   main_model[length(main_model)+1] <- "}"
+   main_model[c(1,length(main_model))] <-  c("nimble::nimbleCode({","})") 
+   unlink(unlist(file_list)) # unlink temp files
+   return(main_model)
+} # End function 'print_model'
