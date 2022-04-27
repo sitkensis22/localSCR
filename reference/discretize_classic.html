@@ -133,13 +133,11 @@ reduced and this object will need to be adjusted before being used in the model.
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get initial activity center starting values</span></span>
 <span class="r-in"><span class="va">s.st</span> <span class="op">=</span> <span class="fu"><a href="initialize_classic.html">initialize_classic</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">data3d</span><span class="op">$</span><span class="va">y</span>, M<span class="op">=</span><span class="va">M</span>, X<span class="op">=</span><span class="va">traps</span>, buff <span class="op">=</span> <span class="fl">3</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">mysigma</span><span class="op">)</span>, </span>
-<span class="r-in">                            hab_mask <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">s.st</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in initialize_classic(y = data3d$y, M = M, X = traps, buff = 3 *     max(mysigma), hab_mask = FALSE)$s.st:</span> $ operator is invalid for atomic vectors</span>
+<span class="r-in">                            hab_mask <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get discretized traps and initial activity center grid indices</span></span>
 <span class="r-in"><span class="va">discrete_list</span> <span class="op">&lt;-</span> <span class="fu">discretize_classic</span><span class="op">(</span>X <span class="op">=</span> <span class="va">traps</span>, grid<span class="op">=</span><span class="va">Grid</span><span class="op">$</span><span class="va">grid</span>, </span>
 <span class="r-in">                     s.st <span class="op">=</span> <span class="va">s.st</span>, crs_<span class="op">=</span> <span class="va">mycrs</span>,site<span class="op">=</span><span class="va">site</span>,hab_mask<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in stopifnot(is.numeric(x), is.matrix(x), !anyNA(x)):</span> object 's.st' not found</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">discretize_list</span><span class="op">)</span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in str(discretize_list):</span> object 'discretize_list' not found</span>
