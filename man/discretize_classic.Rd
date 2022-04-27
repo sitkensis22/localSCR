@@ -61,7 +61,7 @@ Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = 100)
 # simulate data for uniform state-space and habitat mask
 data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = mysigma,
 prop_sex = 0.7,  N = 200, K = 4, base_encounter = 0.15, enc_dist = "binomial",
-hab_mask = NULL, setSeed = 100)
+hab_mask = FALSE, setSeed = 100)
 
 # total augmented population size 
 M = 400
