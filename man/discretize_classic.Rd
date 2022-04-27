@@ -59,7 +59,7 @@ mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
 Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = 100)
 
 # get discretized traps and initial activity center grid indices
-discrete_list <- discretize_classic_t(X = traps, grid=Grid$grid, 
+discrete_list <- discretize_classic(X = traps, grid=Grid$grid, 
                      s.st = s.st, crs_= mycrs,site=site,hab_mask=NULL)
 
 str(discretize_list)
