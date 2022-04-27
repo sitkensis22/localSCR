@@ -3521,7 +3521,7 @@ discretize_classic <- function(X, grid, s.st = s.st,
 #' discrete_model_u
 #' @name get_discrete
 #' @export
-get_discrete <- function(type = "marked", dim_y, occ_specific = FALSE,
+get_discrete <- function(type = "marked", dim_y = NULL, occ_specific = FALSE,
                 enc_dist = "binomial",sex_sigma = FALSE, trapsClustered = FALSE){
            M <- J <- s <- X <- p0 <- sigma <- n0 <- z <- 
            A <- lam0 <- K <- sex  <- 

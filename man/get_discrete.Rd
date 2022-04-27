@@ -6,7 +6,7 @@
 \usage{
 get_discrete(
   type = "marked",
-  dim_y,
+  dim_y = NULL,
   occ_specific = FALSE,
   enc_dist = "binomial",
   sex_sigma = FALSE,
