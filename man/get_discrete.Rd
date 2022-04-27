@@ -60,8 +60,8 @@ discrete_model_m
 
 # get discrete model for unmarked encounter data, binomial encounter 
 # distribution, non-sex-specific scaling parameter, and no clustering of traps
-discrete_model_u = get_classic(type="unmarked",enc_dist = "binomial",
-                         sex_sigma = FALSE, trapsClustered = FALSE)
+discrete_model_u = get_discrete(type="unmarked",occ_specific = FALSE,
+           enc_dist = "binomial",sex_sigma = FALSE, trapsClustered = FALSE)
 
 # inspect model
 discrete_model_u
