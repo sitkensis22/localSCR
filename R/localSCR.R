@@ -3636,7 +3636,6 @@ if(type=="marked"){
               psi_sex ~ dunif(0,1) # probability sex = 1
               sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
               sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
-              psi ~ dunif(0, 1) # inclusion prob
               for(i in 1:M){
                z[i]~dbern(psi)
                sex[i] ~ dbern(psi_sex)
@@ -3991,7 +3990,6 @@ if(enc_dist == "binomial" & sex_sigma  == TRUE){
    psi_sex ~ dunif(0,1) # probability sex = 1
    sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
    sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
-   psi ~ dunif(0, 1) # inclusion prob
   for(i in 1:M){
    z[i]~dbern(psi)
    sex[i] ~ dbern(psi_sex)
