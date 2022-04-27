@@ -3530,8 +3530,8 @@ get_discrete <- function(type = "marked", dim_y = NULL, occ_specific = FALSE,
            grid <- nPix <- pixArea <- x0gu <- y0gu <- 
            m <- su <- s <- zu <-  psiu <-  
            site_indexL <-  site_indexU <- NULL
-  if(dim_y !=2 & dim_y!=3){
-    stop("dim_y must be either 2 or 3")
+  if(dim_y !=2 & dim_y!=3 & is.null(dim_y)==FALSE){
+    stop("dim_y must be either 2 or 3 or NULL")
   }
   if(enc_dist != "poisson" & enc_dist != "binomial"){
     stop("Encounter distribution has to be either binomial or poisson")
