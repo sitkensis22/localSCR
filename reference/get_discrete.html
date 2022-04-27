@@ -65,6 +65,7 @@ function.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_discrete</span><span class="op">(</span>
   type <span class="op">=</span> <span class="st">"marked"</span>,
   <span class="va">dim_y</span>,
+  occ_specific <span class="op">=</span> <span class="cn">FALSE</span>,
   enc_dist <span class="op">=</span> <span class="st">"binomial"</span>,
   sex_sigma <span class="op">=</span> <span class="cn">FALSE</span>,
   trapsClustered <span class="op">=</span> <span class="cn">FALSE</span>
@@ -80,6 +81,11 @@ function.</p>
 <dd><p>An integer of either 2 (the default) or that defines what 
 dimensional format the encounter history data are in. Note that this input
 is not used when <code>type = "unmarked"</code>.</p></dd>
+<dt>occ_specific</dt>
+<dd><p>Logical. If <code>FALSE</code>, the encounter rate will
+not include an occasion-specific loop in the detection function; otherwise, 
+the model will include a for loop for occasions (K) in the detection function.
+Default is <code>FALSE</code>. Only applied when <code>type = "unmarked"</code>.</p></dd>
 <dt>enc_dist</dt>
 <dd><p>Either <code>"binomial"</code> or <code>"poisson"</code>. Default is
 <code>"binomial"</code>.</p></dd>
