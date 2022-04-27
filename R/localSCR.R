@@ -3362,6 +3362,18 @@ return(scrcode)
 #' # create state-space
 #' Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = 100)
 #' 
+#' # simulate data for uniform state-space and habitat mask
+#' data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = mysigma,
+#' prop_sex = 0.7,  N = 200, K = 4, base_encounter = 0.15, enc_dist = "binomial",
+#' hab_mask = NULL, setSeed = 100)
+#' 
+#' # total augmented population size 
+#' M = 400
+#' 
+#' # get initial activity center starting values
+#' s.st = initialize_classic(y=data3d$y, M=M, X=traps, buff = 3*max(mysigma), 
+#'                             hab_mask = NULL)$s.st
+#' 
 #' # get discretized traps and initial activity center grid indices
 #' discrete_list <- discretize_classic(X = traps, grid=Grid$grid, 
 #'                      s.st = s.st, crs_= mycrs,site=site,hab_mask=NULL)
