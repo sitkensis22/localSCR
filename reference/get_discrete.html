@@ -158,7 +158,7 @@ unmarked data sets.</p>
 <span class="r-in"><span class="co"># distribution, non-sex-specific scaling parameter, and no clustering of traps</span></span>
 <span class="r-in"><span class="va">discrete_model_u</span> <span class="op">=</span> <span class="fu">get_discrete</span><span class="op">(</span>type<span class="op">=</span><span class="st">"unmarked"</span>,occ_specific <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span class="r-in">           enc_dist <span class="op">=</span> <span class="st">"binomial"</span>,sex_sigma <span class="op">=</span> <span class="cn">FALSE</span>, trapsClustered <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in if (dim_y != 2 &amp; dim_y != 3) {    stop("dim_y must be either 2 or 3")}:</span> argument is of length zero</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in if (dim_y != 2 &amp; dim_y != 3 &amp; is.null(dim_y) == FALSE) {    stop("dim_y must be either 2 or 3 or NULL")}:</span> argument is of length zero</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># inspect model</span></span>
 <span class="r-in"><span class="va">discrete_model_u</span></span>
