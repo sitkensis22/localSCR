@@ -135,7 +135,7 @@ unmarked data sets.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     sigma ~ dunif(0, sigma_upper)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     for (i in 1:M) {</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         z[i] ~ dbern(psi)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         s[i] ~ dcat(probs[1:npix])</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         s[i] ~ dcat(probs[1:nPix])</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         x0g[i] &lt;- grid[s[i], 1]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         y0g[i] &lt;- grid[s[i], 2]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         dist[i, 1:J] &lt;- sqrt((x0g[i] - X[1:J, 1])^2 + (y0g[i] - </span>
@@ -174,7 +174,7 @@ unmarked data sets.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     sigma ~ dunif(0, sigma_upper)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     for (i in 1:m) {</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         zu[i] ~ dbern(psiu)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         su[i] ~ dcat(probs[1:npix])</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         su[i] ~ dcat(probs[1:nPix])</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         x0gu[i] &lt;- grid[su[i], 1]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         y0gu[i] &lt;- grid[su[i], 2]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         distu[i, 1:J] &lt;- sqrt((x0gu[i] - X[1:J, 1])^2 + (y0gu[i] - </span>
