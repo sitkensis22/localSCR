@@ -72,7 +72,7 @@ s.st = initialize_classic(y=data3d$y, M=M, X=traps, buff = 3*max(mysigma),
 
 # get discretized traps and initial activity center grid indices
 d_list <- discretize_classic(X = traps, grid=Grid$grid, 
-                     s.st = s.st, crs_= mycrs,site=site,hab_mask=NULL)
+                     s.st = s.st, crs_= mycrs,hab_mask=NULL)
 
 str(d_list)
 }

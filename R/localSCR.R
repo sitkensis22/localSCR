@@ -3376,7 +3376,7 @@ return(scrcode)
 #' 
 #' # get discretized traps and initial activity center grid indices
 #' d_list <- discretize_classic(X = traps, grid=Grid$grid, 
-#'                      s.st = s.st, crs_= mycrs,site=site,hab_mask=NULL)
+#'                      s.st = s.st, crs_= mycrs,hab_mask=NULL)
 #' 
 #' str(d_list)
 #' @name discretize_classic
@@ -3446,6 +3446,11 @@ discretize_classic <- function(X, grid, s.st = s.st,
       for(i in 1:nrow(s.st)){
         s.st_discrete[i] <- s.st_dist2[site[i]][[1]][i]
       }
+      # convert grid list to array
+      grid <- array(NA,dim = c(max(unlist(lapply(gridlist_index, nrow))),2,dim(X)[3]))
+      for(i in 1:dim(X)[3]){
+      grid[1:unlist(lapply(gridlist_index, nrow))[i],1:2,i] = gridlist_index[[i]]
+      }
      }else  
      # with habitat mask
      if(isFALSE(is.null(hab_mask))){    
@@ -3469,9 +3474,14 @@ discretize_classic <- function(X, grid, s.st = s.st,
       for(i in 1:nrow(s.st)){
         s.st_discrete[i] <- s.st_dist2[site[i]][[1]][i]
       }
+      # convert grid list to array
+      grid <- array(NA,dim = c(max(unlist(lapply(gridlist_index, nrow))),2,dim(X)[3]))
+      for(i in 1:dim(X)[3]){
+      grid[1:unlist(lapply(gridlist_index, nrow))[i],1:2,i] = gridlist_index[[i]]
+      }
      } # end habitat mask
   } # end dimension 3
-     return(list(X=X_discrete,s.st=s.st_discrete))
+     return(list(grid=grid,X=X_discrete,s.st=s.st_discrete))
 } # End 'discretize_classic' function
 
 
