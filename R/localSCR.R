@@ -3372,7 +3372,7 @@ return(scrcode)
 #' 
 #' # get initial activity center starting values
 #' s.st = initialize_classic(y=data3d$y, M=M, X=traps, buff = 3*max(mysigma), 
-#'                             hab_mask = FALSE)$s.st
+#'                             hab_mask = FALSE)
 #' 
 #' # get discretized traps and initial activity center grid indices
 #' discrete_list <- discretize_classic(X = traps, grid=Grid$grid, 
