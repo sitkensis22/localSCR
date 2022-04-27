@@ -17,9 +17,9 @@ get_discrete(
 \item{type}{Specifies the type of discrete model for either \code{"marked"}
 (the default) or \code{"unmarked"} data sources.}
 
-\item{dim_y}{An integer of either 2 (the default) or that defines what 
-dimensional format the encounter history data are in. Note that this input
-is not used when \code{type = "unmarked"}.}
+\item{dim_y}{Either \code{NULL} (the default) or an integer of either 2 or 3
+that define the dimensional format the encounter history data are in. Note 
+that this input is not used when \code{type = "unmarked"}.}
 
 \item{occ_specific}{Logical. If \code{FALSE}, the encounter rate will
 not include an occasion-specific loop in the detection function; otherwise, 
