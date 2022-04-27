@@ -3508,7 +3508,7 @@ discretize_classic <- function(X = traps, grid, s.st = s.st,
 get_discrete <- function(type = "marked", dim_y, enc_dist = "binomial",
                         sex_sigma = FALSE, trapsClustered = FALSE){
            M <- J <- s <- X <- p0 <- sigma <- n0 <- z <- 
-           A <- lam0 <- K <- sex <- 
+           A <- lam0 <- K <- sex <- traps <- occ_specific <- 
            nSites <-  site <- pixelWidth <- psi <- prop.habitat <-
            EN <- ED <- alpha0 <- mu <- x0g <- y0g <- probs <-
            grid <- nPix <- pixArea <- x0gu <- y0gu <- 
