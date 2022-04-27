@@ -158,11 +158,39 @@ unmarked data sets.</p>
 <span class="r-in"><span class="co"># distribution, non-sex-specific scaling parameter, and no clustering of traps</span></span>
 <span class="r-in"><span class="va">discrete_model_u</span> <span class="op">=</span> <span class="fu">get_discrete</span><span class="op">(</span>type<span class="op">=</span><span class="st">"unmarked"</span>,occ_specific <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span class="r-in">           enc_dist <span class="op">=</span> <span class="st">"binomial"</span>,sex_sigma <span class="op">=</span> <span class="cn">FALSE</span>, trapsClustered <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in if (dim_y != 2 &amp; dim_y != 3 &amp; is.null(dim_y) == FALSE) {    stop("dim_y must be either 2 or 3 or NULL")}:</span> argument is of length zero</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># inspect model</span></span>
 <span class="r-in"><span class="va">discrete_model_u</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'discrete_model_u' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     for (j in 1:nPix) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         probs[j] &lt;- mu[j]/EN</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         mu[j] &lt;- exp(alpha0) * pixArea</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     alpha0 ~ dt(0, 1/10^2, 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     EN &lt;- sum(mu[1:nPix])</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ED &lt;- log(alpha0)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     psiu &lt;- EN/m</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     lam0 ~ dunif(0, lam0_upper)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     sigma ~ dunif(0, sigma_upper)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     for (i in 1:m) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         zu[i] ~ dbern(psiu)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         su[i] ~ dcat(probs[1:npix])</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         x0gu[i] &lt;- grid[su[i], 1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         y0gu[i] &lt;- grid[su[i], 2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         distu[i, 1:J] &lt;- sqrt((x0gu[i] - X[1:J, 1])^2 + (y0gu[i] - </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             X[1:J, 2])^2)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         lamu[i, 1:J] &lt;- lam0 * exp(-distu[i, 1:J]^2/(2 * sigma^2)) * </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             zu[i]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     for (j in 1:J) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         bigLambda[j] &lt;- sum(lamu[1:m, j])</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         for (k in 1:K) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             n[j, k] ~ dpois(bigLambda[j])</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     N &lt;- sum(zu[1:m])</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     D &lt;- N/A</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> }</span>
 </code></pre></div>
     </div>
   </div>
