@@ -3564,7 +3564,6 @@ if(type=="marked"){
           }
           alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
           EN <- sum(mu[1:nPix]) # expected abundance
-          ED <- log(alpha0) # expected average density
           psi <- EN/M # derived inclusion prob
           p0 ~ dunif(0,1) # baseline encounter probability
           sigma ~ dunif(0, sigma_upper) # scaling parameter
@@ -3597,7 +3596,6 @@ if(type=="marked"){
             }
             alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
             EN <- sum(mu[1:nPix]) # expected abundance
-            ED <- log(alpha0) # expected average density  
             psi <- EN/M # derived inclusion prob
             lam0 ~ dunif(0,lam0_upper) # baseline encounter probability
             sigma ~ dunif(0, sigma_upper) # scaling parameter
@@ -3630,7 +3628,6 @@ if(type=="marked"){
              }
               alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
               EN <- sum(mu[1:nPix]) # expected abundance
-              ED <- log(alpha0) # expected average density
               psi <- EN/M # derived inclusion prob
               p0 ~ dunif(0,1) # baseline encounter probability
               psi_sex ~ dunif(0,1) # probability sex = 1
@@ -3667,7 +3664,6 @@ if(type=="marked"){
                }
                 alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
                 EN <- sum(mu[1:nPix]) # expected abundance
-                ED <- log(alpha0) # expected average density
                 psi <- EN/M # derived inclusion prob
                 lam0 ~ dunif(0,lam0_upper) # baseline encounter probability
                 psi_sex ~ dunif(0,1) # probability sex = 1
@@ -3707,7 +3703,6 @@ if(type=="marked"){
            }
             alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
             EN <- sum(mu[1:nPix]) # expected abundance
-            ED <- log(alpha0) # expected average density
             psi <- EN/M # derived inclusion prob
             p0 ~ dunif(0,1) # baseline encounter probability
             sigma ~ dunif(0, sigma_upper) # scaling parameter
@@ -3744,7 +3739,6 @@ if(type=="marked"){
              }
               alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
               EN <- sum(mu[1:nPix]) # expected abundance
-              ED <- log(alpha0) # expected average density
               psi <- EN/M # derived inclusion prob
               p0 ~ dunif(0,1) # baseline encounter probability
               lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
@@ -3782,7 +3776,6 @@ if(type=="marked"){
                }
                 alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
                 EN <- sum(mu[1:nPix]) # expected abundance
-                ED <- log(alpha0) # expected average density
                 psi <- EN/M # derived inclusion prob
                 p0 ~ dunif(0,1) # baseline encounter probability
                 psi_sex ~ dunif(0,1) # probability sex = 1
@@ -3823,7 +3816,6 @@ if(type=="marked"){
                  }
                   alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
                   EN <- sum(mu[1:nPix]) # expected abundance
-                  ED <- log(alpha0) # expected average density
                   psi <- EN/M # derived inclusion prob
                   lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
                   psi_sex ~ dunif(0,1) # probability sex = 1
@@ -3865,7 +3857,6 @@ if(type=="marked"){
       scrcode <- nimble::nimbleCode({
       alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
       EN <- sum(EN_site[1:nSites])
-      ED <- log(alpha0) # expected average density
       psi <- EN/M # derived inclusion prob 
      for(g in 1:nSites){  
       EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
@@ -3901,7 +3892,6 @@ if(type=="marked"){
    scrcode <- nimble::nimbleCode({
       alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
       EN <- sum(EN_site[1:nSites])
-      ED <- log(alpha0) # expected average density
       psi <- EN/M # derived inclusion prob 
      for(g in 1:nSites){  
       EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
@@ -3937,7 +3927,6 @@ if(enc_dist == "binomial" & sex_sigma  == TRUE){
  scrcode <- nimble::nimbleCode({
       alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
       EN <- sum(EN_site[1:nSites])
-      ED <- log(alpha0) # expected average density
       psi <- EN/M # derived inclusion prob 
      for(g in 1:nSites){  
       EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
@@ -3977,7 +3966,6 @@ if(enc_dist == "binomial" & sex_sigma  == TRUE){
   scrcode <- nimble::nimbleCode({
       alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
       EN <- sum(EN_site[1:nSites])
-      ED <- log(alpha0) # expected average density
       psi <- EN/M # derived inclusion prob 
      for(g in 1:nSites){  
       EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
@@ -4021,7 +4009,6 @@ scrcode <- nimble::nimbleCode({
 sigma ~ dunif(0, sigma_upper) # scaling parameter
 alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
 EN <- sum(EN_site[1:nSites])
-ED <- log(alpha0) # expected average density
 psi <- EN/M # derived inclusion prob 
 for(g in 1:nSites){  
 EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
@@ -4061,7 +4048,6 @@ scrcode <- nimble::nimbleCode({
 sigma ~ dunif(0, sigma_upper) # scaling parameter
 alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
 EN <- sum(EN_site[1:nSites])
-ED <- log(alpha0) # expected average density
 psi <- EN/M # derived inclusion prob 
 for(g in 1:nSites){  
 EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
@@ -4103,7 +4089,6 @@ scrcode <- nimble::nimbleCode({
   sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
   alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
   EN <- sum(EN_site[1:nSites])
-  ED <- log(alpha0) # expected average density
   psi <- EN/M # derived inclusion prob 
   for(g in 1:nSites){  
   EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
@@ -4144,7 +4129,6 @@ if(enc_dist == "poisson" & sex_sigma  == TRUE){
   scrcode <- nimble::nimbleCode({
 alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
 EN <- sum(EN_site[1:nSites])
-ED <- log(alpha0) # expected average density
 psi <- EN/M # derived inclusion prob 
 for(g in 1:nSites){  
 EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
@@ -4198,7 +4182,6 @@ if(type == "unmarked"){
             }
             alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
             EN <- sum(mu[1:nPix]) # expected abundance
-            ED <- log(alpha0) # expected average density  
             psiu <- EN/m # derived inclusion prob
             lam0 ~ dunif(0,lam0_upper) # baseline encounter probability
             sigma ~ dunif(0, sigma_upper) # scaling parameter
@@ -4230,7 +4213,6 @@ if(type == "unmarked"){
             }
             alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
             EN <- sum(mu[1:nPix]) # expected abundance
-            ED <- log(alpha0) # expected average density  
             psiu <- EN/m # derived inclusion prob
             lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
             sigma ~ dunif(0, sigma_upper) # scaling parameter
@@ -4262,7 +4244,7 @@ if(type == "unmarked"){
    scrcode <- nimble::nimbleCode({
       alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
       EN <- sum(EN_site[1:nSites])
-      ED <- log(alpha0) # expected average density
+       
       psiu <- EN/m # derived inclusion prob 
      for(g in 1:nSites){  
       EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
@@ -4300,7 +4282,6 @@ scrcode <- nimble::nimbleCode({
 sigma ~ dunif(0, sigma_upper) # scaling parameter
 alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
 EN <- sum(EN_site[1:nSites])
-ED <- log(alpha0) # expected average density
 psiu <- EN/m # derived inclusion prob 
 for(g in 1:nSites){  
 EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
