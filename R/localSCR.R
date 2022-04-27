@@ -3320,8 +3320,8 @@ return(scrcode)
 
 #' Function to discretize traps and initial activity centers
 #'
-#' @description Convert traps and initial activity center locations to 
-#' prepare for using in discrete SCR model. 
+#' @description Discretize state-space grid, traps and initial activity center 
+#' locations to prepare for using in discrete SCR model. 
 #'
 #' @param X Either a matrix or array representing the coordinates of traps in
 #' UTMs. An array is used when traps are clustered over a survey area.
@@ -3339,13 +3339,14 @@ return(scrcode)
 #'  augmented population size (i.e., \code{M}).
 #' @param hab_mask Either \code{NULL} (the default) or a matrix or array output
 #'  from \code{\link{mask_polygon}} or \code{\link{mask_raster}} functions.
-#' @return A list of discretized traps as a matrix or array \code{X} and indices
-#' for initial activity center locations. Note that the latter relates
-#' to the rows of \code{grid} provided as an input.
-#' @details This function prepares the trap coordinates and initial activity
-#' center coordinates for use in a discrete spatial capture-recapture model. Note
-#' that the number of rows in the state-space grid coordinate matrix will be 
-#' reduced and this object will need to be adjusted before being used in the model.
+#' @return A list of grid coordinates for the state-space \code{grid}, number 
+#' of pixels or cells \code{nPix}, discretized traps as a matrix or array \code{X} and 
+#' indices for initial activity center locations \code{s.st}. Note that the latter 
+#' relates to the rows of \code{grid} provided as an input.
+#' @details This function prepares the state-space grid, trap coordinates and 
+#' initial activity center coordinates for use in a discrete spatial capture-recapture 
+#' model. Note that the number of rows in the state-space grid coordinate matrix will 
+#' be reduced and this object will need to be adjusted before being used in the model.
 #' @importFrom purrr map
 #' @author Daniel Eacker
 #' @examples
@@ -3402,7 +3403,8 @@ discretize_classic <- function(X, grid, s.st = s.st,
           sf::st_cast(sf::st_sfc(sf::st_multipoint(grid),crs =  crs_),"POINT"))
     # get the cell indices; just take the first trap (unless it's already represented)
    s.st_discrete <- unlist(lapply(apply(s.st_dist, 1, function(x) which(x==min(x))),function(x) x[1]))
-  }else
+   nPix <- nrow(grid)  # get number of pixels
+    }else
    # with habitat mask
    if(isFALSE(is.null(hab_mask))){
    # first remove grid rows that are unsuitable
@@ -3419,6 +3421,7 @@ discretize_classic <- function(X, grid, s.st = s.st,
           sf::st_cast(sf::st_sfc(sf::st_multipoint(grid),crs =  crs_),"POINT"))
     # get the cell indicies; just take the first trap (unless it's already represented)
    s.st_discrete <- unlist(lapply(apply(s.st_dist, 1, function(x) which(x==min(x))),function(x) x[1]))
+   nPix <- nrow(grid) # get number of pixels 
    } # end hab_mask
   }else # end dimension 2
    # for dim of length 2
@@ -3451,6 +3454,7 @@ discretize_classic <- function(X, grid, s.st = s.st,
       for(i in 1:dim(X)[3]){
       grid[1:unlist(lapply(gridlist_index, nrow))[i],1:2,i] = gridlist_index[[i]]
       }
+      nPix <- unlist(lapply(gridlist_index, nrow))   # get number of pixels
      }else  
      # with habitat mask
      if(isFALSE(is.null(hab_mask))){    
@@ -3479,9 +3483,10 @@ discretize_classic <- function(X, grid, s.st = s.st,
       for(i in 1:dim(X)[3]){
       grid[1:unlist(lapply(gridlist_index, nrow))[i],1:2,i] = gridlist_index[[i]]
       }
+      nPix <- unlist(lapply(gridlist_index, nrow))   # get number of pixels
      } # end habitat mask
   } # end dimension 3
-     return(list(grid=grid,X=X_discrete,s.st=s.st_discrete))
+     return(list(grid=grid,nPix=nPix,X=X_discrete,s.st=s.st_discrete))
 } # End 'discretize_classic' function
 
 
