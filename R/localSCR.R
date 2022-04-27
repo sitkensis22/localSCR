@@ -64,8 +64,8 @@ grid_classic <- function(X, crs_, buff, res){
     if(length(dim(X))==3){
       ext_initial <- apply(X, 3, function(x) raster::extent(c(apply(x, 2, min)-
                           max(buff),apply(x, 2, max)+max(buff))[c(1,3,2,4)]))
-      centroids <- lapply(ext_initial, function(x) cbind(mean(c(x[2],x[1])),
-                          mean(c(x[4],x[3]))))
+      centroids <- lapply(ext_initial, function(x) cbind(mean(c(x[2],x[1]),na.rm=TRUE),
+                          mean(c(x[4],x[3]),na.rm=TRUE)))
       x_lengths <- unlist(lapply(ext_initial, function(x) x[2]-x[1]))
       x_index <- which(x_lengths==max(x_lengths))[1]
       y_lengths <- unlist(lapply(ext_initial, function(x) x[4]-x[3]))
@@ -1524,8 +1524,8 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask, all_random = FALSE
         s.st[i,2]<-temp.X[2]
       }else
         if(length(ntimes)>1){
-          s.st[i,1]<-mean(temp.X2[,1])
-          s.st[i,2]<-mean(temp.X2[,2])
+          s.st[i,1]<-mean(temp.X2[,1],na.rm=TRUE)
+          s.st[i,2]<-mean(temp.X2[,2],na.rm=TRUE)
         }
     }else
       if(isFALSE(hab_mask)==FALSE){ # if habitat mask used
@@ -1534,8 +1534,8 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask, all_random = FALSE
           s.st[i,2]<-temp.X[2]
         }else
           if(length(ntimes)>1){
-            s.st[i,1]<-mean(temp.X2[,1])
-            s.st[i,2]<-mean(temp.X2[,2])
+            s.st[i,1]<-mean(temp.X2[,1],na.rm=TRUE)
+            s.st[i,2]<-mean(temp.X2[,2],na.rm=TRUE)
           }
         sx.rescale <- scales::rescale(s.st[i,1], to = c(0,dim(hab_mask)[2]), 
                                       from=xlim)
@@ -1602,8 +1602,8 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask, all_random = FALSE
       s.st[i,2]<-temp.X[2]
     }else
       if(length(ntimes)>1){
-        s.st[i,1]<-mean(temp.X2[,1])
-        s.st[i,2]<-mean(temp.X2[,2])
+        s.st[i,1]<-mean(temp.X2[,1],na.rm=TRUE)
+        s.st[i,2]<-mean(temp.X2[,2],na.rm=TRUE)
       }
   }else
     if(isFALSE(hab_mask)==FALSE){ # if habitat mask used
@@ -1612,8 +1612,8 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask, all_random = FALSE
         s.st[i,2]<-temp.X[2]
       }else
         if(length(ntimes)>1){
-          s.st[i,1]<-mean(temp.X2[,1])
-          s.st[i,2]<-mean(temp.X2[,2])
+          s.st[i,1]<-mean(temp.X2[,1],na.rm=TRUE)
+          s.st[i,2]<-mean(temp.X2[,2],na.rm=TRUE)
         }
           sx.rescale <- scales::rescale(s.st[i,1], 
                         to = c(0,dim(hab_mask)[2]), from=xlim)
@@ -2572,7 +2572,7 @@ if(is.null(exclude_params)){
     q2.5 <- stats::quantile(d3[,1], 0.025, na.rm=TRUE)
     q50 <- stats::quantile(d3[,1], 0.50, na.rm=TRUE)
     q97.5 <- stats::quantile(d3[,1], 0.975, na.rm=TRUE)
-    over.zero <- round(mean(d3[,1]>0),2)
+    over.zero <- round(mean(d3[,1]>0,na.rm=TRUE),2)
     n.eff <- coda::effectiveSize(mcmc.list(lapply(d2, coda::as.mcmc)))
     Rhat <- round(coda::gelman.diag(coda::mcmc.list(lapply(d2, coda::as.mcmc)), 
     multivariate = FALSE)[[1]][,1],3)
