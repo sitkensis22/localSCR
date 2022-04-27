@@ -3369,7 +3369,7 @@ return(scrcode)
 #' str(discretize_list)
 #' @name discretize_classic
 #' @export
-discretize_classic <- function(X = traps, grid, s.st = s.st, 
+discretize_classic <- function(X, grid, s.st = s.st, 
                                crs_,site,hab_mask=NULL){
    # need to determine if X is 2 or 3 dimensional (stop if not)
    if(length(dim(X))!=2 & length(dim(X))!=3){
@@ -3474,6 +3474,10 @@ discretize_classic <- function(X = traps, grid, s.st = s.st,
 #' @param dim_y An integer of either 2 (the default) or that defines what 
 #' dimensional format the encounter history data are in. Note that this input
 #' is not used when \code{type = "unmarked"}. 
+#' @param occ_specific Logical. If \code{FALSE}, the encounter rate will
+#' not include an occasion-specific loop in the detection function; otherwise, 
+#' the model will include a for loop for occasions (K) in the detection function.
+#' Default is \code{FALSE}. Only applied when \code{type = "unmarked"}.
 #' @param enc_dist Either \code{"binomial"} or \code{"poisson"}. Default is
 #' \code{"binomial"}.
 #' @param sex_sigma A logical value indicating whether the scaling parameter 
@@ -3505,10 +3509,10 @@ discretize_classic <- function(X = traps, grid, s.st = s.st,
 #' discrete_model_u
 #' @name get_discrete
 #' @export
-get_discrete <- function(type = "marked", dim_y, enc_dist = "binomial",
-                        sex_sigma = FALSE, trapsClustered = FALSE){
+get_discrete <- function(type = "marked", dim_y, occ_specific = FALSE,
+                enc_dist = "binomial",sex_sigma = FALSE, trapsClustered = FALSE){
            M <- J <- s <- X <- p0 <- sigma <- n0 <- z <- 
-           A <- lam0 <- K <- sex <- traps <- occ_specific <- 
+           A <- lam0 <- K <- sex  <- 
            nSites <-  site <- pixelWidth <- psi <- prop.habitat <-
            EN <- ED <- alpha0 <- mu <- x0g <- y0g <- probs <-
            grid <- nPix <- pixArea <- x0gu <- y0gu <- 

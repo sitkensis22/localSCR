@@ -7,6 +7,7 @@
 get_discrete(
   type = "marked",
   dim_y,
+  occ_specific = FALSE,
   enc_dist = "binomial",
   sex_sigma = FALSE,
   trapsClustered = FALSE
@@ -19,6 +20,11 @@ get_discrete(
 \item{dim_y}{An integer of either 2 (the default) or that defines what 
 dimensional format the encounter history data are in. Note that this input
 is not used when \code{type = "unmarked"}.}
+
+\item{occ_specific}{Logical. If \code{FALSE}, the encounter rate will
+not include an occasion-specific loop in the detection function; otherwise, 
+the model will include a for loop for occasions (K) in the detection function.
+Default is \code{FALSE}. Only applied when \code{type = "unmarked"}.}
 
 \item{enc_dist}{Either \code{"binomial"} or \code{"poisson"}. Default is
 \code{"binomial"}.}
