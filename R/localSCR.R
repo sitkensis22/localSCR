@@ -4361,3 +4361,189 @@ print_model <- function(model){
    unlink(unlist(file_list)) # unlink temp files
    return(main_model)
 } # End function 'print_model'
+
+
+#' Function to run discrete spatial capture-recapture models in 'nimble' using 
+#' parallel processing
+#'
+#' @description A wrapper function to conduct Markov Chain Monte Carlo (MCMC) sampling using
+#'  'nimble'.
+#'
+#' @param model The \code{nimbleCode} used to define model in \code{nimble} package,
+#'  possibly generated from \code{\link{get_classic}}.
+#' @param data A list of data inputs needed to run SCR models in \code{nimble}.
+#' @param constants A list of constants needed to run SCR models in \code{nimble}.
+#' @param inits Starting values for stochastic parameters to begin MCMC sampling.
+#' @param params A vector of character strings that define the parameters to 
+#' trace in the MCMC simulation.
+#' @param dimensions A named list of dimensions for variables. Only needed for variables
+#' used with empty indices in model code that are not provided in constants or data.
+#' @param niter An integer value of the total number of MCMC iterations to run 
+#' per chain.
+#' @param nburnin An integer value of the number of MCMC iterations to discard 
+#' as 'burnin'.
+#' @param thin An integer value of the amount of thinning of the chain. For 
+#' example, \code{thin=2} would retain every other MCMC sample.
+#' @param nchains An integer value for the number of MCMC chains to run
+#' @param parallel A logical value indicating whether MCMC chains shoud be run 
+#' in parallel processing. Default is \code{FALSE}.
+#' @param RNGseed An integer value specifying the random number generating seed 
+#' using in parallel processing. Also used when \code{parallel = FALSE} in 
+#' setSeed within \code{runMCMC} function in 'nimble'.
+#' This ensures that the MCMC samples will be the same during each run using the
+#'  same data, etc. Default is \code{NULL}.
+#' @return A list of MCMC samples for each parameter traced with length equal to
+#'  the number of chains run.
+#' @details This function provides a wrapper to easily run Bayesian SCR models
+#'  using \code{nimble}.
+#' @importFrom tictoc tic toc
+#' @importFrom graphics hist par abline lines
+#' @importFrom parallel parLapply makeCluster stopCluster clusterSetRNGStream
+#' @import nimble
+#' @author Daniel Eacker
+#' @examples
+#'\dontrun{
+#'# simulate a single trap array with random positional noise
+#'x <- seq(-800, 800, length.out = 5)
+#'y <- seq(-800, 800, length.out = 5)
+#'traps <- as.matrix(expand.grid(x = x, y = y))
+#'set.seed(200)
+#'traps <- traps + runif(prod(dim(traps)),-20,20) 
+#'
+#'mysigma = c(220, 300) # simulate sex-specific scaling parameter
+#'mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
+#'pixelWidth = 100 # store pixelWidth or grid resolution
+#'
+#'# create state-space
+#'Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = pixelWidth)
+#'
+#'# create polygon for mask
+#'library(sf)
+#'poly = st_sfc(st_polygon(x=list(matrix(c(-1765,-1765,1730,-1650,1600,1650,0,1350,
+#'            -800,1700,-1850,1000,-1765,-1765),ncol=2, byrow=TRUE))), crs =  mycrs)
+#'
+#'# create habitat mask
+#'hab_mask = mask_polygon(poly = poly, grid = Grid$grid, crs_ = mycrs, 
+#'prev_mask = NULL)
+#'
+#'# simulate data for uniform state-space and habitat mask
+#'data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = mysigma, 
+#'              prop_sex = 0.6, N = 200, K = 4, base_encounter = 0.15, enc_dist = "binomial",
+#'              hab_mask = hab_mask, setSeed = 100)
+#'
+#'# total augmented population size 
+#'M = 400
+#'
+#'# get initial activity center starting values
+#'s.st = initialize_classic(y=data3d$y, M=M, X=traps, buff = 3*max(mysigma), 
+#'                            hab_mask = hab_mask)
+#'
+#'# convert traps and starting locations to discrete format
+#'d_list = discretize_classic(X=traps, grid = Grid$grid, s.st = s.st, crs_ = mycrs, hab_mask = hab_mask)
+#'
+#'# inspect discrete data list
+#'str(d_list)
+#'
+#'# prepare data
+#'data = list(y=data3d$y)
+#'data$y = data$y[which(apply(data$y, 1, sum)!=0),,] # remove augmented records 
+#'data$y = apply(data$y, c(1,2), sum) # covert to 2d by summing over individuals and traps
+#'
+#'# add discretized traps
+#'data$X = d_list$X100 # convert units to km
+#'
+#'# add grid
+#'data$grid = d_list$grid/1000 # convert units to km
+#'
+#'# prepare constants (note get density in activity center/100 m2 rather than activity centers/m2)
+#'constants = list(M = M,n0 = nrow(data$y),J=dim(data$y)[2], K=dim(data3d$y)[3],
+#'nPix=d_list$nPix,pixArea = 0.1^2,
+#'sigma_upper = 1, A = (sum(hab_mask)*(pixelWidth/100)^2))
+#'
+#'# augment sex
+#'data$sex = c(data3d$sex,rep(NA,constants$M-length(data3d$sex)))
+#'
+#'# add z and zeros vector data for latent inclusion indicator
+#'data$z = c(rep(1,constants$n0),rep(NA,constants$M - constants$n0))
+#'data$zeros =  c(rep(NA,constants$n0),rep(0,constants$M - constants$n0))
+#'
+#'# define all initial values 
+#'inits = list(sigma = runif(2, 0.250, 0.350), s = d_list$s.st,alpha0 = 3,
+#'   p0 = runif(1, 0.05, 0.15),psi_sex = runif(1,0.5, 0.7),
+#'         sex=c(rep(NA,constants$n0),rbinom(constants$M-constants$n0,1,0.6)),
+#'         z=c(rep(NA,constants$n0),rep(0,constants$M-constants$n0)))
+#'
+#'# parameters to monitor
+#'params = c("sigma","psi","p0","N","D","EN","psi_sex","alpha0","s","z")
+#'
+#'    
+#'# get model
+#'discrete_model = get_discrete(type="marked",dim_y = 2, enc_dist = "binomial",
+#'                  sex_sigma = TRUE,trapsClustered=FALSE)
+#'
+#'# run model
+#'library(tictoc)
+#'tic() # track time elapsed
+#'out = run_discrete(model = discrete_model, data=data, constants=constants,
+#'        inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, 
+#'        parallel=TRUE,  RNGseed = 500)
+#'toc()
+#'
+#'nimSummary(out, exclude_params = c("s","z"))
+#'}
+#' @name run_discrete
+#' @export
+run_discrete <- function(model, data, constants, inits, params, dimensions = NULL,
+                        niter = 1000, nburnin=100, thin=1, nchains=1, 
+                       parallel=FALSE, RNGseed=NULL){
+  # for parallel processing
+  if(parallel == FALSE){
+    SCRmodelR <- nimble::nimbleModel(code=model,data=data,constants=constants,
+                            inits=inits,check=FALSE,calculate=TRUE,dimensions = dimensions) # add dimensions
+    SCRmodelR$initializeInfo()
+    # compile model to C++#
+    SCRmodelC <- nimble::compileNimble(SCRmodelR) # compile code
+    # MCMC configurations
+    mcmcspec<-nimble::configureMCMC(SCRmodelR, monitors=params) 
+    scrMCMC <- nimble::buildMCMC(mcmcspec)
+    CscrMCMC <- nimble::compileNimble(scrMCMC, project = SCRmodelR,
+                                      resetFunctions = TRUE)
+    results <- nimble::runMCMC(CscrMCMC, niter = niter, nburnin=nburnin,
+                               thin=thin, nchains=nchains, setSeed=RNGseed) # add setSeed 
+    return(results)
+  }else
+    if(parallel == TRUE){
+      run_parallel <- function(seed,data,model,constants,inits, params,
+                               niter,nburnin,thin){
+    SCRmodelR <- nimble::nimbleModel(code=model,data=data,
+            constants=constants,inits=inits,check=FALSE,calculate=TRUE,
+            dimensions = dimensions)
+    SCRmodelR$initializeInfo()
+    # compile model to C++#
+    SCRmodelC <- nimble::compileNimble(SCRmodelR) # compile code
+    # MCMC configurations
+    mcmcspec<-nimble::configureMCMC(SCRmodelR, monitors=params) 
+        scrMCMC <- nimble::buildMCMC(mcmcspec)
+        CscrMCMC <- nimble::compileNimble(scrMCMC, project = SCRmodelR,
+                                          resetFunctions = TRUE)
+        results <- nimble::runMCMC(CscrMCMC, niter = niter, nburnin= nburnin,
+                                   thin=thin,setSeed = seed)
+        return(results)
+      } # end parallel processing function
+      if(nchains < 2){
+        stop("Must have at least 2 chains to run parallel processing")
+      }
+      this_cluster <- parallel::makeCluster(nchains)
+      parallel::clusterEvalQ(this_cluster, library("nimble")) 
+      if(is.null(RNGseed)==FALSE){
+        parallel::clusterSetRNGStream(cl = this_cluster, RNGseed)
+      }
+      chain_output <- parallel::parLapply(cl = this_cluster, fun = run_parallel,
+                      X=1:nchains,model = model, data=data,constants=constants, 
+                      inits=inits,params = params, niter = niter, 
+                      nburnin=nburnin, thin=thin)
+      parallel::stopCluster(this_cluster)
+      return(chain_output)
+    }
+} # End function 'run_discrete'
+
