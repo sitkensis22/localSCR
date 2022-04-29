@@ -2188,6 +2188,8 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
 #' @param inits Starting values for stochastic parameters to begin MCMC sampling.
 #' @param params A vector of character strings that define the parameters to 
 #' trace in the MCMC simulation.
+#' @param dimensions A named list of dimensions for variables. Only needed for variables
+#' used with empty indices in model code that are not provided in constants or data.
 #' @param niter An integer value of the total number of MCMC iterations to run 
 #' per chain.
 #' @param nburnin An integer value of the number of MCMC iterations to discard 
@@ -2198,9 +2200,8 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
 #' @param parallel A logical value indicating whether MCMC chains shoud be run 
 #' in parallel processing. Default is \code{FALSE}.
 #' @param RNGseed An integer value specifying the random number generating seed 
-#' using in parallel processing. 
-#' This ensures that the MCMC samples will be the same during each run using the
-#'  same data, etc. Default is \code{NULL}.
+#' using in parallel processing. Also used when \code{parallel = FALSE} in 
+#' setSeed within \code{runMCMC} function in 'nimble'.
 #' @param s_alias A character value used to identify the latent activity center
 #'  coordinates used in the model. Default is \code{"s"}. Note that the length
 #'  of \code{s_alias} must be either 1 (e.g., \code{"s"}) or 2 
@@ -2315,13 +2316,13 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
 #'}
 #' @name run_classic
 #' @export
-run_classic <- function(model, data, constants, inits, params,
+run_classic <- function(model, data, constants, inits, params, dimensions = NULL,
                         niter = 1000, nburnin=100, thin=1, nchains=1, 
                         parallel=FALSE, RNGseed=NULL,s_alias="s"){
   # for parallel processing
   if(parallel == FALSE){
     SCRmodelR <- nimble::nimbleModel(code=model,data=data,constants=constants,
-                            inits=inits,check=FALSE,calculate=TRUE)
+                            inits=inits,check=FALSE,calculate=TRUE,dimensions=dimensions)
     SCRmodelR$initializeInfo()
     # compile model to C++#
     SCRmodelC <- nimble::compileNimble(SCRmodelR) # compile code
@@ -2364,7 +2365,7 @@ run_classic <- function(model, data, constants, inits, params,
     CscrMCMC <- nimble::compileNimble(scrMCMC, project = SCRmodelR,
                                       resetFunctions = TRUE)
     results <- nimble::runMCMC(CscrMCMC, niter = niter, nburnin=nburnin,
-                               thin=thin, nchains=nchains)
+                               thin=thin, nchains=nchains, setSeed=RNGseed)
     return(results)
   }else
     if(parallel == TRUE){

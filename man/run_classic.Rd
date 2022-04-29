@@ -11,6 +11,7 @@ run_classic(
   constants,
   inits,
   params,
+  dimensions = NULL,
   niter = 1000,
   nburnin = 100,
   thin = 1,
@@ -33,6 +34,9 @@ possibly generated from \code{\link{get_classic}}.}
 \item{params}{A vector of character strings that define the parameters to 
 trace in the MCMC simulation.}
 
+\item{dimensions}{A named list of dimensions for variables. Only needed for variables
+used with empty indices in model code that are not provided in constants or data.}
+
 \item{niter}{An integer value of the total number of MCMC iterations to run 
 per chain.}
 
@@ -48,9 +52,8 @@ example, \code{thin=2} would retain every other MCMC sample.}
 in parallel processing. Default is \code{FALSE}.}
 
 \item{RNGseed}{An integer value specifying the random number generating seed 
-using in parallel processing. 
-This ensures that the MCMC samples will be the same during each run using the
- same data, etc. Default is \code{NULL}.}
+using in parallel processing. Also used when \code{parallel = FALSE} in 
+setSeed within \code{runMCMC} function in 'nimble'.}
 
 \item{s_alias}{A character value used to identify the latent activity center
 coordinates used in the model. Default is \code{"s"}. Note that the length
