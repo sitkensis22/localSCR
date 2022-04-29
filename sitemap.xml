@@ -73,6 +73,9 @@
     <loc>/reference/run_classic.html</loc>
   </url>
   <url>
+    <loc>/reference/run_discrete.html</loc>
+  </url>
+  <url>
     <loc>/reference/sim_classic.html</loc>
   </url>
 </urlset>
