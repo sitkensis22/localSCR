@@ -71,6 +71,7 @@ parallel processing</h1>
   <span class="va">constants</span>,
   <span class="va">inits</span>,
   <span class="va">params</span>,
+  dimensions <span class="op">=</span> <span class="cn">NULL</span>,
   niter <span class="op">=</span> <span class="fl">1000</span>,
   nburnin <span class="op">=</span> <span class="fl">100</span>,
   thin <span class="op">=</span> <span class="fl">1</span>,
@@ -95,6 +96,9 @@ possibly generated from <code><a href="get_classic.html">get_classic</a></code>.
 <dt>params</dt>
 <dd><p>A vector of character strings that define the parameters to 
 trace in the MCMC simulation.</p></dd>
+<dt>dimensions</dt>
+<dd><p>A named list of dimensions for variables. Only needed for variables
+used with empty indices in model code that are not provided in constants or data.</p></dd>
 <dt>niter</dt>
 <dd><p>An integer value of the total number of MCMC iterations to run 
 per chain.</p></dd>
@@ -111,9 +115,8 @@ example, <code>thin=2</code> would retain every other MCMC sample.</p></dd>
 in parallel processing. Default is <code>FALSE</code>.</p></dd>
 <dt>RNGseed</dt>
 <dd><p>An integer value specifying the random number generating seed 
-using in parallel processing. 
-This ensures that the MCMC samples will be the same during each run using the
- same data, etc. Default is <code>NULL</code>.</p></dd>
+using in parallel processing. Also used when <code>parallel = FALSE</code> in 
+setSeed within <code>runMCMC</code> function in 'nimble'.</p></dd>
 <dt>s_alias</dt>
 <dd><p>A character value used to identify the latent activity center
 coordinates used in the model. Default is <code>"s"</code>. Note that the length
