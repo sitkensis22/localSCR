@@ -2772,7 +2772,7 @@ if(is.null(exclude_params)){
 #'}
 #' @name realized_density
 #' @export
-realized_density <- function(samples, grid, crs_, site, hab_mask, 
+realized_density <- function(samples, grid, crs_, site, hab_mask = FALSE, 
                              s_alias = "s", z_alias = "z"){
    if(length(samples) > 1){
     samples <- do.call(rbind, samples) # rbind mcmc samples

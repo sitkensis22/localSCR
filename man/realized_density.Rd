@@ -9,7 +9,7 @@ realized_density(
   grid,
   crs_,
   site,
-  hab_mask,
+  hab_mask = FALSE,
   s_alias = "s",
   z_alias = "z"
 )
