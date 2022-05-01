@@ -70,9 +70,9 @@ This tutorial includes five parts:
 
 1) Create traps (or detectors) and then construct a state-space
 2) Simulate 'classic' SCR data and covert to spatial count data  
-3) Workflow for 2-D trap array including habitat mask
+3) Workflow for 2D trap array including habitat mask
 4) Adding prior information on the scaling and encounter rate parameters
-5) Workflow for 3-D trap array including  habitat mask
+5) Workflow for 3D trap array including  habitat mask
 
 
 </p>
@@ -119,7 +119,7 @@ ggplot() + geom_point(data=as.data.frame(Grid$grid),aes(x=x,y=y),
 </p>
 <br>
 <p>
-Here, we use the same approach as in the first vignette in creating the state-space from `grid_classic()`. Again, the traps (or detectors) are plotted over top of the grid in blue. We arbitrarily chose a grid resolution of 100 in this example (i.g., `res = 100`), but this will vary by problem. In most situations, it is prudent to test the effect of different grid resolutions on the estimated abundance and density in SCR models (see Royle et al. 2014). Also, note the use to the EPSG code to define the coordinate reference system for our state-space (see <https://epsg.io/32608>). 
+Here, we use the same approach as in the first vignette in creating the state-space from `grid_classic()`. Again, the traps (or detectors) are plotted over top of the grid in blue. We arbitrarily chose a grid resolution of 100 in this example (i.g., `res = 100`), but this will vary by problem. In situations involving habitat masks or discrete models, it is prudent to test the effect of different grid resolutions on the estimated abundance and density in SCR models (see Royle et al. 2014). Also, note the use to the EPSG code to define the coordinate reference system for our state-space (see <https://epsg.io/32608>). 
 
 Now lets first simulate some spatial capture-recapture data using `sim_classic()`. Importantly, we use `enc_dist = "poisson"` to select the Poisson distribution to simulate counts rather than binary data. We will use this simulated data to produce our spatial count data of unmarked individuals. Note for this example, we will simulate a 'true' population size of 200 individuals (`N = 200`), 4 sampling occasions (`K = 4`), a scaling parameter (`sigma_`) of 300 m, a baseline encounter rate of 0.10 (`base_encounter = 0.10`), no sex-specificity (`prop_sex = 1`), and no habitat mask (`hab_mask = FALSE`). We also use `setSeed = 100` to make the simulation reproducible. Again, we provide the function the extent of the state-space output from `grid_classic()` as `ext = Grid$ext`. Note that Grid is a list.
 </p>
@@ -305,7 +305,7 @@ Next we use`nimSummary()` to quickly summarize the MCMC samples. Note that there
 
 ```{r, fig.show='hide',eval=FALSE}
 # summarize MCMC samples (exclude parameters and don't plot)
-nimSummary(out, exclude_params = c("su","zu"), trace=FALSE)
+nimSummary(out, exclude = c("su","zu"), trace=FALSE)
 #>       post.mean post.sd    q2.5     q50   q97.5 f0  n.eff  Rhat
 #> D         0.234   0.121   0.040   0.221   0.453  1 33.817 1.121
 #> N       250.204 129.023  43.000 237.000 485.000  1 33.817 1.121
@@ -419,7 +419,7 @@ toc()
 #> 1193.95 sec elapsed
 
 # summarize output (exclude "su" and "zu" from table and make posterior/trace plots)
-nimSummary(out, exclude_params = c("su","zu"), trace=TRUE, plot_all=FALSE)
+nimSummary(out, exclude = c("su","zu"), trace=TRUE, plot_all=FALSE)
 #>       post.mean post.sd    q2.5     q50   q97.5 f0    n.eff  Rhat
 #> D         0.223   0.053   0.137   0.219   0.343  1  275.831 1.001
 #> N       238.946  56.449 147.000 234.000 367.000  1  275.831 1.001
@@ -618,7 +618,7 @@ toc()
 #> 968.93 sec elapsed
 
 # summary table of MCMC output (exclude "su" and "zu" parameters)
-nimSummary(out, exclude_params = c("su","zu"))
+nimSummary(out, exclude = c("su","zu"))
 #>         post.mean post.sd    q2.5     q50   q97.5 f0    n.eff  Rhat
 #> D           0.102   0.022   0.066   0.099   0.152  1  270.831 1.008
 #> N         228.569  49.067 149.000 223.000 342.000  1  270.831 1.008
