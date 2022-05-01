@@ -149,9 +149,9 @@ Finally, in some SCR designs, clusters of trap arrays may be spread out over the
 <li>Create traps (or detectors) and then construct a state-space</li>
 <li>Simulate ‘classic’ SCR data and covert to spatial count data<br>
 </li>
-<li>Workflow for 2-D trap array including habitat mask</li>
+<li>Workflow for 2D trap array including habitat mask</li>
 <li>Adding prior information on the scaling and encounter rate parameters</li>
-<li>Workflow for 3-D trap array including habitat mask</li>
+<li>Workflow for 3D trap array including habitat mask</li>
 </ol>
 <p><br></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -197,7 +197,7 @@ Finally, in some SCR designs, clusters of trap arrays may be spread out over the
 <img src="../reference/figures/vignette_02/Fig1.png" style="width:70%"></p>
 <br><p>
 </p>
-<p>Here, we use the same approach as in the first vignette in creating the state-space from <code><a href="../reference/grid_classic.html">grid_classic()</a></code>. Again, the traps (or detectors) are plotted over top of the grid in blue. We arbitrarily chose a grid resolution of 100 in this example (i.g., <code>res = 100</code>), but this will vary by problem. In most situations, it is prudent to test the effect of different grid resolutions on the estimated abundance and density in SCR models (see Royle et al. 2014). Also, note the use to the EPSG code to define the coordinate reference system for our state-space (see <a href="https://epsg.io/32608" class="external-link uri">https://epsg.io/32608</a>).</p>
+<p>Here, we use the same approach as in the first vignette in creating the state-space from <code><a href="../reference/grid_classic.html">grid_classic()</a></code>. Again, the traps (or detectors) are plotted over top of the grid in blue. We arbitrarily chose a grid resolution of 100 in this example (i.g., <code>res = 100</code>), but this will vary by problem. In situations involving habitat masks or discrete models, it is prudent to test the effect of different grid resolutions on the estimated abundance and density in SCR models (see Royle et al. 2014). Also, note the use to the EPSG code to define the coordinate reference system for our state-space (see <a href="https://epsg.io/32608" class="external-link uri">https://epsg.io/32608</a>).</p>
 Now lets first simulate some spatial capture-recapture data using <code><a href="../reference/sim_classic.html">sim_classic()</a></code>. Importantly, we use <code>enc_dist = "poisson"</code> to select the Poisson distribution to simulate counts rather than binary data. We will use this simulated data to produce our spatial count data of unmarked individuals. Note for this example, we will simulate a ‘true’ population size of 200 individuals (<code>N = 200</code>), 4 sampling occasions (<code>K = 4</code>), a scaling parameter (<code>sigma_</code>) of 300 m, a baseline encounter rate of 0.10 (<code>base_encounter = 0.10</code>), no sex-specificity (<code>prop_sex = 1</code>), and no habitat mask (<code>hab_mask = FALSE</code>). We also use <code>setSeed = 100</code> to make the simulation reproducible. Again, we provide the function the extent of the state-space output from <code><a href="../reference/grid_classic.html">grid_classic()</a></code> as <code>ext = Grid$ext</code>. Note that Grid is a list.
 
 <p><br></p>
@@ -360,7 +360,7 @@ Next we use<code><a href="../reference/nimSummary.html">nimSummary()</a></code> 
 <p><br></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># summarize MCMC samples (exclude parameters and don't plot)</span>
-<span class="fu"><a href="../reference/nimSummary.html">nimSummary</a></span><span class="op">(</span><span class="va">out</span>, exclude_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"su"</span>,<span class="st">"zu"</span><span class="op">)</span>, trace<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
+<span class="fu"><a href="../reference/nimSummary.html">nimSummary</a></span><span class="op">(</span><span class="va">out</span>, exclude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"su"</span>,<span class="st">"zu"</span><span class="op">)</span>, trace<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 <span class="co">#&gt;       post.mean post.sd    q2.5     q50   q97.5 f0  n.eff  Rhat</span>
 <span class="co">#&gt; D         0.234   0.121   0.040   0.221   0.453  1 33.817 1.121</span>
 <span class="co">#&gt; N       250.204 129.023  43.000 237.000 485.000  1 33.817 1.121</span>
@@ -460,7 +460,7 @@ RNGseed <span class="op">=</span> <span class="fl">500</span>,s_alias<span class
 <span class="co">#&gt; 1193.95 sec elapsed</span>
 
 <span class="co"># summarize output (exclude "su" and "zu" from table and make posterior/trace plots)</span>
-<span class="fu"><a href="../reference/nimSummary.html">nimSummary</a></span><span class="op">(</span><span class="va">out</span>, exclude_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"su"</span>,<span class="st">"zu"</span><span class="op">)</span>, trace<span class="op">=</span><span class="cn">TRUE</span>, plot_all<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
+<span class="fu"><a href="../reference/nimSummary.html">nimSummary</a></span><span class="op">(</span><span class="va">out</span>, exclude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"su"</span>,<span class="st">"zu"</span><span class="op">)</span>, trace<span class="op">=</span><span class="cn">TRUE</span>, plot_all<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 <span class="co">#&gt;       post.mean post.sd    q2.5     q50   q97.5 f0    n.eff  Rhat</span>
 <span class="co">#&gt; D         0.223   0.053   0.137   0.219   0.343  1  275.831 1.001</span>
 <span class="co">#&gt; N       238.946  56.449 147.000 234.000 367.000  1  275.831 1.001</span>
@@ -641,7 +641,7 @@ parallel<span class="op">=</span><span class="cn">TRUE</span>, RNGseed <span cla
 <span class="co">#&gt; 968.93 sec elapsed</span>
 
 <span class="co"># summary table of MCMC output (exclude "su" and "zu" parameters)</span>
-<span class="fu"><a href="../reference/nimSummary.html">nimSummary</a></span><span class="op">(</span><span class="va">out</span>, exclude_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"su"</span>,<span class="st">"zu"</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="../reference/nimSummary.html">nimSummary</a></span><span class="op">(</span><span class="va">out</span>, exclude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"su"</span>,<span class="st">"zu"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt;         post.mean post.sd    q2.5     q50   q97.5 f0    n.eff  Rhat</span>
 <span class="co">#&gt; D           0.102   0.022   0.066   0.099   0.152  1  270.831 1.008</span>
 <span class="co">#&gt; N         228.569  49.067 149.000 223.000 342.000  1  270.831 1.008</span>
