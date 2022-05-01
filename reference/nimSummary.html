@@ -60,13 +60,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">nimSummary</span><span class="op">(</span>
-  <span class="va">d</span>,
-  trace <span class="op">=</span> <span class="cn">FALSE</span>,
-  plot_all <span class="op">=</span> <span class="cn">FALSE</span>,
-  exclude_params <span class="op">=</span> <span class="cn">NULL</span>,
-  digits <span class="op">=</span> <span class="fl">3</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">nimSummary</span><span class="op">(</span><span class="va">d</span>, trace <span class="op">=</span> <span class="cn">FALSE</span>, plot_all <span class="op">=</span> <span class="cn">FALSE</span>, exclude <span class="op">=</span> <span class="cn">NULL</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -80,12 +74,12 @@ should be plotted. Default is <code>FALSE</code>.</p></dd>
 <dt>plot_all</dt>
 <dd><p>A logical value indicating whether or not all parameters 
 should be included in plots. This assumes that some parameters
-are excluded in the summary table (i.e., <code>exclude_params != NULL</code>). 
+are excluded in the summary table (i.e., <code>exclude != NULL</code>). 
 Default is <code>FALSE</code>.</p></dd>
-<dt>exclude_params</dt>
+<dt>exclude</dt>
 <dd><p>Either <code>NULL</code> or a scalar or vector containing 
 parameter(s) to exclude from summary. Note that high dimensional parameters 
-(e.g., <code>s[1, 1, 1]</code>) can be excluded by calling <code>exclude_params =  
+(e.g., <code>s[1, 1, 1]</code>) can be excluded by calling <code>exclude =  
 "s"</code>. Default is <code>NULL</code>.</p></dd>
 <dt>digits</dt>
 <dd><p>An integer value indicating how many digits the output should 
