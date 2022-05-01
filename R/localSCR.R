@@ -2231,7 +2231,7 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
 #'
 # create grid and extent
 #' Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, 
-#' res = pixelWidth) # create slightly larger buffer area for example
+#' res = pixelWidth) 
 #'
 #' # create polygon to use as a mask
 #' library(sf)
@@ -2448,11 +2448,11 @@ run_classic <- function(model, data, constants, inits, params, dimensions = NULL
 #'  should be plotted. Default is \code{FALSE}.
 #' @param plot_all A logical value indicating whether or not all parameters 
 #' should be included in plots. This assumes that some parameters
-#' are excluded in the summary table (i.e., \code{exclude_params != NULL}). 
+#' are excluded in the summary table (i.e., \code{exclude != NULL}). 
 #' Default is \code{FALSE}.
-#' @param exclude_params Either \code{NULL} or a scalar or vector containing 
+#' @param exclude Either \code{NULL} or a scalar or vector containing 
 #' parameter(s) to exclude from summary. Note that high dimensional parameters 
-#' (e.g., \code{s[1, 1, 1]}) can be excluded by calling \code{exclude_params =  
+#' (e.g., \code{s[1, 1, 1]}) can be excluded by calling \code{exclude =  
 #' "s"}. Default is \code{NULL}.
 #' @param digits An integer value indicating how many digits the output should 
 #' be rounded to.
@@ -2542,25 +2542,25 @@ run_classic <- function(model, data, constants, inits, params, dimensions = NULL
 #'}
 #' @name nimSummary
 #' @export
-nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude_params = NULL, 
+nimSummary <- function(d, trace=FALSE, plot_all=FALSE, exclude = NULL, 
                        digits=3){
-  if(is.null(exclude_params)==FALSE){
+  if(is.null(exclude)==FALSE){
     tmp1 <- ifelse(is.na(as.numeric(stringr::str_extract(
       attributes(d[[1]])$dimnames[[2]],"[1-9]+"))),
       attributes(d[[1]])$dimnames[[2]],
       substr(attributes(d[[1]])$dimnames[[2]],1,
       as.numeric(stringr::str_locate(attributes(d[[1]])$dimnames[[2]],
                                      "\\[")[, 1])-1))
-    d.remove <- lapply(d, function(x) which(tmp1 %in% exclude_params))
+    d.remove <- lapply(d, function(x) which(tmp1 %in% exclude))
     d2 <- lapply(d, function(x) x[,-d.remove[[1]]])
   }else
-if(is.null(exclude_params)){
+if(is.null(exclude)){
   if(dim(d[[1]])[2]>100){
    param_length_check <- readline(cat(crayon::red(paste(
    "Do you really want to 
     build a summary table for",dim(d[[1]])[2],"parameters? (1 = Yes or 0 = No); 
     note that this will take forever! \n",
-    "Recommend selecting 0 and setting exclude_params"))))
+    "Recommend selecting 0 and setting exclude"))))
    if(param_length_check=="0"){stop("Exiting function...",call. = FALSE)}
   }
   d2 <- d
@@ -2754,7 +2754,7 @@ if(is.null(exclude_params)){
 #' toc()
 #' 
 #' # summarize output (exclude lengthy parameters "s" and "z")
-#' nimSummary(out, exclude_params = c("s","z"), trace = TRUE)
+#' nimSummary(out, exclude = c("s","z"), trace = TRUE)
 #' 
 #' library(tictoc)       
 #' tic() # track time
@@ -4489,7 +4489,7 @@ print_model <- function(model){
 #'        parallel=TRUE,  RNGseed = 500)
 #'toc()
 #'
-#'nimSummary(out, exclude_params = c("s","z"))
+#'nimSummary(out, exclude = c("s","z"))
 #'}
 #' @name run_discrete
 #' @export

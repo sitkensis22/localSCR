@@ -87,7 +87,7 @@ mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
 pixelWidth = 100 # store pixelWidth
 
 Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, 
-res = pixelWidth) # create slightly larger buffer area for example
+res = pixelWidth) 
 
 # create polygon to use as a mask
 library(sf)

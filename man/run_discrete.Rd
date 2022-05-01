@@ -156,7 +156,7 @@ out = run_discrete(model = discrete_model, data=data, constants=constants,
        parallel=TRUE,  RNGseed = 500)
 toc()
 
-nimSummary(out, exclude_params = c("s","z"))
+nimSummary(out, exclude = c("s","z"))
 }
 }
 \author{
