@@ -193,7 +193,7 @@ hab_mask = hab_mask, setSeed = 100)
 M = 400
 
 # get initial activity center starting values
-s.st3d = initialize_classic(y=data3d$y, M=M, X=traps, buff = ext=Grid$ext, 
+s.st3d = initialize_classic(y=data3d$y, M=M, X=traps, ext=Grid$ext, 
                             hab_mask = hab_mask)
 
 # bind simulated activity centers with vector of either 1 (detected) or 0 (not detected)
