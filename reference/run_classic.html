@@ -171,7 +171,7 @@ of <code>s_alias</code> must be either 1 (e.g., <code>"s"</code>) or 2
 <span class="r-in">enc_dist <span class="op">=</span> <span class="st">"binomial"</span>,hab_mask <span class="op">=</span> <span class="va">hab_mask</span>, setSeed <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get initial activity center starting values</span></span>
-<span class="r-in"><span class="va">s.st3d</span> <span class="op">=</span> <span class="fu"><a href="initialize_classic.html">initialize_classic</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">data3d</span><span class="op">$</span><span class="va">y</span>, M<span class="op">=</span><span class="fl">500</span>, X<span class="op">=</span><span class="va">traps</span>, buff <span class="op">=</span> <span class="fl">3</span><span class="op">*</span><span class="va">mysigma</span>, </span>
+<span class="r-in"><span class="va">s.st3d</span> <span class="op">=</span> <span class="fu"><a href="initialize_classic.html">initialize_classic</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">data3d</span><span class="op">$</span><span class="va">y</span>, M<span class="op">=</span><span class="fl">500</span>, X<span class="op">=</span><span class="va">traps</span>, ext<span class="op">=</span><span class="va">Grid</span><span class="op">$</span><span class="va">ext</span>, </span>
 <span class="r-in">hab_mask <span class="op">=</span> <span class="va">hab_mask</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># rescale inputs</span></span>

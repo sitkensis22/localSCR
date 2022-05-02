@@ -169,7 +169,7 @@ This ensures that the MCMC samples will be the same during each run using the
 <span class="r-in"><span class="va">M</span> <span class="op">=</span> <span class="fl">400</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># get initial activity center starting values</span></span>
-<span class="r-in"><span class="va">s.st</span> <span class="op">=</span> <span class="fu"><a href="initialize_classic.html">initialize_classic</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">data3d</span><span class="op">$</span><span class="va">y</span>, M<span class="op">=</span><span class="va">M</span>, X<span class="op">=</span><span class="va">traps</span>, buff <span class="op">=</span> <span class="fl">3</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">mysigma</span><span class="op">)</span>, </span>
+<span class="r-in"><span class="va">s.st</span> <span class="op">=</span> <span class="fu"><a href="initialize_classic.html">initialize_classic</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">data3d</span><span class="op">$</span><span class="va">y</span>, M<span class="op">=</span><span class="va">M</span>, X<span class="op">=</span><span class="va">traps</span>, ext<span class="op">=</span><span class="va">Grid</span><span class="op">$</span><span class="va">ext</span>, </span>
 <span class="r-in">                           hab_mask <span class="op">=</span> <span class="va">hab_mask</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># convert traps and starting locations to discrete format</span></span>
