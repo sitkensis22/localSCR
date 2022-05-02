@@ -1444,8 +1444,8 @@ return(scrcode)
 #' over a survey area.
 #' @param X Either a matrix or array representing the coordinates of traps in
 #' UTMs. An array is used when traps are clustered over a survey area.
-#' @param buff The distance (m or km) that the traps should be
-#' buffered by as an integer. This is typically 3 times the sigma parameter.
+#' @param ext An \code{Extent} object from the \code{raster} package. This is 
+#' returned from \code{\link{grid_classic}}.
 #' @param site Either \code{NULL} (if a 2D trap array is used) or a vector of 
 #' integers denoting which trap array an individual (either detected or 
 #' augmented) belongs to. Note that \code{site} is provided from 
@@ -1489,7 +1489,7 @@ return(scrcode)
 #'
 #' # generate initial activity center coordinates for 2D trap array without 
 #' # habitat mask
-#' s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, buff = 3*mysigma, 
+#' s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, ext = Grid$ext, 
 #' hab_mask = FALSE, all_random = FALSE)
 #'
 #' # make simple plot
@@ -1499,7 +1499,7 @@ return(scrcode)
 #' points(s.st3d, col="red",pch=20)
 #' @name initialize_classic
 #' @export
-initialize_classic <- function(y, M, X, buff, site, hab_mask, all_random = FALSE){
+initialize_classic <- function(y, M, X, ext, site, hab_mask, all_random = FALSE){
   if(length(dim(X))!=2 & length(dim(X))!=3){
     stop("Trapping grid must be only 2 or 3 dimensions")
   }
@@ -1509,9 +1509,9 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask, all_random = FALSE
     n0 <- length(which(apply(y,1,sum)!=0))
     s.st <- matrix(NA, nrow=M, ncol=2)
     # create x limits for state-space
-    xlim <- c(min(X[,1] - max(buff)), max(X[,1] + max(buff)))
+    xlim <- ext[1:2]
      # create y limits for state-space
-    ylim <- c(min(X[,2] - max(buff)), max(X[,2] + max(buff)))
+    ylim <- ext[3:4]
   for(i in 1:n0){
     temp.y <- y[i,,]
     temp.X <- X[which(apply(temp.y,1,sum)!=0),]
@@ -1587,10 +1587,10 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask, all_random = FALSE
     n0 <- length(which(apply(y,1,sum)!=0))
     s.st <- matrix(NA, nrow=M, ncol=2)
     for(i in 1:n0){
-      # create x limits for state-space
-    xlim <- c(min(X[,1,site[i]] - max(buff)), max(X[,1,site[i]] + max(buff))) 
-    # create y limits for state-space
-    ylim <- c(min(X[,2,site[i]] - max(buff)), max(X[,2,site[i]] + max(buff))) 
+    # create x limits for state-space
+    xlim <- ext[[site[i]]][1:2]
+     # create y limits for state-space
+    ylim <- ext[[site[i]]][3:4] 
     temp.y <- y[i,,]
     temp.X <- X[which(apply(temp.y,1,sum)!=0),,site[i]]
     ntimes <- apply(temp.y,1,sum)[which(apply(temp.y,1,sum)!=0)]
@@ -1636,8 +1636,10 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask, all_random = FALSE
       } # end habitat check
   } # end detected individuals
   for(i in (n0+1):M){
-        xlim <- c(min(X[,1,site[i]] - max(buff)), max(X[,1,site[i]] + max(buff))) # create x limits for state-space
-        ylim <- c(min(X[,2,site[i]] - max(buff)), max(X[,2,site[i]] + max(buff))) # create y limits for state-space
+     # create x limits for state-space
+     xlim <- ext[[site[i]]][1:2]
+     # create y limits for state-space
+     ylim <- ext[[site[i]]][3:4] 
     if(isFALSE(hab_mask)){ # check for habitat mask for augmented individuals
         s.st[i,1]<-runif(1,xlim[1],xlim[2])
         s.st[i,2]<-runif(1,ylim[1],ylim[2])
@@ -1668,9 +1670,9 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask, all_random = FALSE
   if(length(dim(X))==2){
     s.st <- matrix(NA, nrow=M, ncol=2)
     # create x limits for state-space
-    xlim <- c(min(X[,1] - max(buff)), max(X[,1] + max(buff)))
+    xlim <- ext[1:2]
      # create y limits for state-space
-    ylim <- c(min(X[,2] - max(buff)), max(X[,2] + max(buff)))
+    ylim <- ext[3:4]
     for(i in 1:M){
       if(isFALSE(hab_mask)){ # check for habitat mask for augmented individuals
         s.st[i,1]<-runif(1,xlim[1],xlim[2])
@@ -1702,8 +1704,10 @@ initialize_classic <- function(y, M, X, buff, site, hab_mask, all_random = FALSE
     }
     s.st <- matrix(NA, nrow=M, ncol=2)
   for(i in 1:M){
-        xlim <- c(min(X[,1,site[i]] - max(buff)), max(X[,1,site[i]] + max(buff))) # create x limits for state-space
-        ylim <- c(min(X[,2,site[i]] - max(buff)), max(X[,2,site[i]] + max(buff))) # create y limits for state-space
+    # create x limits for state-space
+    xlim <- ext[[site[i]]][1:2]
+     # create y limits for state-space
+    ylim <- ext[[site[i]]][3:4] 
     if(isFALSE(hab_mask)){ # check for habitat mask for augmented individuals
         s.st[i,1]<-runif(1,xlim[1],xlim[2])
         s.st[i,2]<-runif(1,ylim[1],ylim[2])

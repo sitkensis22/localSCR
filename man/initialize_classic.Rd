@@ -4,7 +4,7 @@
 \alias{initialize_classic}
 \title{Function to generate starting locations for activity centers}
 \usage{
-initialize_classic(y, M, X, buff, site, hab_mask, all_random = FALSE)
+initialize_classic(y, M, X, ext, site, hab_mask, all_random = FALSE)
 }
 \arguments{
 \item{y}{Either a matrix or array of encounter history data, possiblity 
@@ -17,8 +17,8 @@ over a survey area.}
 \item{X}{Either a matrix or array representing the coordinates of traps in
 UTMs. An array is used when traps are clustered over a survey area.}
 
-\item{buff}{The distance (m or km) that the traps should be
-buffered by as an integer. This is typically 3 times the sigma parameter.}
+\item{ext}{An \code{Extent} object from the \code{raster} package. This is 
+returned from \code{\link{grid_classic}}.}
 
 \item{site}{Either \code{NULL} (if a 2D trap array is used) or a vector of 
 integers denoting which trap array an individual (either detected or 
@@ -73,7 +73,7 @@ enc_dist = "binomial", hab_mask = FALSE, setSeed = 50)
 
 # generate initial activity center coordinates for 2D trap array without 
 # habitat mask
-s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, buff = 3*mysigma, 
+s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, ext = Grid$ext, 
 hab_mask = FALSE, all_random = FALSE)
 
 # make simple plot
