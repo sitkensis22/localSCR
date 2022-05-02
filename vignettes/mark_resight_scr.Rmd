@@ -215,7 +215,7 @@ Next, we'll create the data and constants lists and all other items needed to in
 M = 200
 
 # get initial activity center starting values for marked individuals
-s.st_m = initialize_classic(y=data_m$y, M=M, X=traps, buff = 3*max(mysigma), 
+s.st_m = initialize_classic(y=data_m$y, M=M, X=traps, ext = Grid$ext, 
                             hab_mask = hab_mask)
 
 # rescale inputs
@@ -233,7 +233,7 @@ ext = rescale_list_m$ext
 m = 200
 
 # get initial activity center starting values for unmarked individuals
-s.st_u = initialize_classic(y=NULL, M=m, X=traps, buff = 3*max(mysigma), 
+s.st_u = initialize_classic(y=NULL, M=m, X=traps, ext = Grid$ext, 
                             hab_mask = hab_mask, all_random = TRUE)
 
 # rescale inputs (note we'll use the traps and extent from above since 

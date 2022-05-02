@@ -1805,7 +1805,7 @@ initialize_classic <- function(y, M, X, ext, site, hab_mask, all_random = FALSE)
 #'
 #' # generate initial activity center coordinates for 2D trap array without 
 #' #habitat mask
-#' s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, buff = 3*mysigma, 
+#' s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, ext=Grid$ext, 
 #' hab_mask = hab_mask)
 #'
 #' # build rescaled constants list for 2D trap array
@@ -2252,7 +2252,7 @@ mask_raster <- function(rast, FUN, grid, crs_, prev_mask){
 #' enc_dist = "binomial",hab_mask = hab_mask, setSeed = 50)
 #'
 #' # get initial activity center starting values
-#' s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, buff = 3*mysigma, 
+#' s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, ext=Grid$ext, 
 #' hab_mask = hab_mask)
 #'
 #' # rescale inputs
@@ -2512,7 +2512,7 @@ run_classic <- function(model, data, constants, inits, params, dimensions = NULL
 #' data$zeros =  c(rep(NA,constants$n0),rep(0,constants$M - constants$n0))
 #'
 #' # get initial activity center starting values
-#' s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, buff = 3*mysigma, 
+#' s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, ext=Grid$ext, 
 #' hab_mask=FALSE)
 #'
 #' # define all initial values
@@ -2734,7 +2734,7 @@ if(is.null(exclude)){
 #' data$zeros =  c(rep(NA,constants$n0),rep(0,constants$M - constants$n0))
 #' 
 #' # get initial activity center starting values
-#' s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, buff = 3*mysigma, 
+#' s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, ext=Grid$ext, 
 #' hab_mask=FALSE)
 #' 
 #' # define all initial values
@@ -3377,7 +3377,7 @@ return(scrcode)
 #' M = 400
 #' 
 #' # get initial activity center starting values
-#' s.st = initialize_classic(y=data3d$y, M=M, X=traps, buff = 3*max(mysigma), 
+#' s.st = initialize_classic(y=data3d$y, M=M, X=traps, ext=Grid$ext, 
 #'                             hab_mask = FALSE)
 #' 
 #' # get discretized traps and initial activity center grid indices
@@ -4439,7 +4439,7 @@ print_model <- function(model){
 #'M = 400
 #'
 #'# get initial activity center starting values
-#'s.st = initialize_classic(y=data3d$y, M=M, X=traps, buff = 3*max(mysigma), 
+#'s.st = initialize_classic(y=data3d$y, M=M, X=traps, ext=Grid$ext, 
 #'                            hab_mask = hab_mask)
 #'
 #'# convert traps and starting locations to discrete format
