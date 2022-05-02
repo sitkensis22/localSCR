@@ -78,7 +78,7 @@
       <h1 data-toc-skip>Spatial count models: continuous state-space and unmarked individuals</h1>
                         <h4 data-toc-skip class="author">Daniel Eacker</h4>
             
-            <h4 data-toc-skip class="date">2022-05-01</h4>
+            <h4 data-toc-skip class="date">2022-05-02</h4>
       
       
       <div class="hidden name"><code>unmarked_scr.Rmd</code></div>
@@ -274,7 +274,7 @@ We also see the use of <code><a href="../reference/initialize_classic.html">init
 <span class="va">m</span> <span class="op">=</span> <span class="fl">500</span>
 
 <span class="co"># get initial activity center starting values</span>
-<span class="va">s.st3d</span> <span class="op">=</span> <span class="fu"><a href="../reference/initialize_classic.html">initialize_classic</a></span><span class="op">(</span>y<span class="op">=</span><span class="cn">NULL</span>, M<span class="op">=</span><span class="va">m</span>, X<span class="op">=</span><span class="va">traps</span>, buff <span class="op">=</span> <span class="fl">3</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">mysigma</span><span class="op">)</span>, 
+<span class="va">s.st3d</span> <span class="op">=</span> <span class="fu"><a href="../reference/initialize_classic.html">initialize_classic</a></span><span class="op">(</span>y<span class="op">=</span><span class="cn">NULL</span>, M<span class="op">=</span><span class="va">m</span>, X<span class="op">=</span><span class="va">traps</span>, ext <span class="op">=</span> <span class="va">Grid</span><span class="op">$</span><span class="va">ext</span>, 
                             hab_mask <span class="op">=</span> <span class="va">hab_mask</span>, all_random<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
   
 <span class="co"># make ggplot</span>
@@ -566,7 +566,7 @@ In the figure we can see our two spatially separated trapping grids and that the
 <span class="va">site</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">200</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">200</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># get initial activity center starting values </span>
-<span class="va">s.st4d</span> <span class="op">=</span> <span class="fu"><a href="../reference/initialize_classic.html">initialize_classic</a></span><span class="op">(</span>y<span class="op">=</span><span class="cn">NULL</span>, M<span class="op">=</span><span class="va">m</span>, X<span class="op">=</span><span class="va">Xarray</span>, buff <span class="op">=</span> <span class="fl">3</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">mysigma</span><span class="op">)</span>, 
+<span class="va">s.st4d</span> <span class="op">=</span> <span class="fu"><a href="../reference/initialize_classic.html">initialize_classic</a></span><span class="op">(</span>y<span class="op">=</span><span class="cn">NULL</span>, M<span class="op">=</span><span class="va">m</span>, X<span class="op">=</span><span class="va">Xarray</span>, ext <span class="op">=</span> <span class="va">GridX</span><span class="op">$</span><span class="va">ext</span>, 
                       site <span class="op">=</span> <span class="va">site</span>, hab_mask <span class="op">=</span> <span class="va">hab_mask</span>,all_random <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="co"># rescale inputs</span>

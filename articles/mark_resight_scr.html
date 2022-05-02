@@ -78,7 +78,7 @@
       <h1 data-toc-skip>Mark-resight models: continuous state-space with both marked and unmarked individuals</h1>
                         <h4 data-toc-skip class="author">Daniel Eacker</h4>
             
-            <h4 data-toc-skip class="date">2022-05-01</h4>
+            <h4 data-toc-skip class="date">2022-05-02</h4>
       
       
       <div class="hidden name"><code>mark_resight_scr.Rmd</code></div>
@@ -281,7 +281,7 @@ Now lets first simulate some spatial capture-recapture data for our ‘marked’
 <span class="va">M</span> <span class="op">=</span> <span class="fl">200</span>
 
 <span class="co"># get initial activity center starting values for marked individuals</span>
-<span class="va">s.st_m</span> <span class="op">=</span> <span class="fu"><a href="../reference/initialize_classic.html">initialize_classic</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">data_m</span><span class="op">$</span><span class="va">y</span>, M<span class="op">=</span><span class="va">M</span>, X<span class="op">=</span><span class="va">traps</span>, buff <span class="op">=</span> <span class="fl">3</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">mysigma</span><span class="op">)</span>, 
+<span class="va">s.st_m</span> <span class="op">=</span> <span class="fu"><a href="../reference/initialize_classic.html">initialize_classic</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">data_m</span><span class="op">$</span><span class="va">y</span>, M<span class="op">=</span><span class="va">M</span>, X<span class="op">=</span><span class="va">traps</span>, ext <span class="op">=</span> <span class="va">Grid</span><span class="op">$</span><span class="va">ext</span>, 
                             hab_mask <span class="op">=</span> <span class="va">hab_mask</span><span class="op">)</span>
 
 <span class="co"># rescale inputs</span>
@@ -299,7 +299,7 @@ Now lets first simulate some spatial capture-recapture data for our ‘marked’
 <span class="va">m</span> <span class="op">=</span> <span class="fl">200</span>
 
 <span class="co"># get initial activity center starting values for unmarked individuals</span>
-<span class="va">s.st_u</span> <span class="op">=</span> <span class="fu"><a href="../reference/initialize_classic.html">initialize_classic</a></span><span class="op">(</span>y<span class="op">=</span><span class="cn">NULL</span>, M<span class="op">=</span><span class="va">m</span>, X<span class="op">=</span><span class="va">traps</span>, buff <span class="op">=</span> <span class="fl">3</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">mysigma</span><span class="op">)</span>, 
+<span class="va">s.st_u</span> <span class="op">=</span> <span class="fu"><a href="../reference/initialize_classic.html">initialize_classic</a></span><span class="op">(</span>y<span class="op">=</span><span class="cn">NULL</span>, M<span class="op">=</span><span class="va">m</span>, X<span class="op">=</span><span class="va">traps</span>, ext <span class="op">=</span> <span class="va">Grid</span><span class="op">$</span><span class="va">ext</span>, 
                             hab_mask <span class="op">=</span> <span class="va">hab_mask</span>, all_random <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="co"># rescale inputs (note we'll use the traps and extent from above since </span>

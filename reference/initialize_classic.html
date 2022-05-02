@@ -62,7 +62,7 @@ for habitat mask.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">initialize_classic</span><span class="op">(</span><span class="va">y</span>, <span class="va">M</span>, <span class="va">X</span>, <span class="va">buff</span>, <span class="va">site</span>, <span class="va">hab_mask</span>, all_random <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">initialize_classic</span><span class="op">(</span><span class="va">y</span>, <span class="va">M</span>, <span class="va">X</span>, <span class="va">ext</span>, <span class="va">site</span>, <span class="va">hab_mask</span>, all_random <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -77,9 +77,9 @@ over a survey area.</p></dd>
 <dt>X</dt>
 <dd><p>Either a matrix or array representing the coordinates of traps in
 UTMs. An array is used when traps are clustered over a survey area.</p></dd>
-<dt>buff</dt>
-<dd><p>The distance (m or km) that the traps should be
-buffered by as an integer. This is typically 3 times the sigma parameter.</p></dd>
+<dt>ext</dt>
+<dd><p>An <code>Extent</code> object from the <code>raster</code> package. This is 
+returned from <code><a href="grid_classic.html">grid_classic</a></code>.</p></dd>
 <dt>site</dt>
 <dd><p>Either <code>NULL</code> (if a 2D trap array is used) or a vector of 
 integers denoting which trap array an individual (either detected or 
@@ -138,7 +138,7 @@ all locations when a habitat mask is included.</p>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># generate initial activity center coordinates for 2D trap array without </span></span>
 <span class="r-in"><span class="co"># habitat mask</span></span>
-<span class="r-in"><span class="va">s.st3d</span> <span class="op">=</span> <span class="fu">initialize_classic</span><span class="op">(</span>y<span class="op">=</span><span class="va">data3d</span><span class="op">$</span><span class="va">y</span>, M<span class="op">=</span><span class="fl">500</span>, X<span class="op">=</span><span class="va">traps</span>, buff <span class="op">=</span> <span class="fl">3</span><span class="op">*</span><span class="va">mysigma</span>, </span>
+<span class="r-in"><span class="va">s.st3d</span> <span class="op">=</span> <span class="fu">initialize_classic</span><span class="op">(</span>y<span class="op">=</span><span class="va">data3d</span><span class="op">$</span><span class="va">y</span>, M<span class="op">=</span><span class="fl">500</span>, X<span class="op">=</span><span class="va">traps</span>, ext <span class="op">=</span> <span class="va">Grid</span><span class="op">$</span><span class="va">ext</span>, </span>
 <span class="r-in">hab_mask <span class="op">=</span> <span class="cn">FALSE</span>, all_random <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># make simple plot</span></span>
