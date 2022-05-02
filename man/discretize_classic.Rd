@@ -68,7 +68,7 @@ hab_mask = FALSE, setSeed = 100)
 M = 400
 
 # get initial activity center starting values
-s.st = initialize_classic(y=data3d$y, M=M, X=traps, buff = 3*max(mysigma), 
+s.st = initialize_classic(y=data3d$y, M=M, X=traps, ext=Grid$ext, 
                             hab_mask = FALSE)
 
 # get discretized traps and initial activity center grid indices

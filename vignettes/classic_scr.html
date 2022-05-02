@@ -12,7 +12,7 @@
 
 <meta name="author" content="Daniel Eacker" />
 
-<meta name="date" content="2022-04-22" />
+<meta name="date" content="2022-05-02" />
 
 <title>Classic SCR models: continuous state-space and marked individuals</title>
 
@@ -335,7 +335,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Classic SCR models: continuous state-space
 and marked individuals</h1>
 <h4 class="author">Daniel Eacker</h4>
-<h4 class="date">2022-04-22</h4>
+<h4 class="date">2022-05-02</h4>
 
 
 
@@ -426,9 +426,9 @@ data</li>
 <ol style="list-style-type: decimal">
 <li>Create traps (or detectors) and then construct a state-space</li>
 <li>Simulate ‘classic’ SCR data using state-space extent</li>
-<li>Workflow for 2-D trap array including sex-specific scaling parameter
+<li>Workflow for 2D trap array including sex-specific scaling parameter
 and habitat mask</li>
-<li>Workflow for 3-D trap array including sex-specific scaling parameter
+<li>Workflow for 3D trap array including sex-specific scaling parameter
 and habitat mask
 </p>
 <br>
@@ -470,10 +470,11 @@ create state-space</h3>
 <code>grid_classic()</code>. Also, the traps (or detectors) are plotted
 over top in blue. We arbitrarily chose a grid resolution of 100 in this
 example (i.g., <code>res = 100</code>), but this will vary by problem.
-In most situations, it is prudent to test the effect of different grid
-resolutions on the estimated abundance and density in SCR models (see
-Royle et al. 2014). Also, note the use to the EPSG code to define the
-coordinate reference system for our state-space (see <a href="https://epsg.io/32608" class="uri">https://epsg.io/32608</a>).</p>
+In situations involving habitat masks or discrete models, it is prudent
+to test the effect of different grid resolutions on the estimated
+abundance and density in SCR models (see Royle et al. 2014). Also, note
+the use to the EPSG code to define the coordinate reference system for
+our state-space (see <a href="https://epsg.io/32608" class="uri">https://epsg.io/32608</a>).</p>
 Now lets simulate some spatial capture-recapture data using
 <code>sim_classic()</code>. Note for this example, we will simulate a
 ‘true’ population size of 200 individuals (<code>N = 200</code>), 4
@@ -539,9 +540,9 @@ respectively. In order to fully specify a sex-specific scaling parameter
 in <code>sim_classic()</code>, we need to set
 <code>0 &gt; prop_sex &lt; 1</code>, otherwise the simulation will only
 use a single scaling parameter. In the example, we also specify
-<code>enc_dist = &quot;binomial</code> to use a binomial encounter
+<code>enc_dist = &quot;binomial&quot;</code> to use a binomial encounter
 distribution; the other available option is the Poisson distribution
-(<code>enc_dist = &quot;poisson</code>).</p>
+(<code>enc_dist = &quot;poisson&quot;</code>).</p>
 <p>We add on an additional layer of complexity by introducing a habitat
 mask. After constructing a polygon feature using the ‘sf’ package, we
 then use the function <code>mask_polygon()</code> to build a habitat
@@ -594,7 +595,7 @@ encounter distribution, and habitat mask</h3>
 <span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>M <span class="ot">=</span> <span class="dv">400</span></span>
 <span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="co"># get initial activity center starting values</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>s.st3d <span class="ot">=</span> <span class="fu">initialize_classic</span>(<span class="at">y=</span>data3d<span class="sc">$</span>y, <span class="at">M=</span>M, <span class="at">X=</span>traps, <span class="at">buff =</span> <span class="dv">3</span><span class="sc">*</span><span class="fu">max</span>(mysigma), </span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>s.st3d <span class="ot">=</span> <span class="fu">initialize_classic</span>(<span class="at">y=</span>data3d<span class="sc">$</span>y, <span class="at">M=</span>M, <span class="at">X=</span>traps, <span class="at">buff =</span> <span class="at">ext=</span>Grid<span class="sc">$</span>ext, </span>
 <span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>                            <span class="at">hab_mask =</span> hab_mask)</span>
 <span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="co"># bind simulated activity centers with vector of either 1 (detected) or 0 (not detected)</span></span>
@@ -724,7 +725,7 @@ was unsuitable.
 </p>
 <p><br></p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># summarize MCMC samples (exclude parameters and don&#39;t plot)</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nimSummary</span>(out, <span class="at">exclude_params =</span> <span class="fu">c</span>(<span class="st">&quot;s&quot;</span>,<span class="st">&quot;z&quot;</span>), <span class="at">trace=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nimSummary</span>(out, <span class="at">exclude =</span> <span class="fu">c</span>(<span class="st">&quot;s&quot;</span>,<span class="st">&quot;z&quot;</span>), <span class="at">trace=</span><span class="cn">FALSE</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D            0.217   0.027   0.174   0.214   0.279  1 287.723 1.003</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; N          232.708  28.761 186.000 229.000 298.000  1 287.723 1.003</span></span>
@@ -845,7 +846,7 @@ very similar to the previous one.
 <span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">rep</span>(<span class="dv">2</span>,((M<span class="sc">-</span><span class="fu">length</span>(data4d<span class="sc">$</span>site))<span class="sc">/</span><span class="dv">2</span>))))</span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co"># get initial activity center starting values </span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>s.st4d <span class="ot">=</span> <span class="fu">initialize_classic</span>(<span class="at">y=</span>data4d<span class="sc">$</span>y, <span class="at">M=</span>M, <span class="at">X=</span>Xarray, <span class="at">buff =</span> <span class="dv">3</span><span class="sc">*</span><span class="fu">max</span>(mysigma), </span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>s.st4d <span class="ot">=</span> <span class="fu">initialize_classic</span>(<span class="at">y=</span>data4d<span class="sc">$</span>y, <span class="at">M=</span>M, <span class="at">X=</span>Xarray, <span class="at">ext =</span> GridX<span class="sc">$</span>ext, </span>
 <span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>                            <span class="at">site =</span> site, <span class="at">hab_mask =</span> hab_mask)</span>
 <span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co"># rescale inputs</span></span>
@@ -907,7 +908,7 @@ very similar to the previous one.
 <span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 110.978 sec elapsed</span></span>
 <span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a><span class="co"># summary table of MCMC output (exclude &quot;s&quot; and &quot;z&quot; parameters)</span></span>
-<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a><span class="fu">nimSummary</span>(out, <span class="at">exclude_params =</span> <span class="fu">c</span>(<span class="st">&quot;s&quot;</span>,<span class="st">&quot;z&quot;</span>), <span class="at">trace =</span> <span class="cn">TRUE</span>, <span class="at">plot_all =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a><span class="fu">nimSummary</span>(out, <span class="at">exclude =</span> <span class="fu">c</span>(<span class="st">&quot;s&quot;</span>,<span class="st">&quot;z&quot;</span>), <span class="at">trace =</span> <span class="cn">TRUE</span>, <span class="at">plot_all =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat</span></span>
 <span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D            0.100   0.015   0.074   0.098   0.136  1 221.187 1.063</span></span>
 <span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; N          223.906  34.525 166.000 221.000 306.000  1 221.187 1.063</span></span>

@@ -91,7 +91,7 @@ library(localSCR)
 #  m = 500
 #  
 #  # get initial activity center starting values
-#  s.st3d = initialize_classic(y=NULL, M=m, X=traps, buff = 3*max(mysigma),
+#  s.st3d = initialize_classic(y=NULL, M=m, X=traps, ext = Grid$ext,
 #                              hab_mask = hab_mask, all_random=TRUE)
 #  
 #  # make ggplot
@@ -161,7 +161,7 @@ library(localSCR)
 
 ## ---- fig.show='hide',eval=FALSE----------------------------------------------
 #  # summarize MCMC samples (exclude parameters and don't plot)
-#  nimSummary(out, exclude_params = c("su","zu"), trace=FALSE)
+#  nimSummary(out, exclude = c("su","zu"), trace=FALSE)
 #  #>       post.mean post.sd    q2.5     q50   q97.5 f0  n.eff  Rhat
 #  #> D         0.234   0.121   0.040   0.221   0.453  1 33.817 1.121
 #  #> N       250.204 129.023  43.000 237.000 485.000  1 33.817 1.121
@@ -243,7 +243,7 @@ library(localSCR)
 #  #> 1193.95 sec elapsed
 #  
 #  # summarize output (exclude "su" and "zu" from table and make posterior/trace plots)
-#  nimSummary(out, exclude_params = c("su","zu"), trace=TRUE, plot_all=FALSE)
+#  nimSummary(out, exclude = c("su","zu"), trace=TRUE, plot_all=FALSE)
 #  #>       post.mean post.sd    q2.5     q50   q97.5 f0    n.eff  Rhat
 #  #> D         0.223   0.053   0.137   0.219   0.343  1  275.831 1.001
 #  #> N       238.946  56.449 147.000 234.000 367.000  1  275.831 1.001
@@ -326,7 +326,7 @@ library(localSCR)
 #  site = c(rep(1,200),rep(2,200))
 #  
 #  # get initial activity center starting values
-#  s.st4d = initialize_classic(y=NULL, M=m, X=Xarray, buff = 3*max(mysigma),
+#  s.st4d = initialize_classic(y=NULL, M=m, X=Xarray, ext = GridX$ext,
 #                        site = site, hab_mask = hab_mask,all_random = TRUE)
 #  
 #  # rescale inputs
@@ -401,7 +401,7 @@ library(localSCR)
 #  #> 968.93 sec elapsed
 #  
 #  # summary table of MCMC output (exclude "su" and "zu" parameters)
-#  nimSummary(out, exclude_params = c("su","zu"))
+#  nimSummary(out, exclude = c("su","zu"))
 #  #>         post.mean post.sd    q2.5     q50   q97.5 f0    n.eff  Rhat
 #  #> D           0.102   0.022   0.066   0.099   0.152  1  270.831 1.008
 #  #> N         228.569  49.067 149.000 223.000 342.000  1  270.831 1.008

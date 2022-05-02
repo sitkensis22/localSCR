@@ -79,7 +79,7 @@ enc_dist = "binomial", hab_mask = hab_mask, setSeed = 50)
 
 # generate initial activity center coordinates for 2D trap array without 
 #habitat mask
-s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, buff = 3*mysigma, 
+s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, ext=Grid$ext, 
 hab_mask = hab_mask)
 
 # build rescaled constants list for 2D trap array

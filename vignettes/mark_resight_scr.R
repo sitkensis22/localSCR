@@ -91,7 +91,7 @@ library(localSCR)
 #  M = 200
 #  
 #  # get initial activity center starting values for marked individuals
-#  s.st_m = initialize_classic(y=data_m$y, M=M, X=traps, buff = 3*max(mysigma),
+#  s.st_m = initialize_classic(y=data_m$y, M=M, X=traps, ext = Grid$ext,
 #                              hab_mask = hab_mask)
 #  
 #  # rescale inputs
@@ -109,7 +109,7 @@ library(localSCR)
 #  m = 200
 #  
 #  # get initial activity center starting values for unmarked individuals
-#  s.st_u = initialize_classic(y=NULL, M=m, X=traps, buff = 3*max(mysigma),
+#  s.st_u = initialize_classic(y=NULL, M=m, X=traps, ext = Grid$ext,
 #                              hab_mask = hab_mask, all_random = TRUE)
 #  
 #  # rescale inputs (note we'll use the traps and extent from above since
@@ -186,7 +186,7 @@ library(localSCR)
 #  toc()
 #  #> 175.6 sec elapsed
 #  
-#  nimSummary(out, exclude_params = c("s","z","su","zu"), trace=TRUE,
+#  nimSummary(out, exclude = c("s","z","su","zu"), trace=TRUE,
 #             plot_all = FALSE)
 #  #>       post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat
 #  #> D         0.206   0.041   0.141   0.202   0.300  1 123.795 1.057

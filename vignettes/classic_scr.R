@@ -94,7 +94,7 @@ library(localSCR)
 #  M = 400
 #  
 #  # get initial activity center starting values
-#  s.st3d = initialize_classic(y=data3d$y, M=M, X=traps, buff = 3*max(mysigma),
+#  s.st3d = initialize_classic(y=data3d$y, M=M, X=traps, buff = ext=Grid$ext,
 #                              hab_mask = hab_mask)
 #  
 #  # bind simulated activity centers with vector of either 1 (detected) or 0 (not detected)
@@ -184,7 +184,7 @@ library(localSCR)
 
 ## ---- fig.show='hide',eval=FALSE----------------------------------------------
 #  # summarize MCMC samples (exclude parameters and don't plot)
-#  nimSummary(out, exclude_params = c("s","z"), trace=FALSE)
+#  nimSummary(out, exclude = c("s","z"), trace=FALSE)
 #  #>          post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat
 #  #> D            0.217   0.027   0.174   0.214   0.279  1 287.723 1.003
 #  #> N          232.708  28.761 186.000 229.000 298.000  1 287.723 1.003
@@ -262,7 +262,7 @@ library(localSCR)
 #                         rep(2,((M-length(data4d$site))/2))))
 #  
 #  # get initial activity center starting values
-#  s.st4d = initialize_classic(y=data4d$y, M=M, X=Xarray, buff = 3*max(mysigma),
+#  s.st4d = initialize_classic(y=data4d$y, M=M, X=Xarray, ext = GridX$ext,
 #                              site = site, hab_mask = hab_mask)
 #  
 #  # rescale inputs
@@ -324,7 +324,7 @@ library(localSCR)
 #  #> 110.978 sec elapsed
 #  
 #  # summary table of MCMC output (exclude "s" and "z" parameters)
-#  nimSummary(out, exclude_params = c("s","z"), trace = TRUE, plot_all = FALSE)
+#  nimSummary(out, exclude = c("s","z"), trace = TRUE, plot_all = FALSE)
 #  #>          post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat
 #  #> D            0.100   0.015   0.074   0.098   0.136  1 221.187 1.063
 #  #> N          223.906  34.525 166.000 221.000 306.000  1 221.187 1.063

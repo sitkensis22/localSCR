@@ -102,7 +102,7 @@ data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = mysigma,
 M = 400
 
 # get initial activity center starting values
-s.st = initialize_classic(y=data3d$y, M=M, X=traps, buff = 3*max(mysigma), 
+s.st = initialize_classic(y=data3d$y, M=M, X=traps, ext=Grid$ext, 
                            hab_mask = hab_mask)
 
 # convert traps and starting locations to discrete format

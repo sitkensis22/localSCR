@@ -92,7 +92,7 @@ data$z = c(rep(1,constants$n0),rep(NA,constants$M - constants$n0))
 data$zeros =  c(rep(NA,constants$n0),rep(0,constants$M - constants$n0))
 
 # get initial activity center starting values
-s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, buff = 3*mysigma, 
+s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, ext=Grid$ext, 
 hab_mask=FALSE)
 
 # define all initial values

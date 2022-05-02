@@ -104,7 +104,7 @@ mysigma, prop_sex = 1, N = 200, K = 4, base_encounter = 0.15,
 enc_dist = "binomial",hab_mask = hab_mask, setSeed = 50)
 
 # get initial activity center starting values
-s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, buff = 3*mysigma, 
+s.st3d = initialize_classic(y=data3d$y, M=500, X=traps, ext=Grid$ext, 
 hab_mask = hab_mask)
 
 # rescale inputs
