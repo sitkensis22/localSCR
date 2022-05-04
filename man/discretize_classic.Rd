@@ -30,10 +30,12 @@ augmented) belongs to. Note that \code{site} is provided from
 from \code{\link{mask_polygon}} or \code{\link{mask_raster}} functions.}
 }
 \value{
-A list of grid coordinates for the state-space \code{grid}, number 
-of pixels or cells \code{nPix}, discretized traps as a matrix or array \code{X} and 
-indices for initial activity center locations \code{s.st}. Note that the latter 
-relates to the rows of \code{grid} provided as an input.
+\itemize{
+ \item{\code{grid}}{ Grid coordinates for the state-space.}
+ \item{\code{nPix}}{ Number of state-space pixels.}
+ \item{\code{X}}{ Discretized traps as a matrix or array.}
+ \item{\code{s.st}}{ Indices for initial activity center locations.}
+}
 }
 \description{
 Discretize state-space grid, traps and initial activity center 
@@ -44,6 +46,10 @@ This function prepares the state-space grid, trap coordinates and
 initial activity center coordinates for use in a discrete spatial capture-recapture 
 model. Note that the number of rows in the state-space grid coordinate matrix will 
 be reduced and this object will need to be adjusted before being used in the model.
+}
+\note{
+The vector \code{s.st} returned from the function indexes the
+rows of \code{grid}.
 }
 \examples{
 # simulate a single trap array with random positional noise
