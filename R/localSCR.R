@@ -1846,9 +1846,9 @@ rescale_classic <- function(X, ext, s.st, site, hab_mask){
                               to = c(0,dim(hab_mask)[2]), from=ext[1:2])
     rescale_list$s.st[,2] <- scales::rescale(s.st[,2], 
                               to = c(0,dim(hab_mask)[1]), from=ext[3:4])
-    rescale_list$ext[,1:2] <- scales::rescale(ext[,1:2], 
+    rescale_list$ext[1:2] <- scales::rescale(ext[1:2], 
                               to = c(0,dim(hab_mask)[2]), from=ext[1:2])
-    rescale_list$ext[,3:4] <- scales::rescale(ext[,3:4], 
+    rescale_list$ext[3:4] <- scales::rescale(ext[3:4], 
                               to = c(0,dim(hab_mask)[1]), from=ext[3:4])
 
   }else
