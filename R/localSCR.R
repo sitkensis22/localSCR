@@ -1823,6 +1823,8 @@ initialize_classic <- function(y, M, X, ext, site, hab_mask, all_random = FALSE)
 #' # build rescaled constants list for 2D trap array
 #' constList = rescale_classic(X = traps, ext = Grid$ext, s.st = s.st3d, 
 #' site = NULL, hab_mask = hab_mask)
+#' 
+#' # inspect list
 #' str(constList)
 #' @name rescale_classic
 #' @export
@@ -1833,7 +1835,7 @@ rescale_classic <- function(X, ext, s.st, site, hab_mask){
   if(is.null(hab_mask)){
     stop("Must include habitat mask for rescaling of inputs")
   }
-  rescale_list <- list(X=X,exts.st=s.st)
+  rescale_list <- list(X=X,ext=ext,s.st=s.st)
   # for dim of length 2
   if(length(dim(X))==2){
     rescale_list$X[,1] <- scales::rescale(X[,1], to = c(0,dim(hab_mask)[2]), 
@@ -5146,3 +5148,5 @@ if(class(ext)=="list"){ # for clustered traps
     }
   return(rescale_list)
 } # end function 'rescale_local'
+
+

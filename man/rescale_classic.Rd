@@ -87,6 +87,8 @@ hab_mask = hab_mask)
 # build rescaled constants list for 2D trap array
 constList = rescale_classic(X = traps, ext = Grid$ext, s.st = s.st3d, 
 site = NULL, hab_mask = hab_mask)
+
+# inspect list
 str(constList)
 }
 \seealso{
