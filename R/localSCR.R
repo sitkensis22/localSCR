@@ -5019,7 +5019,7 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
 #' @return
 #' \itemize{ 
 #'  \item{\code{X}}{ Rescaled trap coordinates}
-#'  \item{\code{ext}}{ Rescaled \code{Extent} object from the \code{raster} package.}
+#'  \item{\code{ext_mat}}{ Rescaled matrix of individual state-space grid extents.}
 #'  \item{\code{s.st}}{ A matrix of rescaled starting activity center coordinates.}
 #' }
 #' @details This function is only meant to be used when habitat masking is 
