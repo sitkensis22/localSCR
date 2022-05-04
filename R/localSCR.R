@@ -4937,3 +4937,148 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
   }
   } # end dim 3
 } # end function 'localize_classic'
+
+
+
+#' Function to rescale trap coordinates, individual-level grid extent, 
+#' and starting activity center coordinates for local SCR approach
+#'
+#' @description Rescale inputs to prepare data for habitat mask to be used.
+#'
+#' @param X An array representing the coordinates of traps in
+#' UTMs for each individual. This is returned from \code{\link{localize_classic}}.
+#' @param ext An \code{Extent} object from the \code{raster} package. This is 
+#' returned from \code{\link{localize_classic}}.
+#' @param ext_mat A matrix of individual state-space grid extents returned from 
+#' \code{\link{localize_classic}}.
+#' @param s.st A matrix of starting activity center coordinates. This is 
+#' returned from \code{\link{localize_classic}}
+#' @param site Either \code{NULL} (if a 2D trap array is used) or a vector of 
+#' integers denoting which trap array an individual (either detected or 
+#' augmented) belongs to. Note that \code{site} is provided from 
+#' \code{\link{sim_classic}} when a 3D trap array is used. However, this 
+#' \code{site} variable must be correctly augmented based on the total 
+#' augmented population size (i.e., \code{M}).
+#' @param hab_mask A matrix or arary output from \code{\link{mask_polygon}} or
+#'  \code{\link{mask_raster}} functions.
+#' @return A list of rescaled trap coordinates, grid extents, and starting 
+#' activity center coordinates.
+#' @details This function is only meant to be used when habitat masking is 
+#' incorporated into a local SCR model. The functions properly rescales inputs for this
+#' SCR approach based onthe habitat mask. Note that the \code{pixelWidth} needs to 
+#' be included as an input in the model after inputs are rescaled to correctly
+#' estimate the scaling parameter (i.e., 'sigma').
+#' @author Daniel Eacker
+#' @importFrom scales rescale
+#' @seealso \code{\link{mask_polygon}}, \code{\link{mask_raster}}
+#' @examples
+#'\dontrun{
+#' # simulate a single trap array with random positional noise
+#' x <- seq(-1600, 1600, length.out = 6)
+#' y <- seq(-1600, 1600, length.out = 6)
+#' traps <- as.matrix(expand.grid(x = x, y = y))
+#' # add some random noise to locations
+#' set.seed(100)
+#' traps <- traps + runif(prod(dim(traps)),-20,20) 
+#' mysigma = 300 # simulate sigma of 300 m
+#' mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
+#' pixelWidth = 100 # grid resolution
+#' 
+#' # Simulated abundance
+#' Nsim = 250
+#' 
+#' # Create initial grid and extent (use a slightly bigger buffer to match
+#' # scaled-up state-space below)
+#' Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3.7*mysigma, res = pixelWidth)
+#' 
+#' # create polygon to use as a mask
+#' library(sf)
+#' poly = st_sfc(st_polygon(x=list(matrix(c(-2465,-2465,2530,-2550,2650,2550,
+#' 0,2550,-800,2500,-2350,2300,-2465,-2465),ncol=2, byrow=TRUE))), crs =  mycrs)
+#' 
+#' # make simple plot
+#' par(mfrow=c(1,1))
+#' plot(Grid$grid, pch=20)
+#' points(traps, col="blue",pch=20)
+#' plot(poly, add=TRUE)
+#' 
+#' # create habitat mask from polygon
+#' hab_mask = mask_polygon(poly = poly, grid = Grid$grid, crs_ = mycrs, 
+#' prev_mask = NULL)
+#' 
+# simulate SCR data
+#' data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, sigma_ = mysigma, 
+#'                   prop_sex = 1, N = Nsim, K = 4, base_encounter = 0.15, 
+#'                   enc_dist = "binomial", hab_mask = hab_mask, setSeed = 100)
+#' 
+#' # generate initial activity center coordinates for 2D trap array without 
+#' # habitat mask
+#' s.st = initialize_classic(y=data3d$y, M=500, X=traps, ext = Grid$ext, 
+#' hab_mask = hab_mask)
+#' 
+#' # now use grid_classic to create an individual-level state-space (with origin 0, 0)
+#' Grid_ind = grid_classic(X = matrix(c(0,0),nrow=1), crs_ = mycrs, 
+#'                         buff = 3*mysigma, res = 100)
+#' 
+#' # now localize the data components created above 
+#' local_list = localize_classic(y = data3d$y, grid_ind = Grid_ind$grid, X=traps, 
+#'                             crs_ = mycrs, sigma_ = mysigma, s.st = s.st,
+#'                             hab_mask = hab_mask)
+#' 
+#' # rescale inputs
+#' rescale_list = rescale_local(X = local_list$X, ext = local_list$ext, 
+#'                              ext_mat = local_list$ext_mat,
+#'                              s.st = local_list$s.st, hab_mask = hab_mask)
+#' 
+#' # inspect rescaled list
+#' str(rescale_list)
+#'}
+#' @name rescale_local
+#' @export
+rescale_local <- function(X, ext, ext_mat, s.st, site, hab_mask){
+  if(is.null(hab_mask)){
+    stop("Must include habitat mask for rescaling of inputs")
+  }
+  rescale_list <- list(X=X,ext_mat=ext_mat,s.st=s.st)
+  # for non-clustered traps
+  if(class(ext)!="list"){
+    rescale_list$X[,,1] <- scales::rescale(X[,,1], to = c(0,dim(hab_mask)[2]), 
+                                          from=ext[1:2])
+    rescale_list$X[,,2] <- scales::rescale(X[,,2], to = c(0,dim(hab_mask)[1]), 
+                                          from=ext[3:4])
+    rescale_list$s.st[,1] <- scales::rescale(s.st[,1], 
+                              to = c(0,dim(hab_mask)[2]), from=ext[1:2])
+    rescale_list$s.st[,2] <- scales::rescale(s.st[,2], 
+                              to = c(0,dim(hab_mask)[1]), from=ext[3:4])
+    rescale_list$ext_mat[,1:2] <- scales::rescale(ext_mat[,1:2], 
+                              to = c(0,dim(hab_mask)[2]), from=ext[1:2])
+    rescale_list$ext_mat[,3:4] <- scales::rescale(ext_mat[,3:4], 
+                              to = c(0,dim(hab_mask)[1]), from=ext[3:4])
+  }else
+if(class(ext)=="list"){ # for clustered traps
+  for(g in 1:dim(X)[3]){ # loop over trap arrays
+  rescale_list$X[which(site==g),,1] <- scales::rescale(X[which(site==g),,1], 
+                  to = c(0,dim(hab_mask)[2]), from=ext[[g]][1:2])
+  rescale_list$X[which(site==g),,2] <- scales::rescale(X[which(site==g),,2], 
+                  to = c(0,dim(hab_mask)[1]), from=ext[[g]][3:4])
+  rescale_list$s.st[which(site==g),1] <- scales::rescale(s.st[which(site==g),1], 
+                 to = c(0,dim(hab_mask)[2]), from=ext[[g]][1:2])
+  rescale_list$s.st[which(site==g),2] <- scales::rescale(s.st[which(site==g),2], 
+                  to = c(0,dim(hab_mask)[1]), from=ext[[g]][3:4])
+    # check that starting coordinates are still in bounds
+  rescale_list$s.st[which(site==g),1] <- 
+      ifelse(rescale_list$s.st[which(site==g),1]>=dim(hab_mask)[2],
+      rescale_list$s.st[which(site==g),1]-1,rescale_list$s.st[which(site==g),1])
+  rescale_list$s.st[which(site==g),2] <- 
+      ifelse(rescale_list$s.st[which(site==g),2]>=dim(hab_mask)[1],
+      rescale_list$s.st[which(site==g),2]-1,rescale_list$s.st[which(site==g),2])
+  rescale_list$ext_mat[which(site==g),1:2] <- 
+    scales::rescale(ext_mat[which(site==g),1:2], 
+       to = c(0,dim(hab_mask)[2]), from=ext[[g]][1:2])
+  rescale_list$ext_mat[which(site==g),3:4] <- 
+    scales::rescale(ext_mat[which(site==g),3:4], 
+      to = c(0,dim(hab_mask)[1]), from=ext[[g]][3:4])
+  }
+    }
+  return(rescale_list)
+} # end function 'rescale_local'
