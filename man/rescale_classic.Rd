@@ -28,8 +28,11 @@ augmented population size (i.e., \code{M}).}
 \code{\link{mask_raster}} functions.}
 }
 \value{
-A list of rescaled trap coordinates, grid extents, and starting 
-activity center coordinates.
+\itemize{ 
+ \item{\code{X}}{ Rescaled trap coordinates}
+ \item{\code{ext}}{ Rescaled \code{Extent} object from the \code{raster} package.}
+ \item{\code{s.st}}{ A matrix of rescaled starting activity center coordinates.}
+}
 }
 \description{
 Rescale inputs to prepare data for habitat mask to be used.

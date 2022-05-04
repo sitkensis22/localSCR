@@ -1766,8 +1766,12 @@ initialize_classic <- function(y, M, X, ext, site, hab_mask, all_random = FALSE)
 #' augmented population size (i.e., \code{M}).
 #' @param hab_mask A matrix or arary output from \code{\link{mask_polygon}} or
 #'  \code{\link{mask_raster}} functions.
-#' @return A list of rescaled trap coordinates, grid extents, and starting 
-#' activity center coordinates.
+#' @return
+#' \itemize{ 
+#'  \item{\code{X}}{ Rescaled trap coordinates}
+#'  \item{\code{ext}}{ Rescaled \code{Extent} object from the \code{raster} package.}
+#'  \item{\code{s.st}}{ A matrix of rescaled starting activity center coordinates.}
+#' }
 #' @details This function is only meant to be used when habitat masking is 
 #' incorporated into the model. The functions properly rescales inputs based on 
 #' the dimensions of the habitat mask. Note that the \code{pixelWidth} needs to 
@@ -5012,8 +5016,12 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
 #' augmented population size (i.e., \code{M}).
 #' @param hab_mask A matrix or arary output from \code{\link{mask_polygon}} or
 #'  \code{\link{mask_raster}} functions.
-#' @return A list of rescaled trap coordinates, grid extents, and starting 
-#' activity center coordinates.
+#' @return
+#' \itemize{ 
+#'  \item{\code{X}}{ Rescaled trap coordinates}
+#'  \item{\code{ext}}{ Rescaled \code{Extent} object from the \code{raster} package.}
+#'  \item{\code{s.st}}{ A matrix of rescaled starting activity center coordinates.}
+#' }
 #' @details This function is only meant to be used when habitat masking is 
 #' incorporated into a local SCR model. The functions properly rescales inputs for this
 #' SCR approach based onthe habitat mask. Note that the \code{pixelWidth} needs to 
