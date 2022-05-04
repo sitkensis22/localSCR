@@ -4661,6 +4661,13 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
   x_coord <- seq(-sigma_*6,sigma_*6,sigma_*6) + centroid[1]
   y_coord <-  seq(-sigma_*6,sigma_*6,sigma_*6) + centroid[2]
   xy_ss <- as.matrix(expand.grid(x_coord,y_coord))
+  # check to see if augmented coordinates are in trap range
+  poly_check <- sf::st_buffer(sf::st_cast(sf::st_sfc(sf::st_multipoint(xy_ss),
+              crs = crs_),"POINT"),dist = sigma_*9)
+  Xcheck <- as.numeric(sf::st_intersects(poly_check,
+                sf::st_sfc(sf::st_multipoint(X), crs =  crs_)))
+  # remove augmented coordinates that are out of trap range
+  xy_ss <- xy_ss[Xcheck == 1,]
    # remake grid
    grid_out <- raster::rasterFromXYZ(xy_ss,crs= crs_)
    res(grid_out) <- res(raster::rasterFromXYZ(grid_ind,crs= crs_))
@@ -4689,6 +4696,13 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
     x_coord <- seq(-sigma_*6,sigma_*6,sigma_*6) + centroid[1]
     y_coord <-  seq(-sigma_*6,sigma_*6,sigma_*6) + centroid[2]
     xy_ss <- as.matrix(expand.grid(x_coord,y_coord))
+    # check to see if augmented coordinates are in trap range
+    poly_check <- sf::st_buffer(sf::st_cast(sf::st_sfc(sf::st_multipoint(xy_ss),
+              crs = crs_),"POINT"),dist = sigma_*9)
+    Xcheck <- as.numeric(sf::st_intersects(poly_check,
+                sf::st_sfc(sf::st_multipoint(X), crs =  crs_)))
+    # remove augmented coordinates that are out of trap range
+    xy_ss <- xy_ss[Xcheck == 1,]
    # remake grid
    grid_out <- raster::rasterFromXYZ(xy_ss,crs=crs_)
    res(grid_out) <- res(raster::rasterFromXYZ(grid_ind,crs=crs_))
@@ -4785,6 +4799,13 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
   grid_out <- list() # create empty list to hold fine-scale state-space coordinates for each site
   for(i in 1:dim(X)[3]){
     xy_ss[[i]] <- as.matrix(expand.grid(x_coord[,i],y_coord[,i]))
+    # check to see if augmented coordinates are in trap range
+    poly_check <- sf::st_buffer(sf::st_cast(sf::st_sfc(sf::st_multipoint(xy_ss[[i]]),
+              crs = crs_),"POINT"),dist = sigma_*9)
+    Xcheck <- as.numeric(sf::st_intersects(poly_check,
+                sf::st_sfc(sf::st_multipoint(X[,,i]), crs =  crs_)))
+    # remove augmented coordinates that are out of trap range
+    xy_ss[[i]] <- xy_ss[[i]][Xcheck == 1,]
     grid_out[[i]] <- raster::rasterFromXYZ(xy_ss[[i]],crs= crs_)
     res(grid_out[[i]]) <- res(raster::rasterFromXYZ(grid_ind,crs= crs_))
   }
@@ -4798,7 +4819,7 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
    aug_mat <- list() # create empty list to hold augmentation coordinates
    for(i in 1:dim(X)[3]){
    aug_mat[[i]] <- do.call(rbind, replicate(xy_ss[[i]], 
-                      n = ceiling(n_vec[i]/nrow(xy_ss[[1]])), simplify = FALSE))
+                      n = ceiling(n_vec[i]/nrow(xy_ss[[i]])), simplify = FALSE))
    aug_mat[[i]] <- aug_mat[[i]][1:n_vec[i],]
    }
    aug_all <- do.call(rbind, aug_mat)
@@ -4834,6 +4855,13 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
    grid_out <- list()
    for(i in 1:dim(X)[3]){
     xy_ss[[i]] <- as.matrix(expand.grid(x_coord[,i],y_coord[,i]))
+    # check to see if augmented coordinates are in trap range
+    poly_check <- sf::st_buffer(sf::st_cast(sf::st_sfc(sf::st_multipoint(xy_ss[[i]]),
+              crs = crs_),"POINT"),dist = sigma_*9)
+    Xcheck <- as.numeric(sf::st_intersects(poly_check,
+                sf::st_sfc(sf::st_multipoint(X[,,i]), crs =  crs_)))
+    # remove augmented coordinates that are out of trap range
+    xy_ss[[i]] <- xy_ss[[i]][Xcheck == 1,]
     grid_out[[i]] <- raster::rasterFromXYZ(xy_ss[[i]],crs= crs_)
     res(grid_out[[i]]) <- res(raster::rasterFromXYZ(grid_ind,crs= crs_))
    }
