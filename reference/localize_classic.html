@@ -90,10 +90,11 @@ UTMs. An array is used when traps are clustered over a survey area.</p></dd>
 location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).</p></dd>
 <dt>sigma_</dt>
 <dd><p>The scaling parameter of the bivariate normal kernel either
-in meters or kilometers as an integer.</p></dd>
+in meters or kilometers as an integer. Note that if <code>sigma_</code> is
+sex-specific, the maximum value will be used.</p></dd>
 <dt>s.st</dt>
 <dd><p>A matrix of starting activity center coordinates. This is 
-returned from <code><a href="initialize_classic.html">initialize_classic</a></code></p></dd>
+returned from <code><a href="initialize_classic.html">initialize_classic</a></code>.</p></dd>
 <dt>site</dt>
 <dd><p>Either <code>NULL</code> (if a 2D trap array is used) or a vector of 
 integers denoting which trap array an individual (either detected or 
@@ -103,7 +104,7 @@ augmented) belongs to. Note that <code>site</code> is provided from
  augmented population size (i.e., <code>M</code>).</p></dd>
 <dt>hab_mask</dt>
 <dd><p>Either <code>FALSE</code> (the default) or a matrix or array output
-from <code><a href="mask_polygon.html">mask_polygon</a></code> or <code><a href="mask_raster.html">mask_raster</a></code> functions</p></dd>
+from <code><a href="mask_polygon.html">mask_polygon</a></code> or <code><a href="mask_raster.html">mask_raster</a></code> functions.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
