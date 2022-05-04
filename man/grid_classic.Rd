@@ -21,7 +21,7 @@ buffered by as an integer. This is typically 3 times the sigma parameter.}
 \value{
 \itemize{
  \item{\code{grid}}{ A list of a matrix or array of grid coordinates.}
- \item{\code{ext}}{ An extent object \code{ext}.} 
+ \item{\code{ext}}{ An extent object from the \code{raster} package.} 
 }
 }
 \description{
@@ -38,7 +38,7 @@ The matrix or array object can be used to develop a habitat mask in a uniform
 state-space or as a discretized state-space.
 }
 \note{
-Note that a matrix object is returned if the 
+A matrix object is returned if the 
 coordinates of the traps are a matrix (i.e., 2D), otherwise an array object
 is returned when trap coordinates are in a 3D array.
 }

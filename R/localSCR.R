@@ -14,9 +14,9 @@
 #' @return 
 #' \itemize{
 #'  \item{\code{grid}}{ A list of a matrix or array of grid coordinates.}
-#'  \item{\code{ext}}{ An extent object \code{ext}.} 
+#'  \item{\code{ext}}{ An extent object from the \code{raster} package.} 
 #' }
-#' @note Note that a matrix object is returned if the 
+#' @note A matrix object is returned if the 
 #' coordinates of the traps are a matrix (i.e., 2D), otherwise an array object
 #' is returned when trap coordinates are in a 3D array.
 #' @details This function supports spatial capture-recapture analysis by
