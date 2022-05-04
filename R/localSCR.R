@@ -4589,9 +4589,10 @@ run_discrete <- function(model, data, constants, inits, params, dimensions = NUL
 #' @param crs_ The UTM coordinate reference system (EPSG code) used for your
 #' location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).
 #' @param sigma_ The scaling parameter of the bivariate normal kernel either
-#' in meters or kilometers as an integer.
+#' in meters or kilometers as an integer. Note that if \code{sigma_} is
+#' sex-specific, the maximum value will be used. 
 #' @param s.st A matrix of starting activity center coordinates. This is 
-#' returned from \code{\link{initialize_classic}}
+#' returned from \code{\link{initialize_classic}}.
 #' @param site Either \code{NULL} (if a 2D trap array is used) or a vector of 
 #' integers denoting which trap array an individual (either detected or 
 #' augmented) belongs to. Note that \code{site} is provided from 
@@ -4599,7 +4600,7 @@ run_discrete <- function(model, data, constants, inits, params, dimensions = NUL
 #'  \code{site} variable must be correctly augmented based on the total 
 #'  augmented population size (i.e., \code{M}).
 #' @param hab_mask Either \code{FALSE} (the default) or a matrix or array output
-#'  from \code{\link{mask_polygon}} or \code{\link{mask_raster}} functions
+#'  from \code{\link{mask_polygon}} or \code{\link{mask_raster}} functions.
 #' @return A list of data components needed to for classic SCR models in a local
 #' approach. Specifically, the function returns:
 #' \itemize{
@@ -4685,7 +4686,7 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
    # first get trap indices
    grid_i <- cbind(grid_ind[,1]+s.st[i,1],grid_ind[,2]+s.st[i,2])
    ext_mat[i,] <- as.vector(raster::extent(raster::rasterFromXYZ(grid_i,crs= crs_)))
-   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = sigma_*9)
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = max(sigma_)*9)
    Xint <- unlist(sf::st_intersects(poly_buff,
                     sf::st_cast(sf::st_sfc(sf::st_multipoint(X), crs =  crs_),"POINT")))
    Jind[i] <- length(Xint) 
@@ -4695,12 +4696,12 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
   # now deal with augmentation
   centroid <- matrix(apply(X, 2, mean),nrow=1)
   # get coordinates for augmented state-space centroid
-  x_coord <- seq(-sigma_*6,sigma_*6,sigma_*6) + centroid[1]
-  y_coord <-  seq(-sigma_*6,sigma_*6,sigma_*6) + centroid[2]
+  x_coord <- seq(-max(sigma_)*6,max(sigma_)*6,max(sigma_)*6) + centroid[1]
+  y_coord <-  seq(-max(sigma_)*6,max(sigma_)*6,max(sigma_)*6) + centroid[2]
   xy_ss <- as.matrix(expand.grid(x_coord,y_coord))
   # check to see if augmented coordinates are in trap range
   poly_check <- sf::st_buffer(sf::st_cast(sf::st_sfc(sf::st_multipoint(xy_ss),
-              crs = crs_),"POINT"),dist = sigma_*9)
+              crs = crs_),"POINT"),dist = max(sigma_)*9)
   Xcheck <- as.numeric(sf::st_intersects(poly_check,
                 sf::st_sfc(sf::st_multipoint(X), crs =  crs_)))
   # remove augmented coordinates that are out of trap range
@@ -4715,7 +4716,7 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
   # replicate layers of individual state-space centroids
   for(i in (n0+1):nrow(s.st)){
    s.st[i,] <- aug_mat[i-n0,]
-   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = sigma_*9)
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = max(sigma_)*9)
    Xint <- unlist(sf::st_intersects(poly_buff,
                 sf::st_cast(sf::st_sfc(sf::st_multipoint(X), crs =  crs_),"POINT")))
    Jind[i] <- length(Xint) 
@@ -4730,12 +4731,12 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
     # now deal with augmentation
     centroid <- matrix(apply(X, 2, mean),nrow=1)
     # get coordinates for augmented state-space centroid
-    x_coord <- seq(-sigma_*6,sigma_*6,sigma_*6) + centroid[1]
-    y_coord <-  seq(-sigma_*6,sigma_*6,sigma_*6) + centroid[2]
+    x_coord <- seq(-max(sigma_)*6,max(sigma_)*6,max(sigma_)*6) + centroid[1]
+    y_coord <-  seq(-max(sigma_)*6,max(sigma_)*6,max(sigma_)*6) + centroid[2]
     xy_ss <- as.matrix(expand.grid(x_coord,y_coord))
     # check to see if augmented coordinates are in trap range
     poly_check <- sf::st_buffer(sf::st_cast(sf::st_sfc(sf::st_multipoint(xy_ss),
-              crs = crs_),"POINT"),dist = sigma_*9)
+              crs = crs_),"POINT"),dist = max(sigma_)*9)
     Xcheck <- as.numeric(sf::st_intersects(poly_check,
                 sf::st_sfc(sf::st_multipoint(X), crs =  crs_)))
     # remove augmented coordinates that are out of trap range
@@ -4763,7 +4764,7 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
    prop_habitat[i] <- mean(apply(grid_i_rescale, 1, function(x)  
       hab_mask[(trunc(x[2])+1),(trunc(x[1])+1)]),na.rm=TRUE)
    ext_mat[i,] <- as.vector(raster::extent(raster::rasterFromXYZ(grid_i,crs= crs_)))
-   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = sigma_*9)
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = max(sigma_)*9)
    Xint <- unlist(sf::st_intersects(poly_buff,
                 sf::st_cast(sf::st_sfc(sf::st_multipoint(X), crs =  crs_),"POINT")))
    Jind[i] <- length(Xint) 
@@ -4774,7 +4775,7 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
         replicate(n = ceiling((nrow(s.st) - n0)/nrow(xy_ss)), xy_ss, simplify = FALSE))
   for(i in (n0+1):nrow(s.st)){
    s.st[i,] <- aug_mat[i-n0,]
-   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = sigma_*9)
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = max(sigma_)*9)
    Xint <- unlist(sf::st_intersects(poly_buff,
                   sf::st_cast(sf::st_sfc(sf::st_multipoint(X), crs =  crs_),"POINT")))
    Jind[i] <- length(Xint) 
@@ -4820,7 +4821,7 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
    # first get trap indices
    grid_i <- cbind(grid_ind[,1]+s.st[i,1],grid_ind[,2]+s.st[i,2])
    ext_mat[i,] <- as.vector(raster::extent(raster::rasterFromXYZ(grid_i,crs= crs_)))
-   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = sigma_*9)
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = max(sigma_)*9)
    Xint <- unlist(sf::st_intersects(poly_buff,
           sf::st_cast(sf::st_sfc(sf::st_multipoint(X[,,site[i]]), crs =  crs_),"POINT")))
    Jind[i] <- length(Xint) 
@@ -4830,15 +4831,15 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
   # now deal with augmentation
   centroid <- matrix(apply(X, c(2,3), mean),nrow=2)
   # get coordinates for augmented state-space centroid
-  x_coord <- apply(centroid, 2, function(x) seq(-sigma_*6,sigma_*6,sigma_*6) + x[1])
-  y_coord <- apply(centroid, 2, function(x) seq(-sigma_*6,sigma_*6,sigma_*6) + x[2])
+  x_coord <- apply(centroid, 2, function(x) seq(-max(sigma_)*6,max(sigma_)*6,max(sigma_)*6) + x[1])
+  y_coord <- apply(centroid, 2, function(x) seq(-max(sigma_)*6,max(sigma_)*6,max(sigma_)*6) + x[2])
   xy_ss <- list() # create empty list to hold course state-space coordinates for each site
   grid_out <- list() # create empty list to hold fine-scale state-space coordinates for each site
   for(i in 1:dim(X)[3]){
     xy_ss[[i]] <- as.matrix(expand.grid(x_coord[,i],y_coord[,i]))
     # check to see if augmented coordinates are in trap range
     poly_check <- sf::st_buffer(sf::st_cast(sf::st_sfc(sf::st_multipoint(xy_ss[[i]]),
-              crs = crs_),"POINT"),dist = sigma_*9)
+              crs = crs_),"POINT"),dist = max(sigma_)*9)
     Xcheck <- as.numeric(sf::st_intersects(poly_check,
                 sf::st_sfc(sf::st_multipoint(X[,,i]), crs =  crs_)))
     # remove augmented coordinates that are out of trap range
@@ -4872,7 +4873,7 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
    s.st = rbind(s.st, matrix(NA,nrow=(nrow(aug_all)+n0-nrow(s.st)), ncol=2))
    for(i in (n0+1):nrow(s.st)){
    s.st[i,] <- aug_all[i-n0,]
-   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = sigma_*9)
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = max(sigma_)*9)
    Xint <- unlist(sf::st_intersects(poly_buff,
           sf::st_cast(sf::st_sfc(sf::st_multipoint(X[,,site[i]]), crs =  crs_),"POINT")))
    Jind[i] <- length(Xint) 
@@ -4886,8 +4887,8 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
  if(isFALSE(hab_mask)==FALSE){ # habitat mask 
    centroid <- matrix(apply(X, c(2,3), mean),nrow=2)
    # get coordinates for augmented state-space centroid
-   x_coord <- apply(centroid, 2, function(x) seq(-sigma_*6,sigma_*6,sigma_*6) + x[1])
-   y_coord <- apply(centroid, 2, function(x) seq(-sigma_*6,sigma_*6,sigma_*6) + x[2])
+   x_coord <- apply(centroid, 2, function(x) seq(-max(sigma_)*6,max(sigma_)*6,max(sigma_)*6) + x[1])
+   y_coord <- apply(centroid, 2, function(x) seq(-max(sigma_)*6,max(sigma_)*6,max(sigma_)*6) + x[2])
    xy_ss <- list() # create empty list to hold course state-space coordinates for each site
     # create empty list to hold fine-scale state-space coordinates for each site
    grid_out <- list()
@@ -4895,7 +4896,7 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
     xy_ss[[i]] <- as.matrix(expand.grid(x_coord[,i],y_coord[,i]))
     # check to see if augmented coordinates are in trap range
     poly_check <- sf::st_buffer(sf::st_cast(sf::st_sfc(sf::st_multipoint(xy_ss[[i]]),
-              crs = crs_),"POINT"),dist = sigma_*9)
+              crs = crs_),"POINT"),dist = max(sigma_)*9)
     Xcheck <- as.numeric(sf::st_intersects(poly_check,
                 sf::st_sfc(sf::st_multipoint(X[,,i]), crs =  crs_)))
     # remove augmented coordinates that are out of trap range
@@ -4927,7 +4928,7 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
    prop_habitat[i] <- mean(apply(grid_i_rescale, 1, function(x)  
       hab_mask[(trunc(x[2])+1),(trunc(x[1])+1),site[i]]),na.rm=TRUE)
    ext_mat[i,] <- as.vector(raster::extent(raster::rasterFromXYZ(grid_i,crs= crs_)))
-   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = sigma_*9)
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = max(sigma_)*9)
    Xint <- unlist(sf::st_intersects(poly_buff,
         sf::st_cast(sf::st_sfc(sf::st_multipoint(X[,,site[i]]), crs =  crs_),"POINT")))
    Jind[i] <- length(Xint) 
@@ -4947,7 +4948,7 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
    }
   for(i in (n0+1):nrow(s.st)){
    s.st[i,] <- aug_all[i-n0,]
-   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = sigma_*9)
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = max(sigma_)*9)
    Xint <- unlist(sf::st_intersects(poly_buff,
             sf::st_cast(sf::st_sfc(sf::st_multipoint(X[,,site[i]]), crs =  crs_),"POINT")))
    Jind[i] <- length(Xint) 

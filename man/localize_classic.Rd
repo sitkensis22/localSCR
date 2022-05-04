@@ -29,10 +29,11 @@ UTMs. An array is used when traps are clustered over a survey area.}
 location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).}
 
 \item{sigma_}{The scaling parameter of the bivariate normal kernel either
-in meters or kilometers as an integer.}
+in meters or kilometers as an integer. Note that if \code{sigma_} is
+sex-specific, the maximum value will be used.}
 
 \item{s.st}{A matrix of starting activity center coordinates. This is 
-returned from \code{\link{initialize_classic}}}
+returned from \code{\link{initialize_classic}}.}
 
 \item{site}{Either \code{NULL} (if a 2D trap array is used) or a vector of 
 integers denoting which trap array an individual (either detected or 
@@ -42,7 +43,7 @@ augmented) belongs to. Note that \code{site} is provided from
  augmented population size (i.e., \code{M}).}
 
 \item{hab_mask}{Either \code{FALSE} (the default) or a matrix or array output
-from \code{\link{mask_polygon}} or \code{\link{mask_raster}} functions}
+from \code{\link{mask_polygon}} or \code{\link{mask_raster}} functions.}
 }
 \value{
 A list of data components needed to for classic SCR models in a local
