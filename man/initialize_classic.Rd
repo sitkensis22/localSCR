@@ -7,7 +7,7 @@
 initialize_classic(y, M, X, ext, site, hab_mask, all_random = FALSE)
 }
 \arguments{
-\item{y}{Either a matrix or array of encounter history data, possiblity 
+\item{y}{Either a matrix or array of encounter history data, possibly 
 from \code{sim_classic()}.}
 
 \item{M}{An integer of the total augmented population size (i.e., detected 

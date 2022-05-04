@@ -1437,7 +1437,7 @@ return(scrcode)
 #' @description Generate a matrix of initial starting locations, possibly accounting 
 #' for habitat mask.
 #'
-#' @param y Either a matrix or array of encounter history data, possiblity 
+#' @param y Either a matrix or array of encounter history data, possibly 
 #' from \code{sim_classic()}.
 #' @param M An integer of the total augmented population size (i.e., detected 
 #' and augmented individuals). UTMs. An array is used when traps are clustered 
@@ -1821,7 +1821,7 @@ rescale_classic <- function(X, ext, s.st, site, hab_mask){
   if(is.null(hab_mask)){
     stop("Must include habitat mask for rescaling of inputs")
   }
-  rescale_list <- list(X=X,ext=ext,s.st=s.st)
+  rescale_list <- list(X=X,exts.st=s.st)
   # for dim of length 2
   if(length(dim(X))==2){
     rescale_list$X[,1] <- scales::rescale(X[,1], to = c(0,dim(hab_mask)[2]), 
@@ -1832,9 +1832,9 @@ rescale_classic <- function(X, ext, s.st, site, hab_mask){
                               to = c(0,dim(hab_mask)[2]), from=ext[1:2])
     rescale_list$s.st[,2] <- scales::rescale(s.st[,2], 
                               to = c(0,dim(hab_mask)[1]), from=ext[3:4])
-    rescale_list$ext[1:2] <- scales::rescale(ext[1:2], 
+    rescale_list$ext[,1:2] <- scales::rescale(ext[,1:2], 
                               to = c(0,dim(hab_mask)[2]), from=ext[1:2])
-    rescale_list$ext[3:4] <- scales::rescale(ext[3:4], 
+    rescale_list$ext[,3:4] <- scales::rescale(ext[,3:4], 
                               to = c(0,dim(hab_mask)[1]), from=ext[3:4])
 
   }else
@@ -4551,3 +4551,390 @@ run_discrete <- function(model, data, constants, inits, params, dimensions = NUL
     }
 } # End function 'run_discrete'
 
+
+
+#' Function to prepare classic SCR data components for local modeling approach
+#'
+#' @description A function to scale up from individual-level state-space to 
+#' study-area level state-space using classic SCR data components.
+#'
+#' @param y Either a matrix or array of encounter history data, possiblity 
+#' from \code{sim_classic()}.
+#' @param grid_ind A matrix representing an individual state-space grid. This 
+#' is returned from \code{\link{grid_classic}}.
+#' @param X Either a matrix or array representing the coordinates of traps in
+#' UTMs. An array is used when traps are clustered over a survey area.
+#' @param crs_ The UTM coordinate reference system (EPSG code) used for your
+#' location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).
+#' @param sigma_ The scaling parameter of the bivariate normal kernel either
+#' in meters or kilometers as an integer.
+#' @param s.st A matrix of starting activity center coordinates. This is 
+#' returned from \code{\link{initialize_classic}}
+#' @param site Either \code{NULL} (if a 2D trap array is used) or a vector of 
+#' integers denoting which trap array an individual (either detected or 
+#' augmented) belongs to. Note that \code{site} is provided from 
+#' \code{\link{sim_classic}} when a 3D trap array is used. However, this
+#'  \code{site} variable must be correctly augmented based on the total 
+#'  augmented population size (i.e., \code{M}).
+#' @param hab_mask Either \code{FALSE} (the default) or a matrix or array output
+#'  from \code{\link{mask_polygon}} or \code{\link{mask_raster}} functions.
+#' @return A list of data components need to for classic SCR models in a local
+#' approach. If a habitat mask is used, then the proportion of suitable habitat
+#' will be returned for each individual (\code{prop_habitat}). 
+#' @details This function converts classic SCR data to a format that is used in 
+#' local evaluations of the individual state-space.
+#' @importFrom sf st_buffer st_point st_multipoint st_buffer st_cast st_intersects
+#' @importFrom raster coordinates rasterFromXYZ extent
+#' @importFrom scales rescale
+#' @author Daniel Eacker
+#' @examples
+#'\dontrun{
+#'# simulate a single trap array with random positional noise
+#'x <- seq(-1600, 1600, length.out = 6)
+#'y <- seq(-1600, 1600, length.out = 6)
+#'traps <- as.matrix(expand.grid(x = x, y = y))
+#'# add some random noise to locations
+#'traps <- traps + runif(prod(dim(traps)),-20,20) 
+#'mysigma = 300 # simulate sigma of 300 m
+#'mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
+#'pixelWidth = 100 # grid resolution
+#'
+#'# Create initial grid and extent (use a slightly bigger buffer to match
+#'# scaled-up state-space below)
+#'Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3.7*mysigma, res = pixelWidth)
+#'
+#'# Simulated abundance
+#'Nsim = 250
+#'
+#'# simulate SCR data
+#'data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, 
+#'sigma_ = mysigma, prop_sex = 1, N = Nsim, K = 4, base_encounter = 0.15, 
+#'enc_dist = "binomial", hab_mask = FALSE, setSeed = 50)
+#'
+#'# generate initial activity center coordinates for 2D trap array without 
+#'# habitat mask
+#'s.st = initialize_classic(y=data3d$y, M=500, X=traps, ext = Grid$ext, 
+#'hab_mask = FALSE, all_random = FALSE)
+#'
+#'# now use grid_classic to create an individual-level state-space (with origin 0, 0)
+#'Grid_ind = grid_classic(X = matrix(c(0,0),nrow=1), crs_ = mycrs, 
+#'           buff = 3*mysigma, res = 100)
+#'
+#'# now localize the data components created above
+#'local_list = localize_classic(y = data3d$y, grid_ind = Grid_ind$grid, X=traps, 
+#'                            crs_ = mycrs, sigma_ = mysigma, s.st = s.st,
+#'                            site = NULL, hab_mask = FALSE)
+#'# inspect local list
+#'str(local_list)
+#'}
+#' @name localize_classic
+#' @export
+# uses abind importFrom abind abind
+localize_classic <- function(y, grid_ind, X, crs_, sigma_, 
+                            s.st,site=NULL,hab_mask = FALSE){
+  # need to determine if X is 2 or 3 dimensional (stop if not)
+  if(length(dim(X))!=2 & length(dim(X))!=3){
+    stop("Trapping grid must be only 2 or 3 dimensions")
+  }
+  # for dim of length 2
+  if(length(dim(X))==2){
+   n0 <- length(which(apply(y, 1, function(x) sum(x, na.rm=TRUE))!=0))   
+   y_array <- array(NA, dim=c(n0,dim(y)[2],dim(y)[3]))
+   X_array <- array(NA, dim=c(nrow(s.st),dim(X)[1],dim(X)[2]))
+   ext_mat <- matrix(NA, nrow = nrow(s.st), ncol=4)
+   Jind <- numeric(nrow(s.st)) # number of traps each individual is exposed to
+   if(isFALSE(hab_mask)){ # no habitat mask
+  # first need to build up from individual state-space
+  for(i in 1:n0){
+   # first get trap indices
+   grid_i <- cbind(grid_ind[,1]+s.st[i,1],grid_ind[,2]+s.st[i,2])
+   ext_mat[i,] <- as.vector(raster::extent(raster::rasterFromXYZ(grid_i,crs= crs_)))
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = sigma_*9)
+   Xint <- unlist(sf::st_intersects(poly_buff,
+                    sf::st_cast(sf::st_sfc(sf::st_multipoint(X), crs =  crs_),"POINT")))
+   Jind[i] <- length(Xint) 
+   X_array[i,1:length(Xint),] <- X[Xint,]
+   y_array[i,1:length(Xint),] <- y[i,Xint,]
+  } # end individual loop for detected individuals
+  # now deal with augmentation
+  centroid <- matrix(apply(X, 2, mean),nrow=1)
+  # get coordinates for augmented state-space centroid
+  x_coord <- seq(-sigma_*6,sigma_*6,sigma_*6) + centroid[1]
+  y_coord <-  seq(-sigma_*6,sigma_*6,sigma_*6) + centroid[2]
+  xy_ss <- as.matrix(expand.grid(x_coord,y_coord))
+   # remake grid
+   grid_out <- raster::rasterFromXYZ(xy_ss,crs= crs_)
+   res(grid_out) <- res(raster::rasterFromXYZ(grid_ind,crs= crs_))
+  # calculate the global extent of the state-space
+   ext <- raster::extent(grid_out)
+  aug_mat <- do.call(rbind, 
+            replicate(n = ceiling((nrow(s.st) - n0)/nrow(xy_ss)), xy_ss, simplify = FALSE))
+  # replicate layers of individual state-space centroids
+  for(i in (n0+1):nrow(s.st)){
+   s.st[i,] <- aug_mat[i-n0,]
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = sigma_*9)
+   Xint <- unlist(sf::st_intersects(poly_buff,
+                sf::st_cast(sf::st_sfc(sf::st_multipoint(X), crs =  crs_),"POINT")))
+   Jind[i] <- length(Xint) 
+   X_array[i,1:length(Xint),] <- X[Xint,]
+   grid_i <- cbind(grid_ind[,1]+s.st[i,1],grid_ind[,2]+s.st[i,2])
+   ext_mat[i,] <- as.vector(raster::extent(raster::rasterFromXYZ(grid_i,crs= crs_)))
+   s.st[i,1] <- runif(1,ext_mat[i,1],ext_mat[i,2])
+   s.st[i,2] <- runif(1,ext_mat[i,3],ext_mat[i,4])
+  }  
+ } else
+   if(isFALSE(hab_mask)==FALSE){ # habitat mask 
+    # now deal with augmentation
+    centroid <- matrix(apply(X, 2, mean),nrow=1)
+    # get coordinates for augmented state-space centroid
+    x_coord <- seq(-sigma_*6,sigma_*6,sigma_*6) + centroid[1]
+    y_coord <-  seq(-sigma_*6,sigma_*6,sigma_*6) + centroid[2]
+    xy_ss <- as.matrix(expand.grid(x_coord,y_coord))
+   # remake grid
+   grid_out <- raster::rasterFromXYZ(xy_ss,crs=crs_)
+   res(grid_out) <- res(raster::rasterFromXYZ(grid_ind,crs=crs_))
+   # calculate the global extent of the state-space
+   ext <- raster::extent(grid_out)
+   # create x limits for state-space
+   xlim <- ext[1:2]
+   # create y limits for state-space
+   ylim <- ext[3:4]
+    # get proportion of available habitat for each individual
+   prop_habitat <- numeric(nrow(s.st))
+  # first need to build up from individual state-space
+  for(i in 1:n0){
+   # first get trap indices
+   grid_i <- cbind(grid_ind[,1]+s.st[i,1],grid_ind[,2]+s.st[i,2])
+   grid_i_rescale_x <- scales::rescale(grid_i[,1], to = c(0,dim(hab_mask)[2]), 
+                              from=xlim)
+   grid_i_rescale_y <- scales::rescale(grid_i[,2], to = c(0,dim(hab_mask)[1]), 
+                              from=ylim)                       
+   grid_i_rescale <- cbind(grid_i_rescale_x,grid_i_rescale_y) 
+   prop_habitat[i] <- mean(apply(grid_i_rescale, 1, function(x)  
+      hab_mask[(trunc(x[2])+1),(trunc(x[1])+1)]),na.rm=TRUE)
+   ext_mat[i,] <- as.vector(raster::extent(raster::rasterFromXYZ(grid_i,crs= crs_)))
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = sigma_*9)
+   Xint <- unlist(sf::st_intersects(poly_buff,
+                sf::st_cast(sf::st_sfc(sf::st_multipoint(X), crs =  crs_),"POINT")))
+   Jind[i] <- length(Xint) 
+   X_array[i,1:length(Xint),] <- X[Xint,]
+   y_array[i,1:length(Xint),] <- y[i,Xint,]
+  } # end individual loop for detected individuals
+   aug_mat <- do.call(rbind, 
+        replicate(n = ceiling((nrow(s.st) - n0)/nrow(xy_ss)), xy_ss, simplify = FALSE))
+  for(i in (n0+1):nrow(s.st)){
+   s.st[i,] <- aug_mat[i-n0,]
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = sigma_*9)
+   Xint <- unlist(sf::st_intersects(poly_buff,
+                  sf::st_cast(sf::st_sfc(sf::st_multipoint(X), crs =  crs_),"POINT")))
+   Jind[i] <- length(Xint) 
+   X_array[i,1:length(Xint),] <- X[Xint,]
+   grid_i <- cbind(grid_ind[,1]+s.st[i,1],grid_ind[,2]+s.st[i,2])
+   grid_i_rescale_x <- scales::rescale(grid_i[,1], to = c(0,dim(hab_mask)[2]), 
+                              from=xlim)
+   grid_i_rescale_y <- scales::rescale(grid_i[,2], to = c(0,dim(hab_mask)[1]), 
+                              from=ylim)                       
+   grid_i_rescale <- cbind(grid_i_rescale_x,grid_i_rescale_y)                        
+   prop_habitat[i] <- mean(apply(grid_i_rescale, 1, function(x)  
+      hab_mask[(trunc(x[2])+1),(trunc(x[1])+1)]),na.rm=TRUE)
+   ext_mat[i,] <- as.vector(raster::extent(raster::rasterFromXYZ(grid_i,crs= crs_)))
+   s.st[i,1] <- runif(1,ext_mat[i,1],ext_mat[i,2])
+   s.st[i,2] <- runif(1,ext_mat[i,3],ext_mat[i,4])
+   sx.rescale <- scales::rescale(s.st[i,1], to = c(0,dim(hab_mask)[2]), 
+                              from=xlim)
+   sy.rescale <- scales::rescale(s.st[i,2], to = c(0,dim(hab_mask)[1]), 
+                              from=ylim)
+   pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1)]
+   while(pOK==0){
+   s.st[i,1] <- runif(1,ext_mat[i,1],ext_mat[i,2])
+   s.st[i,2] <- runif(1,ext_mat[i,3],ext_mat[i,4])
+   sx.rescale <- scales::rescale(s.st[i,1], to = c(0,dim(hab_mask)[2]), 
+                                from=xlim)
+   sy.rescale <- scales::rescale(s.st[i,2], to = c(0,dim(hab_mask)[1]),
+                                from=ylim)
+   pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1)]
+   } # end hab check
+  }  # end augmentation 
+ } # end habitat mask
+} # end dim length 2
+# for dim of length 3
+ if(length(dim(X))==3){             
+   n0 <- length(which(apply(y, 1, function(x) sum(x, na.rm=TRUE))!=0))   
+   y_array <- array(NA, dim=c(n0,dim(y)[2],dim(y)[3]))
+   X_array <- array(NA, dim=c(nrow(s.st),dim(X)[1],dim(X)[2]))
+   ext_mat <- matrix(NA, nrow = nrow(s.st), ncol=4)
+   Jind <- numeric(nrow(s.st)) # number of traps each individual is exposed to
+ if(isFALSE(hab_mask)){ # no habitat mask
+  # first need to build up from individual state-space
+  for(i in 1:n0){
+   # first get trap indices
+   grid_i <- cbind(grid_ind[,1]+s.st[i,1],grid_ind[,2]+s.st[i,2])
+   ext_mat[i,] <- as.vector(raster::extent(raster::rasterFromXYZ(grid_i,crs= crs_)))
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = sigma_*9)
+   Xint <- unlist(sf::st_intersects(poly_buff,
+          sf::st_cast(sf::st_sfc(sf::st_multipoint(X[,,site[i]]), crs =  crs_),"POINT")))
+   Jind[i] <- length(Xint) 
+   X_array[i,1:length(Xint),] <- X[Xint,,site[i]]
+   y_array[i,1:length(Xint),] <- y[i,Xint,]
+  } # end individual loop for detected individuals
+  # now deal with augmentation
+  centroid <- matrix(apply(X, c(2,3), mean),nrow=2)
+  # get coordinates for augmented state-space centroid
+  x_coord <- apply(centroid, 2, function(x) seq(-sigma_*6,sigma_*6,sigma_*6) + x[1])
+  y_coord <- apply(centroid, 2, function(x) seq(-sigma_*6,sigma_*6,sigma_*6) + x[2])
+  xy_ss <- list() # create empty list to hold course state-space coordinates for each site
+  grid_out <- list() # create empty list to hold fine-scale state-space coordinates for each site
+  for(i in 1:dim(X)[3]){
+    xy_ss[[i]] <- as.matrix(expand.grid(x_coord[,i],y_coord[,i]))
+    grid_out[[i]] <- raster::rasterFromXYZ(xy_ss[[i]],crs= crs_)
+    res(grid_out[[i]]) <- res(raster::rasterFromXYZ(grid_ind,crs= crs_))
+  }
+     # calculate the global extent of the state-space
+   ext <- lapply(grid_out, function(x) raster::extent(x))
+   # remake grid
+   grid_out <- array(unlist(lapply(grid_out, raster::coordinates)), 
+                     dim=c(dim(raster::coordinates(grid_out[[1]])),dim(X)[3]))
+   
+   n_vec <- as.vector(table(site[(n0+1):nrow(s.st)]))
+   aug_mat <- list() # create empty list to hold augmentation coordinates
+   for(i in 1:dim(X)[3]){
+   aug_mat[[i]] <- do.call(rbind, replicate(xy_ss[[i]], 
+                      n = ceiling(n_vec[i]/nrow(xy_ss[[1]])), simplify = FALSE))
+   aug_mat[[i]] <- aug_mat[[i]][1:n_vec[i],]
+   }
+   aug_all <- do.call(rbind, aug_mat)
+   for(i in 1:dim(X)[3]){
+   aug_all[which(site[(n0+1):nrow(s.st)]==i),1:2] <- aug_mat[[i]]
+   }
+  # replicate layers of individual state-space centroids
+   X_array = abind::abind(X_array, array(NA, dim=c((nrow(aug_all)+n0-nrow(s.st)),
+                                        dim(X)[1],dim(X)[2])),along=1)
+   Jind <- c(Jind, numeric(nrow(aug_all)+n0-nrow(s.st)))
+   ext_mat <- rbind(ext_mat, matrix(NA, nrow = (nrow(aug_all)+n0-nrow(s.st)), ncol=4))
+   s.st = rbind(s.st, matrix(NA,nrow=(nrow(aug_all)+n0-nrow(s.st)), ncol=2))
+   for(i in (n0+1):nrow(s.st)){
+   s.st[i,] <- aug_all[i-n0,]
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = sigma_*9)
+   Xint <- unlist(sf::st_intersects(poly_buff,
+          sf::st_cast(sf::st_sfc(sf::st_multipoint(X[,,site[i]]), crs =  crs_),"POINT")))
+   Jind[i] <- length(Xint) 
+   X_array[i,1:length(Xint),] <- X[Xint,,site[i]]
+   grid_i <- cbind(grid_ind[,1]+s.st[i,1],grid_ind[,2]+s.st[i,2])
+   ext_mat[i,] <- as.vector(raster::extent(raster::rasterFromXYZ(grid_i,crs= crs_)))
+   s.st[i,1] <- runif(1,ext_mat[i,1],ext_mat[i,2])
+   s.st[i,2] <- runif(1,ext_mat[i,3],ext_mat[i,4])
+  }
+  }else # end no habitat mask
+ if(isFALSE(hab_mask)==FALSE){ # habitat mask 
+   centroid <- matrix(apply(X, c(2,3), mean),nrow=2)
+   # get coordinates for augmented state-space centroid
+   x_coord <- apply(centroid, 2, function(x) seq(-sigma_*6,sigma_*6,sigma_*6) + x[1])
+   y_coord <- apply(centroid, 2, function(x) seq(-sigma_*6,sigma_*6,sigma_*6) + x[2])
+   xy_ss <- list() # create empty list to hold course state-space coordinates for each site
+    # create empty list to hold fine-scale state-space coordinates for each site
+   grid_out <- list()
+   for(i in 1:dim(X)[3]){
+    xy_ss[[i]] <- as.matrix(expand.grid(x_coord[,i],y_coord[,i]))
+    grid_out[[i]] <- raster::rasterFromXYZ(xy_ss[[i]],crs= crs_)
+    res(grid_out[[i]]) <- res(raster::rasterFromXYZ(grid_ind,crs= crs_))
+   }
+   # calculate the global extent of the state-space
+   ext <- lapply(grid_out, function(x) raster::extent(x))
+   # remake grid
+   grid_out <- array(unlist(lapply(grid_out, raster::coordinates)), 
+                     dim=c(dim(raster::coordinates(grid_out[[1]])),dim(X)[3]))
+   # create x limits for state-space
+   xlim <- lapply(ext, function(x) x[1:2])
+   # create y limits for state-space
+   ylim <- lapply(ext, function(x) x[3:4])
+    # get proportion of available habitat for each individual
+   prop_habitat <- numeric(nrow(s.st))
+  # first need to build up from individual state-space
+  for(i in 1:n0){
+   # first get trap indices
+   grid_i <- cbind(grid_ind[,1]+s.st[i,1],grid_ind[,2]+s.st[i,2])
+   grid_i_rescale_x <- scales::rescale(grid_i[,1], to = c(0,dim(hab_mask)[2]), 
+                              from=xlim[[site[i]]])
+   grid_i_rescale_y <- scales::rescale(grid_i[,2], to = c(0,dim(hab_mask)[1]), 
+                              from=ylim[[site[i]]])                       
+   grid_i_rescale <- cbind(grid_i_rescale_x,grid_i_rescale_y) 
+   prop_habitat[i] <- mean(apply(grid_i_rescale, 1, function(x)  
+      hab_mask[(trunc(x[2])+1),(trunc(x[1])+1),site[i]]),na.rm=TRUE)
+   ext_mat[i,] <- as.vector(raster::extent(raster::rasterFromXYZ(grid_i,crs= crs_)))
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = sigma_*9)
+   Xint <- unlist(sf::st_intersects(poly_buff,
+        sf::st_cast(sf::st_sfc(sf::st_multipoint(X[,,site[i]]), crs =  crs_),"POINT")))
+   Jind[i] <- length(Xint) 
+   X_array[i,1:length(Xint),] <- X[Xint,,site[i]]
+   y_array[i,1:length(Xint),] <- y[i,Xint,]
+  } # end individual loop for detected individuals
+   n_vec <- as.vector(table(site[(n0+1):nrow(s.st)]))
+   aug_mat <- list() # create empty list to hold augmentation coordinates
+   for(i in 1:dim(X)[3]){
+   aug_mat[[i]] <- do.call(rbind, replicate(xy_ss[[i]], 
+                              n = ceiling(n_vec[i]/nrow(xy_ss[[1]])), simplify = FALSE))
+   aug_mat[[i]] <- aug_mat[[i]][1:n_vec[i],]
+   }
+   aug_all <- do.call(rbind, aug_mat)
+   for(i in 1:dim(X)[3]){
+   aug_all[which(site[(n0+1):nrow(s.st)]==i),1:2] <- aug_mat[[i]]
+   }
+  for(i in (n0+1):nrow(s.st)){
+   s.st[i,] <- aug_all[i-n0,]
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = sigma_*9)
+   Xint <- unlist(sf::st_intersects(poly_buff,
+            sf::st_cast(sf::st_sfc(sf::st_multipoint(X[,,site[i]]), crs =  crs_),"POINT")))
+   Jind[i] <- length(Xint) 
+   X_array[i,1:length(Xint),] <- X[Xint,,site[i]]
+   grid_i <- cbind(grid_ind[,1]+s.st[i,1],grid_ind[,2]+s.st[i,2])
+   grid_i_rescale_x <- scales::rescale(grid_i[,1], to = c(0,dim(hab_mask)[2]), 
+                              from=xlim[[site[i]]])
+   grid_i_rescale_y <- scales::rescale(grid_i[,2], to = c(0,dim(hab_mask)[1]), 
+                              from=ylim[[site[i]]])                       
+   grid_i_rescale <- cbind(grid_i_rescale_x,grid_i_rescale_y)                        
+   prop_habitat[i] <- mean(apply(grid_i_rescale, 1, function(x)  
+      hab_mask[(trunc(x[2])+1),(trunc(x[1])+1),site[i]]),na.rm=TRUE)
+   ext_mat[i,] <- as.vector(raster::extent(raster::rasterFromXYZ(grid_i,crs= crs_)))
+   s.st[i,1] <- runif(1,ext_mat[i,1],ext_mat[i,2])
+   s.st[i,2] <- runif(1,ext_mat[i,3],ext_mat[i,4])
+   sx.rescale <- scales::rescale(s.st[i,1], to = c(0,dim(hab_mask)[2]), 
+                              from=xlim[[site[i]]])
+   sy.rescale <- scales::rescale(s.st[i,2], to = c(0,dim(hab_mask)[1]), 
+                              from=ylim[[site[i]]])
+   pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1),site[i]]
+   while(pOK==0){
+   s.st[i,1] <- runif(1,ext_mat[i,1],ext_mat[i,2])
+   s.st[i,2] <- runif(1,ext_mat[i,3],ext_mat[i,4])
+   sx.rescale <- scales::rescale(s.st[i,1], to = c(0,dim(hab_mask)[2]), 
+                                from=xlim[[site[i]]])
+   sy.rescale <- scales::rescale(s.st[i,2], to = c(0,dim(hab_mask)[1]),
+                                from=ylim[[site[i]]])
+   pOK <- hab_mask[(trunc(sy.rescale)+1),(trunc(sx.rescale)+1),site[i]]
+   } # end hab check
+  }  # end augmentation 
+ } # end hab mask
+ } # end dimension 3
+  if(length(dim(X))==2){
+  if(isFALSE(hab_mask)){ # no habitat mask
+  return(list(y=y_array,X=X_array,grid = raster::coordinates(grid_out), 
+              ext_mat=ext_mat,ext=ext,Jind=Jind,s.st=s.st))
+  } else
+  if(isFALSE(hab_mask)==FALSE){ # habitat mask
+  return(list(y=y_array,X=X_array,grid = raster::coordinates(grid_out),
+              prop_habitat=prop_habitat,ext_mat=ext_mat,
+              ext=ext,Jind=Jind,s.st=s.st))
+    
+  }
+  }else # end dim 2
+  if(length(dim(X))==3){
+  if(isFALSE(hab_mask)){ # no habitat mask
+  return(list(y=y_array,X=X_array,grid = grid_out, 
+              ext_mat=ext_mat,ext=ext,Jind=Jind,s.st=s.st))
+  } else
+  if(isFALSE(hab_mask)==FALSE){ # habitat mask
+  return(list(y=y_array,X=X_array,grid = grid_out,prop_habitat=prop_habitat,
+             ext_mat=ext_mat,ext=ext,Jind=Jind,s.st=s.st))
+    
+  }
+  } # end dim 3
+} # end function 'localize_classic'
