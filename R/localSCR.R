@@ -1748,8 +1748,7 @@ initialize_classic <- function(y, M, X, ext, site, hab_mask, all_random = FALSE)
 #' @param ext An \code{Extent} object from the \code{raster} package. This is 
 #' returned from \code{\link{grid_classic}}.
 #' @param s.st A matrix of starting activity center coordinates. This is 
-#' returned from \code{\link{initialize_classic}}
-#' buffered by as an integer. This is typically 3 times the sigma parameter.
+#' returned from \code{\link{initialize_classic}}.
 #' @param site Either \code{NULL} (if a 2D trap array is used) or a vector of 
 #' integers denoting which trap array an individual (either detected or 
 #' augmented) belongs to. Note that \code{site} is provided from 

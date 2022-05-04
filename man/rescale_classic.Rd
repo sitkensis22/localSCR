@@ -15,8 +15,7 @@ UTMs. An array is used when traps are clustered over a survey area.}
 returned from \code{\link{grid_classic}}.}
 
 \item{s.st}{A matrix of starting activity center coordinates. This is 
-returned from \code{\link{initialize_classic}}
-buffered by as an integer. This is typically 3 times the sigma parameter.}
+returned from \code{\link{initialize_classic}}.}
 
 \item{site}{Either \code{NULL} (if a 2D trap array is used) or a vector of 
 integers denoting which trap array an individual (either detected or 
