@@ -4579,19 +4579,21 @@ run_discrete <- function(model, data, constants, inits, params, dimensions = NUL
 #'  from \code{\link{mask_polygon}} or \code{\link{mask_raster}} functions
 #' @returns A list of data components needed to for classic SCR models in a local
 #' approach. Specifically, the function returns:
-#' \code{y} Individual-specific encounter history that only considers traps within 
-#' a distance of 9 times \code{sigma_}.
-#' <*> \code{X} Individual-specific trap array that only provides coordinates for traps
-#' within a distance of 9 times \code{sigma_}.
-#' <*> \code{grid} A matrix or array of state-space grid coordinates that encompasses all
-#' individual state-space grids.
-#' <*> \code{prop_habitat} The proportion of suitable habitat for each individual. Note
-#' that this is only returned when a habitat mask is used. 
-#' <*> \code{ext_mat} A matrix of individual state-space grid extents.
-#' <*> \code{ext} An \code{Extent} object from the \code{raster} package for the 
-#' scaled-up state-space grid
-#' <*> \code{Jind} A vector with the number of traps each individual is exposed to.
-#' <*> \code{s.st} A matrix of starting activity center coordinates.
+#' \describe{
+#'     \item{y} Individual-specific encounter history that only considers traps 
+#'     within a distance of 9 times \code{sigma_}.
+#'     \item{X} Individual-specific trap array that only provides coordinates 
+#'     for traps within a distance of 9 times \code{sigma_}.
+#'     \item{grid} A matrix or array of state-space grid coordinates that 
+#'     encompasses all individual state-space grids.
+#'     \item{prop_habitat} The proportion of suitable habitat for each individual. 
+#'     Note that this is only returned when a habitat mask is used. 
+#'     \item{ext_mat} A matrix of individual state-space grid extents.
+#'     \item{ext} An \code{Extent} object from the \code{raster} package for the 
+#'     scaled-up state-space grid
+#'     \item{Jind} A vector with the number of traps each individual is exposed to.
+#'     \item{s.st} A matrix of starting activity center coordinates.
+#' }
 #' @details This function converts classic SCR data to a format that is used in 
 #' local evaluations of the individual state-space.
 #' @importFrom sf st_buffer st_point st_multipoint st_buffer st_cast st_intersects
