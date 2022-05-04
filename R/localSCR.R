@@ -11,8 +11,12 @@
 #' @param buff The distance (m or km) that the traps should be
 #' buffered by as an integer. This is typically 3 times the sigma parameter.
 #' @param res The grid cell resolution for the state-space.
-#' @return A list of a matrix or array of grid coordinates \code{grid} and an
-#' extent object \code{ext}. Note that a matrix object is returned if the 
+#' @return 
+#' \itemize{
+#'  \item{\code{grid}}{ A list of a matrix or array of grid coordinates.}
+#'  \item{\code{ext}}{ An extent object \code{ext}.} 
+#' }
+#' @note Note that a matrix object is returned if the 
 #' coordinates of the traps are a matrix (i.e., 2D), otherwise an array object
 #' is returned when trap coordinates are in a 3D array.
 #' @details This function supports spatial capture-recapture analysis by

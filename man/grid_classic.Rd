@@ -19,10 +19,10 @@ buffered by as an integer. This is typically 3 times the sigma parameter.}
 \item{res}{The grid cell resolution for the state-space.}
 }
 \value{
-A list of a matrix or array of grid coordinates \code{grid} and an
-extent object \code{ext}. Note that a matrix object is returned if the 
-coordinates of the traps are a matrix (i.e., 2D), otherwise an array object
-is returned when trap coordinates are in a 3D array.
+\itemize{
+ \item{\code{grid}}{ A list of a matrix or array of grid coordinates.}
+ \item{\code{ext}}{ An extent object \code{ext}.} 
+}
 }
 \description{
 Returns a list of a matrix or array object of grid
@@ -36,6 +36,11 @@ mask is not used, then only the \code{Extent} object from the \code{raster}
 package is needed under a uniform state-space.
 The matrix or array object can be used to develop a habitat mask in a uniform
 state-space or as a discretized state-space.
+}
+\note{
+Note that a matrix object is returned if the 
+coordinates of the traps are a matrix (i.e., 2D), otherwise an array object
+is returned when trap coordinates are in a 3D array.
 }
 \examples{
 # simulate a single trap array with random positional noise
