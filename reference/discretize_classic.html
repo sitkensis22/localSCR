@@ -92,17 +92,22 @@ from <code><a href="mask_polygon.html">mask_polygon</a></code> or <code><a href=
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list of grid coordinates for the state-space <code>grid</code>, number 
-of pixels or cells <code>nPix</code>, discretized traps as a matrix or array <code>X</code> and 
-indices for initial activity center locations <code>s.st</code>. Note that the latter 
-relates to the rows of <code>grid</code> provided as an input.</p>
-    </div>
+    <ul><li><p><code>grid</code> Grid coordinates for the state-space.</p></li>
+<li><p><code>nPix</code> Number of state-space pixels.</p></li>
+<li><p><code>X</code> Discretized traps as a matrix or array.</p></li>
+<li><p><code>s.st</code> Indices for initial activity center locations.</p></li>
+</ul></div>
     <div id="details">
     <h2>Details</h2>
     <p>This function prepares the state-space grid, trap coordinates and 
 initial activity center coordinates for use in a discrete spatial capture-recapture 
 model. Note that the number of rows in the state-space grid coordinate matrix will 
 be reduced and this object will need to be adjusted before being used in the model.</p>
+    </div>
+    <div id="note">
+    <h2>Note</h2>
+    <p>The vector <code>s.st</code> returned from the function indexes the
+rows of <code>grid</code>.</p>
     </div>
     <div id="author">
     <h2>Author</h2>
