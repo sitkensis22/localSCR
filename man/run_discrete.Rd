@@ -106,7 +106,8 @@ s.st = initialize_classic(y=data3d$y, M=M, X=traps, ext=Grid$ext,
                            hab_mask = hab_mask)
 
 # convert traps and starting locations to discrete format
-d_list = discretize_classic(X=traps, grid = Grid$grid, s.st = s.st, crs_ = mycrs, hab_mask = hab_mask)
+d_list = discretize_classic(X=traps, grid = Grid$grid, s.st = s.st, 
+         crs_ = mycrs, hab_mask = hab_mask)
 
 # inspect discrete data list
 str(d_list)
@@ -114,7 +115,8 @@ str(d_list)
 # prepare data
 data = list(y=data3d$y)
 data$y = data$y[which(apply(data$y, 1, sum)!=0),,] # remove augmented records 
-data$y = apply(data$y, c(1,2), sum) # covert to 2d by summing over individuals and traps
+# covert to 2d by summing over individuals and traps
+data$y = apply(data$y, c(1,2), sum) 
 
 # add discretized traps
 data$X = d_list$X100 # convert units to km
@@ -122,7 +124,8 @@ data$X = d_list$X100 # convert units to km
 # add grid
 data$grid = d_list$grid/1000 # convert units to km
 
-# prepare constants (note get density in activity center/100 m2 rather than activity centers/m2)
+# prepare constants (note get density in activity center/100 m2 rather 
+# than activity centers/m2)
 constants = list(M = M,n0 = nrow(data$y),J=dim(data$y)[2], K=dim(data3d$y)[3],
 nPix=d_list$nPix,pixArea = 0.1^2,
 sigma_upper = 1, A = (sum(hab_mask)*(pixelWidth/100)^2))
@@ -152,8 +155,8 @@ discrete_model = get_discrete(type="marked",dim_y = 2, enc_dist = "binomial",
 library(tictoc)
 tic() # track time elapsed
 out = run_discrete(model = discrete_model, data=data, constants=constants,
-       inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, 
-       parallel=TRUE,  RNGseed = 500)
+       inits=inits, params = params,niter = 10000, nburnin=1000, 
+       thin=1, nchains=2, parallel=TRUE,  RNGseed = 500)
 toc()
 
 nimSummary(out, exclude = c("s","z"))

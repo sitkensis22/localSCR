@@ -4462,7 +4462,8 @@ print_model <- function(model){
 #'                            hab_mask = hab_mask)
 #'
 #'# convert traps and starting locations to discrete format
-#'d_list = discretize_classic(X=traps, grid = Grid$grid, s.st = s.st, crs_ = mycrs, hab_mask = hab_mask)
+#'d_list = discretize_classic(X=traps, grid = Grid$grid, s.st = s.st, 
+#'          crs_ = mycrs, hab_mask = hab_mask)
 #'
 #'# inspect discrete data list
 #'str(d_list)
@@ -4470,7 +4471,8 @@ print_model <- function(model){
 #'# prepare data
 #'data = list(y=data3d$y)
 #'data$y = data$y[which(apply(data$y, 1, sum)!=0),,] # remove augmented records 
-#'data$y = apply(data$y, c(1,2), sum) # covert to 2d by summing over individuals and traps
+#'# covert to 2d by summing over individuals and traps
+#'data$y = apply(data$y, c(1,2), sum) 
 #'
 #'# add discretized traps
 #'data$X = d_list$X100 # convert units to km
@@ -4478,7 +4480,8 @@ print_model <- function(model){
 #'# add grid
 #'data$grid = d_list$grid/1000 # convert units to km
 #'
-#'# prepare constants (note get density in activity center/100 m2 rather than activity centers/m2)
+#'# prepare constants (note get density in activity center/100 m2 rather 
+#'# than activity centers/m2)
 #'constants = list(M = M,n0 = nrow(data$y),J=dim(data$y)[2], K=dim(data3d$y)[3],
 #'nPix=d_list$nPix,pixArea = 0.1^2,
 #'sigma_upper = 1, A = (sum(hab_mask)*(pixelWidth/100)^2))
@@ -4508,8 +4511,8 @@ print_model <- function(model){
 #'library(tictoc)
 #'tic() # track time elapsed
 #'out = run_discrete(model = discrete_model, data=data, constants=constants,
-#'        inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, 
-#'        parallel=TRUE,  RNGseed = 500)
+#'        inits=inits, params = params,niter = 10000, nburnin=1000, 
+#'        thin=1, nchains=2, parallel=TRUE,  RNGseed = 500)
 #'toc()
 #'
 #'nimSummary(out, exclude = c("s","z"))
@@ -4617,7 +4620,7 @@ run_discrete <- function(model, data, constants, inits, params, dimensions = NUL
 #' @details This function converts classic SCR data to a format that is used in 
 #' local evaluations of the individual state-space.
 #' @importFrom sf st_buffer st_point st_multipoint st_buffer st_cast st_intersects
-#' @importFrom raster coordinates rasterFromXYZ extent
+#' @importFrom raster coordinates rasterFromXYZ extent res
 #' @importFrom scales rescale
 #' @author Daniel Eacker
 #' @examples
@@ -4704,7 +4707,7 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
   xy_ss <- xy_ss[Xcheck == 1,]
    # remake grid
    grid_out <- raster::rasterFromXYZ(xy_ss,crs= crs_)
-   res(grid_out) <- res(raster::rasterFromXYZ(grid_ind,crs= crs_))
+   raster::res(grid_out) <- raster::res(raster::rasterFromXYZ(grid_ind,crs= crs_))
   # calculate the global extent of the state-space
    ext <- raster::extent(grid_out)
   aug_mat <- do.call(rbind, 
@@ -4739,7 +4742,7 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
     xy_ss <- xy_ss[Xcheck == 1,]
    # remake grid
    grid_out <- raster::rasterFromXYZ(xy_ss,crs=crs_)
-   res(grid_out) <- res(raster::rasterFromXYZ(grid_ind,crs=crs_))
+   raster::res(grid_out) <- raster::res(raster::rasterFromXYZ(grid_ind,crs=crs_))
    # calculate the global extent of the state-space
    ext <- raster::extent(grid_out)
    # create x limits for state-space
@@ -4841,7 +4844,8 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
     # remove augmented coordinates that are out of trap range
     xy_ss[[i]] <- xy_ss[[i]][Xcheck == 1,]
     grid_out[[i]] <- raster::rasterFromXYZ(xy_ss[[i]],crs= crs_)
-    res(grid_out[[i]]) <- res(raster::rasterFromXYZ(grid_ind,crs= crs_))
+    raster::res(grid_out[[i]]) <- raster::res(
+      raster::rasterFromXYZ(grid_ind,crs= crs_))
   }
      # calculate the global extent of the state-space
    ext <- lapply(grid_out, function(x) raster::extent(x))
@@ -4897,7 +4901,8 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
     # remove augmented coordinates that are out of trap range
     xy_ss[[i]] <- xy_ss[[i]][Xcheck == 1,]
     grid_out[[i]] <- raster::rasterFromXYZ(xy_ss[[i]],crs= crs_)
-    res(grid_out[[i]]) <- res(raster::rasterFromXYZ(grid_ind,crs= crs_))
+    raster::res(grid_out[[i]]) <- raster::res(
+      raster::rasterFromXYZ(grid_ind,crs= crs_))
    }
    # calculate the global extent of the state-space
    ext <- lapply(grid_out, function(x) raster::extent(x))
