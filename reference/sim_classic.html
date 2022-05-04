@@ -117,17 +117,22 @@ simulations to obtain repeatable data simulations. Default is 500.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list of a matrix or array of encounter histories <code>y</code>, a
-vector or matrix of 0's and 1's for <code>sex</code>, a batrix of simulated activity
-centers <code>s</code>, and when a 3-dimensional trap array is given, a vector
-for the site identifier <code>site</code>.</p>
-    </div>
+    <ul><li><p><code>y</code> A list of a matrix or array of encounter histories.</p></li>
+<li><p><code>sex</code> A vector or matrix of 0's and 1's for sex identification.</p></li>
+<li><p><code>s</code> A matrix of simulated activity centers.</p></li>
+<li><p><code>site</code> A vector for the site identifier.</p></li>
+</ul></div>
     <div id="details">
     <h2>Details</h2>
     <p>This function supports spatial capture-recapture (SCR) analysis by 
 allowing for easy simulation of data components used by nimble in Baysian 
 SCR models. Note that the output for the encounter histories <code>y</code> will be
 sorted by detected and not detected individuals.</p>
+    </div>
+    <div id="note">
+    <h2>Note</h2>
+    <p>The <code>site</code> identfier is only returned when a 3-dimensional 
+trap array is provided.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
