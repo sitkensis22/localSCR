@@ -108,21 +108,30 @@ from <code><a href="mask_polygon.html">mask_polygon</a></code> or <code><a href=
     <div id="value">
     <h2>Value</h2>
     <p>A list of data components needed to for classic SCR models in a local
-approach. Specifically, the function returns:
-<code>y</code> Individual-specific encounter history that only considers traps within 
-a distance of 9 times <code>sigma_</code>.
-&lt;*&gt; <code>X</code> Individual-specific trap array that only provides coordinates for traps
-within a distance of 9 times <code>sigma_</code>.
-&lt;*&gt; <code>grid</code> A matrix or array of state-space grid coordinates that encompasses all
-individual state-space grids.
-&lt;*&gt; <code>prop_habitat</code> The proportion of suitable habitat for each individual. Note
-that this is only returned when a habitat mask is used. 
-&lt;*&gt; <code>ext_mat</code> A matrix of individual state-space grid extents.
-&lt;*&gt; <code>ext</code> An <code>Extent</code> object from the <code>raster</code> package for the 
-scaled-up state-space grid
-&lt;*&gt; <code>Jind</code> A vector with the number of traps each individual is exposed to.
-&lt;*&gt; <code>s.st</code> A matrix of starting activity center coordinates.</p>
-    </div>
+approach. Specifically, the function returns:</p><dl><dt>y</dt>
+<dd><p>Individual-specific encounter history that only considers traps</p></dd>
+    within a distance of 9 times sigma_.
+    <dt>X</dt>
+<dd><p>Individual-specific trap array that only provides coordinates</p></dd>
+    for traps within a distance of 9 times sigma_.
+    <dt>grid</dt>
+<dd><p>A matrix or array of state-space grid coordinates that</p></dd>
+    encompasses all individual state-space grids.
+    <dt>prop_habitat</dt>
+<dd><p>The proportion of suitable habitat for each individual.</p></dd>
+    Note that this is only returned when a habitat mask is used. 
+    <dt>ext_mat</dt>
+<dd><p>A matrix of individual state-space grid extents.</p></dd>
+    <dt>ext</dt>
+<dd><p>An</p></dd>
+Extent object from the raster package for the 
+    scaled-up state-space grid
+    <dt>Jind</dt>
+<dd><p>A vector with the number of traps each individual is exposed to.</p></dd>
+    <dt>s.st</dt>
+<dd><p>A matrix of starting activity center coordinates.</p></dd>
+
+</dl></div>
     <div id="details">
     <h2>Details</h2>
     <p>This function converts classic SCR data to a format that is used in 
