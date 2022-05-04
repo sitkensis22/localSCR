@@ -156,18 +156,9 @@ be included as an input in the model after inputs are rescaled to correctly
 <span class="r-in"><span class="co"># build rescaled constants list for 2D trap array</span></span>
 <span class="r-in"><span class="va">constList</span> <span class="op">=</span> <span class="fu">rescale_classic</span><span class="op">(</span>X <span class="op">=</span> <span class="va">traps</span>, ext <span class="op">=</span> <span class="va">Grid</span><span class="op">$</span><span class="va">ext</span>, s.st <span class="op">=</span> <span class="va">s.st3d</span>, </span>
 <span class="r-in">site <span class="op">=</span> <span class="cn">NULL</span>, hab_mask <span class="op">=</span> <span class="va">hab_mask</span><span class="op">)</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in rescale_list$s.st[, 1] &lt;- scales::rescale(s.st[, 1], to = c(0,     dim(hab_mask)[2]), from = ext[1:2]):</span> incorrect number of subscripts on matrix</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">constList</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> List of 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ X   : num [1:25, 1:2] 8.92 13.15 16.79 20.81 24.83 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dimnames")=List of 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ : NULL</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ : chr [1:2] "x" "y"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ ext :Formal class 'Extent' [package "raster"] with 4 slots</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..@ xmin: num 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..@ xmax: num 34</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..@ ymin: num 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..@ ymax: num 34</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ s.st: num [1:500, 1:2] 18.39 9.05 24.84 18.98 20.99 ...</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in str(constList):</span> object 'constList' not found</span>
 </code></pre></div>
     </div>
   </div>
