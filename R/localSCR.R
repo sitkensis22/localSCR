@@ -3387,7 +3387,7 @@ return(scrcode)
 #' str(d_list)
 #' @name discretize_classic
 #' @export
-discretize_classic <- function(X, grid, s.st = s.st, 
+discretize_classic <- function(X, grid, s.st, 
                                crs_,site,hab_mask=NULL){
    # need to determine if X is 2 or 3 dimensional (stop if not)
    if(length(dim(X))!=2 & length(dim(X))!=3){

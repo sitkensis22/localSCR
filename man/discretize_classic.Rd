@@ -4,7 +4,7 @@
 \alias{discretize_classic}
 \title{Function to discretize traps and initial activity centers}
 \usage{
-discretize_classic(X, grid, s.st = s.st, crs_, site, hab_mask = NULL)
+discretize_classic(X, grid, s.st, crs_, site, hab_mask = NULL)
 }
 \arguments{
 \item{X}{Either a matrix or array representing the coordinates of traps in
