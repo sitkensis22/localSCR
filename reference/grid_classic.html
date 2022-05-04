@@ -83,11 +83,9 @@ buffered by as an integer. This is typically 3 times the sigma parameter.</p></d
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list of a matrix or array of grid coordinates <code>grid</code> and an
-extent object <code>ext</code>. Note that a matrix object is returned if the 
-coordinates of the traps are a matrix (i.e., 2D), otherwise an array object
-is returned when trap coordinates are in a 3D array.</p>
-    </div>
+    <ul><li><p><code>grid</code> A list of a matrix or array of grid coordinates.</p></li>
+<li><p><code>ext</code> An extent object <code>ext</code>.</p></li>
+</ul></div>
     <div id="details">
     <h2>Details</h2>
     <p>This function supports spatial capture-recapture analysis by
@@ -96,6 +94,12 @@ mask is not used, then only the <code>Extent</code> object from the <code>raster
 package is needed under a uniform state-space.
 The matrix or array object can be used to develop a habitat mask in a uniform
 state-space or as a discretized state-space.</p>
+    </div>
+    <div id="note">
+    <h2>Note</h2>
+    <p>Note that a matrix object is returned if the 
+coordinates of the traps are a matrix (i.e., 2D), otherwise an array object
+is returned when trap coordinates are in a 3D array.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>

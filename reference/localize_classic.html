@@ -108,19 +108,19 @@ from <code><a href="mask_polygon.html">mask_polygon</a></code> or <code><a href=
     <div id="value">
     <h2>Value</h2>
     <p>A list of data components needed to for classic SCR models in a local
-approach. Specifically, the function returns:</p><ul><li><p>"y"Individual-specific encounter history that only considers traps 
+approach. Specifically, the function returns:</p><ul><li><p><code>y</code> Individual-specific encounter history that only considers traps 
     within a distance of 9 times <code>sigma_</code>.</p></li>
-<li><p>"X"Individual-specific trap array that only provides coordinates 
+<li><p><code>X</code> Individual-specific trap array that only provides coordinates 
     for traps within a distance of 9 times <code>sigma_</code>.</p></li>
-<li><p>"grid"A matrix or array of state-space grid coordinates that 
+<li><p><code>grid</code> A matrix or array of state-space grid coordinates that 
     encompasses all individual state-space grids.</p></li>
-<li><p>"prop_habitat"The proportion of suitable habitat for each individual. 
+<li><p><code>prop_habitat</code> The proportion of suitable habitat for each individual. 
     Note that this is only returned when a habitat mask is used.</p></li>
-<li><p>"ext_mat"A matrix of individual state-space grid extents.</p></li>
-<li><p>"ext"An <code>Extent</code> object from the <code>raster</code> package for the 
+<li><p><code>ext_mat</code> A matrix of individual state-space grid extents.</p></li>
+<li><p><code>ext</code> An <code>Extent</code> object from the <code>raster</code> package for the 
     scaled-up state-space grid.</p></li>
-<li><p>"Jind"A vector with the number of traps each individual is exposed to.</p></li>
-<li><p>"s.st"A matrix of starting activity center coordinates.</p></li>
+<li><p><code>Jind</code> A vector with the number of traps each individual is exposed to.</p></li>
+<li><p><code>s.st</code> A matrix of starting activity center coordinates.</p></li>
 </ul></div>
     <div id="details">
     <h2>Details</h2>
