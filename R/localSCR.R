@@ -119,10 +119,15 @@ grid_classic <- function(X, crs_, buff, res){
 #' or \code{\link{mask_raster}} functions.
 #' @param setSeed The random number generater seed as an integer used in
 #' simulations to obtain repeatable data simulations. Default is 500.
-#' @return A list of a matrix or array of encounter histories \code{y}, a
-#' vector or matrix of 0's and 1's for \code{sex}, a batrix of simulated activity
-#' centers \code{s}, and when a 3-dimensional trap array is given, a vector
-#' for the site identifier \code{site}.
+#' @return 
+#' \itemize{
+#'  \item{\code{y}}{ A list of a matrix or array of encounter histories.}
+#'  \item{\code{sex}}{ A vector or matrix of 0's and 1's for sex identification.}
+#'  \item{\code{s}}{ A matrix of simulated activity centers.}
+#'  \item{\code{site}}{ A vector for the site identifier.}
+#' }
+#' @note The \code{site} identfier is only returned when a 3-dimensional 
+#' trap array is provided.
 #' @author Daniel Eacker
 #' @details This function supports spatial capture-recapture (SCR) analysis by 
 #' allowing for easy simulation of data components used by nimble in Baysian 

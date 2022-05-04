@@ -55,10 +55,12 @@ or \code{\link{mask_raster}} functions.}
 simulations to obtain repeatable data simulations. Default is 500.}
 }
 \value{
-A list of a matrix or array of encounter histories \code{y}, a
-vector or matrix of 0's and 1's for \code{sex}, a batrix of simulated activity
-centers \code{s}, and when a 3-dimensional trap array is given, a vector
-for the site identifier \code{site}.
+\itemize{
+ \item{\code{y}}{ A list of a matrix or array of encounter histories.}
+ \item{\code{sex}}{ A vector or matrix of 0's and 1's for sex identification.}
+ \item{\code{s}}{ A matrix of simulated activity centers.}
+ \item{\code{site}}{ A vector for the site identifier.}
+}
 }
 \description{
 Returns a list of simulated data including the encounter
@@ -69,6 +71,10 @@ This function supports spatial capture-recapture (SCR) analysis by
 allowing for easy simulation of data components used by nimble in Baysian 
 SCR models. Note that the output for the encounter histories \code{y} will be
 sorted by detected and not detected individuals.
+}
+\note{
+The \code{site} identfier is only returned when a 3-dimensional 
+trap array is provided.
 }
 \examples{
 # simulate a single trap array with random positional noise
