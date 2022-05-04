@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{get_unmarked}
 \alias{get_unmarked}
-\title{Function to retrieve nimbleCode for spatial count models}
+\title{Retrieve nimbleCode for spatial count models}
 \usage{
 get_unmarked(occ_specific = FALSE, hab_mask = FALSE, trapsClustered = FALSE)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{run_discrete}
 \alias{run_discrete}
-\title{Function to run discrete spatial capture-recapture models in 'nimble' using 
+\title{Run discrete spatial capture-recapture models in 'nimble' using 
 parallel processing}
 \usage{
 run_discrete(

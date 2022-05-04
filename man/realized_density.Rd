@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{realized_density}
 \alias{realized_density}
-\title{Function to generate realized density surface from MCMC output}
+\title{Generate realized density surface from MCMC output}
 \usage{
 realized_density(
   samples,

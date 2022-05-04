@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{customize_model}
 \alias{customize_model}
-\title{Function to efficiently edit rows of model code generated from nimble}
+\title{Efficiently edit rows of model code generated from nimble}
 \usage{
 customize_model(
   model,

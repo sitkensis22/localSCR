@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{initialize_classic}
 \alias{initialize_classic}
-\title{Function to generate starting locations for activity centers}
+\title{Generate starting locations for activity centers}
 \usage{
 initialize_classic(y, M, X, ext, site, hab_mask, all_random = FALSE)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{localize_classic}
 \alias{localize_classic}
-\title{Function to prepare classic SCR data components for local modeling approach}
+\title{Prepare classic SCR data components for local modeling approach}
 \usage{
 localize_classic(
   y,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{nimSummary}
 \alias{nimSummary}
-\title{Function to summarize MCMC chain output from nimble}
+\title{Summarize MCMC chain output from nimble}
 \usage{
 nimSummary(d, trace = FALSE, plot_all = FALSE, exclude = NULL, digits = 3)
 }

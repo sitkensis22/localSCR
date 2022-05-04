@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{rescale_local}
 \alias{rescale_local}
-\title{Function to rescale trap coordinates, individual-level grid extent, 
+\title{Rescale trap coordinates, individual-level grid extent, 
 and starting activity center coordinates for local SCR approach}
 \usage{
 rescale_local(X, ext, ext_mat, s.st, site, hab_mask)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{mask_raster}
 \alias{mask_raster}
-\title{Function to create habitat mask matrix or array from raster}
+\title{Create habitat mask matrix or array from raster}
 \usage{
 mask_raster(rast, FUN, grid, crs_, prev_mask)
 }

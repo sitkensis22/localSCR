@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{rescale_classic}
 \alias{rescale_classic}
-\title{Function to rescale trap coordinates, grid extent, and starting activity 
+\title{Rescale trap coordinates, grid extent, and starting activity 
 center coordinates}
 \usage{
 rescale_classic(X, ext, s.st, site, hab_mask)

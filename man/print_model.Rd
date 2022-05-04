@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{print_model}
 \alias{print_model}
-\title{Function to display row indices for model used in 'nimble'}
+\title{Display row indices for model used in 'nimble'}
 \usage{
 print_model(model)
 }

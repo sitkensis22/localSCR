@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{run_classic}
 \alias{run_classic}
-\title{Function to run spatial capture-recapture models in nimble using 
+\title{Run spatial capture-recapture models in nimble using 
 parallel processing}
 \usage{
 run_classic(

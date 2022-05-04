@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{discretize_classic}
 \alias{discretize_classic}
-\title{Function to discretize traps and initial activity centers}
+\title{Discretize traps and initial activity centers}
 \usage{
 discretize_classic(X, grid, s.st, crs_, site, hab_mask = NULL)
 }

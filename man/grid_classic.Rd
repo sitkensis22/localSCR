@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{grid_classic}
 \alias{grid_classic}
-\title{Function to define state-space for spatial capture-recapture models}
+\title{Define state-space for spatial capture-recapture models}
 \usage{
 grid_classic(X, crs_, buff, res)
 }

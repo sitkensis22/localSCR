@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{get_discrete}
 \alias{get_discrete}
-\title{Function to retrieve nimbleCode for discrete spatial capture-recapture models}
+\title{Retrieve nimbleCode for discrete spatial capture-recapture models}
 \usage{
 get_discrete(
   type = "marked",

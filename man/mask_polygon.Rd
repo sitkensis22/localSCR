@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{mask_polygon}
 \alias{mask_polygon}
-\title{Function to create habitat mask matrix or array from polygon}
+\title{Create habitat mask matrix or array from polygon}
 \usage{
 mask_polygon(poly, grid, crs_, prev_mask)
 }

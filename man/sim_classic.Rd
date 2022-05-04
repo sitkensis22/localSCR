@@ -2,7 +2,7 @@
 % Please edit documentation in R/localSCR.R
 \name{sim_classic}
 \alias{sim_classic}
-\title{Function to simulate basic spatial capture-recapture data}
+\title{Simulate basic spatial capture-recapture data}
 \usage{
 sim_classic(
   X,
