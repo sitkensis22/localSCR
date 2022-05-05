@@ -2812,9 +2812,9 @@ realized_density <- function(samples, grid, crs_, site, hab_mask = FALSE,
         ], 2]} else
         if(length(dim(grid)==3)){
         smat[[i]][j, 1:(ncol(smat[[i]])/2)] <- grid[stemp[j, 
-        ], 1, site[i]]
+        ], 1, i]
         smat[[i]][j, ((ncol(smat[[i]])/2) + 1):ncol(smat[[i]])] <- grid[stemp[j, 
-        ], 2, site[i]] 
+        ], 2, i] 
         }
       }
       samples[[i]] <- cbind(zlen, smat[[i]])
