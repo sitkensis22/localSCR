@@ -2811,7 +2811,7 @@ realized_density <- function(samples, grid, crs_, site, hab_mask = FALSE,
        # set attribute column names
        attr(smat[[i]], "dimnames") = list(NULL, c(paste(s_alias,"[",1:dim(samples[[1]])[2],
                 ","," 1","]",sep=""),paste(s_alias,"[",
-                1:dim(out2[[1]])[2],","," 2","]",sep="")))
+                1:dim(samples[[1]])[2],","," 2","]",sep="")))
        samples[[i]] <- cbind(zlen, smat[[i]])
      }
      hab_mask = FALSE # set habitat mask to FALSE for discrete
