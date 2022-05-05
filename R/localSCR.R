@@ -2801,7 +2801,7 @@ realized_density <- function(samples, grid, crs_, site, hab_mask = FALSE,
      for(i in 1:length(samples)){
        zlen <- samples[[i]][,grep(paste0(z_alias,"\\["), colnames(samples[[i]]))]
        stemp <- samples[[i]][,grep(paste0(s_alias,"\\["), colnames(samples[[i]]))]
-       smat[[i]] <- matrix(NA, nrow=nrow(out[[1]]),ncol=dim(zlen)[2]*2)
+       smat[[i]] <- matrix(NA, nrow=nrow(samples[[1]]),ncol=dim(zlen)[2]*2)
        for(j in 1:dim(samples[[1]])[1]){
          # x coordinates
         smat[[i]][j,1:(ncol(smat[[i]])/2)] <- grid[stemp[j,],1]
@@ -2809,7 +2809,7 @@ realized_density <- function(samples, grid, crs_, site, hab_mask = FALSE,
         smat[[i]][j,((ncol(smat[[i]])/2)+1):ncol(smat[[i]])] <- grid[stemp[j,],2]
        }
        # set attribute column names
-       attr(smat[[i]], "dimnames") = list(NULL, c(paste(s_alias,"[",1:dim(out2[[1]])[2],
+       attr(smat[[i]], "dimnames") = list(NULL, c(paste(s_alias,"[",1:dim(samples[[1]])[2],
                 ","," 1","]",sep=""),paste(s_alias,"[",
                 1:dim(out2[[1]])[2],","," 2","]",sep="")))
        samples[[i]] <- cbind(zlen, smat[[i]])
