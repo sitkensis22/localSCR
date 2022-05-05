@@ -2814,6 +2814,7 @@ realized_density <- function(samples, grid, crs_, site, hab_mask = FALSE,
                 1:dim(out2[[1]])[2],","," 2","]",sep="")))
        samples[[i]] <- cbind(zlen, smat[[i]])
      }
+     hab_mask = FALSE # set habitat mask to FALSE for discrete
     }
    if(length(samples) > 1){
     samples <- do.call(rbind, samples) # rbind mcmc samples
