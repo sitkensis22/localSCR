@@ -2696,6 +2696,9 @@ if(is.null(exclude)){
 #' @param hab_mask Either \code{FALSE} (the default) or a matrix or arary 
 #' output from \code{\link{mask_polygon}}
 #' or \code{\link{mask_raster}} functions.
+#' @param discrete Logical. Either \code{FALSE} (the default) to indicate that the 
+#' MCMC output is from a 'classic' or continuous SCR model or \code{TRUE} that
+#' the MCMC output is from a 'discrete' SCR model. 
 #' @param s_alias A character value used to identify the latent activity center 
 #' coordinates used in the model. Default is \code{"s"}.
 #' @param z_alias A character value used to identify the latent inclusion 
@@ -2777,7 +2780,7 @@ if(is.null(exclude)){
 #' library(tictoc)       
 #' tic() # track time
 #' r = realized_density(samples = out, grid = Grid$grid, crs_ = mycrs, 
-#' site = NULL, hab_mask = FALSE)       
+#' site = NULL, hab_mask = FALSE, discrete = FALSE)       
 #' toc()      
 #' 
 #' # load virdiis color pallete library      
@@ -2791,7 +2794,27 @@ if(is.null(exclude)){
 #' @name realized_density
 #' @export
 realized_density <- function(samples, grid, crs_, site, hab_mask = FALSE, 
-                             s_alias = "s", z_alias = "z"){
+                             discrete = FALSE, s_alias = "s", z_alias = "z"){
+   if(discrete){
+     smat <- list()
+     
+     for(i in 1:length(samples)){
+       zlen <- samples[[i]][,grep(paste0(z_alias,"\\["), colnames(samples[[i]]))]
+       stemp <- samples[[i]][,grep(paste0(s_alias,"\\["), colnames(samples[[i]]))]
+       smat[[i]] <- matrix(NA, nrow=nrow(out[[1]]),ncol=dim(zlen)[2]*2)
+       for(j in 1:dim(samples[[1]])[1]){
+         # x coordinates
+        smat[[i]][j,1:(ncol(smat[[i]])/2)] <- grid[stemp[j,],1]
+        # x coordinates
+        smat[[i]][j,((ncol(smat[[i]])/2)+1):ncol(smat[[i]])] <- grid[stemp[j,],2]
+       }
+       # set attribute column names
+       attr(smat[[i]], "dimnames") = list(NULL, c(paste(s_alias,"[",1:dim(out2[[1]])[2],
+                ","," 1","]",sep=""),paste(s_alias,"[",
+                1:dim(out2[[1]])[2],","," 2","]",sep="")))
+       samples[[i]] <- cbind(zlen, smat[[i]])
+     }
+    }
    if(length(samples) > 1){
     samples <- do.call(rbind, samples) # rbind mcmc samples
    }

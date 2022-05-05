@@ -10,6 +10,7 @@ realized_density(
   crs_,
   site,
   hab_mask = FALSE,
+  discrete = FALSE,
   s_alias = "s",
   z_alias = "z"
 )
@@ -31,6 +32,10 @@ individuals used as a constant in model runs.}
 \item{hab_mask}{Either \code{FALSE} (the default) or a matrix or arary 
 output from \code{\link{mask_polygon}}
 or \code{\link{mask_raster}} functions.}
+
+\item{discrete}{Logical. Either \code{FALSE} (the default) to indicate that the 
+MCMC output is from a 'classic' or continuous SCR model or \code{TRUE} that
+the MCMC output is from a 'discrete' SCR model.}
 
 \item{s_alias}{A character value used to identify the latent activity center 
 coordinates used in the model. Default is \code{"s"}.}
@@ -121,7 +126,7 @@ nimSummary(out, exclude = c("s","z"), trace = TRUE)
 library(tictoc)       
 tic() # track time
 r = realized_density(samples = out, grid = Grid$grid, crs_ = mycrs, 
-site = NULL, hab_mask = FALSE)       
+site = NULL, hab_mask = FALSE, discrete = FALSE)       
 toc()      
 
 # load virdiis color pallete library      
