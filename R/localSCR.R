@@ -2805,10 +2805,17 @@ realized_density <- function(samples, grid, crs_, site, hab_mask = FALSE,
       smat[[i]] <- matrix(NA, nrow = nrow(samples[[i]]), 
                           ncol = dim(zlen)[2] * 2)
       for (j in 1:dim(samples[[i]])[1]) {
+        if(length(dim(grid))==2){
         smat[[i]][j, 1:(ncol(smat[[i]])/2)] <- grid[stemp[j, 
         ], 1]
         smat[[i]][j, ((ncol(smat[[i]])/2) + 1):ncol(smat[[i]])] <- grid[stemp[j, 
-        ], 2]
+        ], 2]} else
+        if(length(dim(grid)==3)){
+        smat[[i]][j, 1:(ncol(smat[[i]])/2)] <- grid[stemp[j, 
+        ], 1, site[i]]
+        smat[[i]][j, ((ncol(smat[[i]])/2) + 1):ncol(smat[[i]])] <- grid[stemp[j, 
+        ], 2, site[i]] 
+        }
       }
       samples[[i]] <- cbind(zlen, smat[[i]])
       dimnames(samples[[i]])[[2]][(dim(zlen)[2]+1):dim(samples[[i]])[2]] <-
