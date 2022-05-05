@@ -2795,27 +2795,30 @@ if(is.null(exclude)){
 #' @export
 realized_density <- function(samples, grid, crs_, site, hab_mask = FALSE, 
                              discrete = FALSE, s_alias = "s", z_alias = "z"){
-   if(discrete){
-     smat <- list()
-     
-     for(i in 1:length(samples)){
-       zlen <- samples[[i]][,grep(paste0(z_alias,"\\["), colnames(samples[[i]]))]
-       stemp <- samples[[i]][,grep(paste0(s_alias,"\\["), colnames(samples[[i]]))]
-       smat[[i]] <- matrix(NA, nrow=nrow(samples[[1]]),ncol=dim(zlen)[2]*2)
-       for(j in 1:dim(samples[[1]])[1]){
-         # x coordinates
-        smat[[i]][j,1:(ncol(smat[[i]])/2)] <- grid[stemp[j,],1]
-        # x coordinates
-        smat[[i]][j,((ncol(smat[[i]])/2)+1):ncol(smat[[i]])] <- grid[stemp[j,],2]
-       }
-       # set attribute column names
-       attr(smat[[i]], "dimnames") = list(NULL, c(paste(s_alias,"[",1:dim(samples[[1]])[2],
-                ","," 1","]",sep=""),paste(s_alias,"[",
-                1:dim(samples[[1]])[2],","," 2","]",sep="")))
-       samples[[i]] <- cbind(zlen, smat[[i]])
-     }
-     hab_mask = FALSE # set habitat mask to FALSE for discrete
+  if (discrete) {
+    smat <- list()
+    for (i in 1:length(samples)) {
+      zlen <- samples[[i]][, grep(paste0(z_alias, "\\["), 
+                                  colnames(samples[[i]]))]
+      stemp <- samples[[i]][, grep(paste0(s_alias, "\\["), 
+                                   colnames(samples[[i]]))]
+      smat[[i]] <- matrix(NA, nrow = nrow(samples[[i]]), 
+                          ncol = dim(zlen)[2] * 2)
+      for (j in 1:dim(samples[[i]])[1]) {
+        smat[[i]][j, 1:(ncol(smat[[i]])/2)] <- grid[stemp[j, 
+        ], 1]
+        smat[[i]][j, ((ncol(smat[[i]])/2) + 1):ncol(smat[[i]])] <- grid[stemp[j, 
+        ], 2]
+      }
+      samples[[i]] <- cbind(zlen, smat[[i]])
+      dimnames(samples[[i]])[[2]][(dim(zlen)[2]+1):dim(samples[[i]])[2]] <-
+        c(paste(s_alias, 
+                "[", 1:dim(zlen)[2], ",", " 1", "]", 
+                sep = ""), paste(s_alias, "[", 1:dim(zlen)[2], 
+                                 ",", " 2", "]", sep = ""))
     }
+    hab_mask = FALSE
+  }
    if(length(samples) > 1){
     samples <- do.call(rbind, samples) # rbind mcmc samples
    }
