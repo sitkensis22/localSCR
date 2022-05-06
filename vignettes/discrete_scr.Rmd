@@ -41,6 +41,7 @@ Finally, in some SCR designs, clusters of trap arrays may be spread out over the
 <p>
 
 ## Functions used from 'localSCR' package:
+* `discretize_classic()` discretize traps and initial activity centers
 * `get_discrete()` grabs template model for given inputs using the `nimbleCode()` function
 * `grid_classic()` define state-space grid and extent 
 * `initialize_classic()` generate starting locations for activity area centers
