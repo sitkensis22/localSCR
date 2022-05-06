@@ -4,7 +4,7 @@
 \alias{initialize_classic}
 \title{Generate starting locations for activity centers}
 \usage{
-initialize_classic(y, M, X, ext, site, hab_mask, all_random = FALSE)
+initialize_classic(y, M, X, ext, site, hab_mask = FALSE, all_random = FALSE)
 }
 \arguments{
 \item{y}{Either a matrix or array of encounter history data, possibly 

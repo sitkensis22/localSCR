@@ -16,7 +16,7 @@ localize_classic(
 )
 }
 \arguments{
-\item{y}{Either a matrix or array of encounter history data, possiblity 
+\item{y}{Either a matrix or array of encounter history data, possibly 
 from \code{sim_classic()}.}
 
 \item{grid_ind}{A matrix representing an individual state-space grid. This 

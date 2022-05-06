@@ -1508,7 +1508,7 @@ return(scrcode)
 #' points(s.st3d, col="red",pch=20)
 #' @name initialize_classic
 #' @export
-initialize_classic <- function(y, M, X, ext, site, hab_mask, all_random = FALSE){
+initialize_classic <- function(y, M, X, ext, site, hab_mask = FALSE, all_random = FALSE){
   if(length(dim(X))!=2 & length(dim(X))!=3){
     stop("Trapping grid must be only 2 or 3 dimensions")
   }
