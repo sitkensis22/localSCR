@@ -4614,7 +4614,7 @@ run_discrete <- function(model, data, constants, inits, params, dimensions = NUL
 #' @description A function to scale up from individual-level state-space to 
 #' study-area level state-space using classic SCR data components.
 #'
-#' @param y Either a matrix or array of encounter history data, possiblity 
+#' @param y Either a matrix or array of encounter history data, possibly 
 #' from \code{sim_classic()}.
 #' @param grid_ind A matrix representing an individual state-space grid. This 
 #' is returned from \code{\link{grid_classic}}.
