@@ -75,6 +75,7 @@ parallel processing</h1>
   <span class="va">inits</span>,
   <span class="va">params</span>,
   dimensions <span class="op">=</span> <span class="cn">NULL</span>,
+  nimFun <span class="op">=</span> <span class="cn">NULL</span>,
   niter <span class="op">=</span> <span class="fl">1000</span>,
   nburnin <span class="op">=</span> <span class="fl">100</span>,
   thin <span class="op">=</span> <span class="fl">1</span>,
@@ -101,6 +102,9 @@ trace in the MCMC simulation.</p></dd>
 <dt>dimensions</dt>
 <dd><p>A named list of dimensions for variables. Only needed for variables
 used with empty indices in model code that are not provided in constants or data.</p></dd>
+<dt>nimFun</dt>
+<dd><p>A list of nimbleFunction(s) to be used in the model when using 
+<code>parallel = TRUE</code>.</p></dd>
 <dt>niter</dt>
 <dd><p>An integer value of the total number of MCMC iterations to run 
 per chain.</p></dd>
