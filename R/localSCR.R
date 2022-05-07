@@ -4435,6 +4435,8 @@ print_model <- function(model){
 #' trace in the MCMC simulation.
 #' @param dimensions A named list of dimensions for variables. Only needed for variables
 #' used with empty indices in model code that are not provided in constants or data.
+#' @param nimFun A list of nimbleFunction(s) to be used in the model when using 
+#' \code{parallel = TRUE}.
 #' @param niter An integer value of the total number of MCMC iterations to run 
 #' per chain.
 #' @param nburnin An integer value of the number of MCMC iterations to discard 
@@ -4554,12 +4556,12 @@ print_model <- function(model){
 #' @name run_discrete
 #' @export
 run_discrete <- function(model, data, constants, inits, params, dimensions = NULL,
-                        niter = 1000, nburnin=100, thin=1, nchains=1, 
+                        nimFun = NULL, niter = 1000, nburnin=100, thin=1, nchains=1, 
                        parallel=FALSE, RNGseed=NULL){
   # for parallel processing
   if(parallel == FALSE){
     SCRmodelR <- nimble::nimbleModel(code=model,data=data,constants=constants,
-                            inits=inits,check=FALSE,calculate=TRUE,dimensions = dimensions) # add dimensions
+                inits=inits,check=FALSE,calculate=TRUE,dimensions = dimensions) 
     SCRmodelR$initializeInfo()
     # compile model to C++#
     SCRmodelC <- nimble::compileNimble(SCRmodelR) # compile code
@@ -4573,8 +4575,15 @@ run_discrete <- function(model, data, constants, inits, params, dimensions = NUL
     return(results)
   }else
     if(parallel == TRUE){
-      run_parallel <- function(seed,data,model,constants,inits, params,
-                               niter,nburnin,thin){
+      run_parallel <- function(seed,data,model,constants,dimensions,
+                             nimFun,inits, params, niter,nburnin,thin){
+      # load any custom functions
+      if(is.null(nimFun)==FALSE){
+        for(i in 1:length(nimFun)){
+            nimFun[[i]]
+            assign(names(nimFun)[i],nimFun[[i]], envir = .GlobalEnv)
+        }
+      }
     SCRmodelR <- nimble::nimbleModel(code=model,data=data,
             constants=constants,inits=inits,check=FALSE,calculate=TRUE,
             dimensions = dimensions)
@@ -4600,8 +4609,8 @@ run_discrete <- function(model, data, constants, inits, params, dimensions = NUL
       }
       chain_output <- parallel::parLapply(cl = this_cluster, fun = run_parallel,
                       X=1:nchains,model = model, data=data,constants=constants, 
-                      inits=inits,params = params, niter = niter, 
-                      nburnin=nburnin, thin=thin)
+                      nimFun=nimFun, dimensions = dimensions,inits=inits,
+                      params = params, niter = niter,nburnin=nburnin, thin=thin)
       parallel::stopCluster(this_cluster)
       return(chain_output)
     }
