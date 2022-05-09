@@ -3620,7 +3620,7 @@ if(type=="marked"){
             probs[j] <- mu[j]/EN
             mu[j] <- exp(alpha0) * pixArea
           }
-          alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+          alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
           EN <- sum(mu[1:nPix]) # expected abundance
           psi <- EN/M # derived inclusion prob
           p0 ~ dunif(0,1) # baseline encounter probability
@@ -3652,7 +3652,7 @@ if(type=="marked"){
               probs[j] <- mu[j]/EN
               mu[j] <- exp(alpha0) * pixArea
             }
-            alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+            alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
             EN <- sum(mu[1:nPix]) # expected abundance
             psi <- EN/M # derived inclusion prob
             lam0 ~ dunif(0,lam0_upper) # baseline encounter probability
@@ -3684,7 +3684,7 @@ if(type=="marked"){
               probs[j] <- mu[j]/EN
               mu[j] <- exp(alpha0) * pixArea
              }
-              alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+              alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
               EN <- sum(mu[1:nPix]) # expected abundance
               psi <- EN/M # derived inclusion prob
               p0 ~ dunif(0,1) # baseline encounter probability
@@ -3720,7 +3720,7 @@ if(type=="marked"){
                 probs[j] <- mu[j]/EN
                 mu[j] <- exp(alpha0) * pixArea
                }
-                alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+                alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
                 EN <- sum(mu[1:nPix]) # expected abundance
                 psi <- EN/M # derived inclusion prob
                 lam0 ~ dunif(0,lam0_upper) # baseline encounter probability
@@ -3759,7 +3759,7 @@ if(type=="marked"){
             probs[j] <- mu[j]/EN
             mu[j] <- exp(alpha0) * pixArea
            }
-            alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+            alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
             EN <- sum(mu[1:nPix]) # expected abundance
             psi <- EN/M # derived inclusion prob
             p0 ~ dunif(0,1) # baseline encounter probability
@@ -3795,7 +3795,7 @@ if(type=="marked"){
               probs[j] <- mu[j]/EN
               mu[j] <- exp(alpha0) * pixArea
              }
-              alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+              alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
               EN <- sum(mu[1:nPix]) # expected abundance
               psi <- EN/M # derived inclusion prob
               p0 ~ dunif(0,1) # baseline encounter probability
@@ -3832,7 +3832,7 @@ if(type=="marked"){
                 probs[j] <- mu[j]/EN
                 mu[j] <- exp(alpha0) * pixArea
                }
-                alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+                alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
                 EN <- sum(mu[1:nPix]) # expected abundance
                 psi <- EN/M # derived inclusion prob
                 p0 ~ dunif(0,1) # baseline encounter probability
@@ -3872,7 +3872,7 @@ if(type=="marked"){
                   probs[j] <- mu[j]/EN
                   mu[j] <- exp(alpha0) * pixArea
                  }
-                  alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+                  alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
                   EN <- sum(mu[1:nPix]) # expected abundance
                   psi <- EN/M # derived inclusion prob
                   lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
@@ -3913,21 +3913,20 @@ if(type=="marked"){
   if(dim_y == 2){
    if(enc_dist == "binomial" & sex_sigma  == FALSE){
       scrcode <- nimble::nimbleCode({
-      alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
-      EN <- sum(EN_site[1:nSites])
+      alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
+      EN <- sum(mu[1:nPix])
       psi <- EN/M # derived inclusion prob 
-     for(g in 1:nSites){  
-      EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
-      for(j in 1:nPix[g]){
-      probs[j,g] <- mu[j,g]/EN
-      mu[j,g] <- exp(alpha0) * pixArea
+      for(j in 1:nPix){
+      probs[j] <- mu[j]/EN
+      mu[j] <- exp(alpha0) * pixArea
      } # j pixels
+    for(g in 1:nSites){
       p0[g] ~ dunif(0,1) # baseline encounter probability
     } # g sites
      sigma ~ dunif(0, sigma_upper) # scaling parameter
  for(i in 1:M){
   z[i]~dbern(psi)
-  s[i] ~ dcat(probs[1:nPix[site[i]],site[i]])
+  s[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
   x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
   y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid
   dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
@@ -3948,21 +3947,20 @@ if(type=="marked"){
  } else
  if(enc_dist == "poisson" & sex_sigma  == FALSE){
    scrcode <- nimble::nimbleCode({
-      alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
-      EN <- sum(EN_site[1:nSites])
+      alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
+      EN <- sum(mu[1:nPix])
       psi <- EN/M # derived inclusion prob 
-     for(g in 1:nSites){  
-      EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
-      for(j in 1:nPix[g]){
-      probs[j,g] <- mu[j,g]/EN
-      mu[j,g] <- exp(alpha0) * pixArea
+      for(j in 1:nPix){
+      probs[j] <- mu[j]/EN
+      mu[j] <- exp(alpha0) * pixArea
      } # j pixels
-    lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
-  } # g sites
+    for(g in 1:nSites){
+      lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
+    } # g sites
     sigma ~ dunif(0, sigma_upper) # scaling parameter
   for(i in 1:M){
    z[i]~dbern(psi)
-   s[i] ~ dcat(probs[1:nPix[site[i]],site[i]])
+   s[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
    x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
    y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid
    dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
@@ -3983,25 +3981,25 @@ if(type=="marked"){
 }else
 if(enc_dist == "binomial" & sex_sigma  == TRUE){
  scrcode <- nimble::nimbleCode({
-      alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
-      EN <- sum(EN_site[1:nSites])
+      alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
+      EN <- sum(mu[1:nPix])
       psi <- EN/M # derived inclusion prob 
-     for(g in 1:nSites){  
-      EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
-      for(j in 1:nPix[g]){
-      probs[j,g] <- mu[j,g]/EN
-      mu[j,g] <- exp(alpha0) * pixArea
+      for(j in 1:nPix){
+      probs[j] <- mu[j]/EN
+      mu[j] <- exp(alpha0) * pixArea
      } # j pixels
+    for(g in 1:nSites){
       p0[g] ~ dunif(0,1) # baseline encounter probability
     } # g sites
+    sigma ~ dunif(0, sigma_upper) # scaling parameter
     psi_sex ~ dunif(0,1) # probability sex = 1
     sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
     sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
  for(i in 1:M){
-  z[i]~dbern(psi)
-  sex[i] ~ dbern(psi_sex)
-  sx[i] <- sex[i] + 1
-   s[i] ~ dcat(probs[1:nPix[site[i]],site[i]])
+   z[i]~dbern(psi)
+   sex[i] ~ dbern(psi_sex)
+   sx[i] <- sex[i] + 1
+   s[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
    x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
    y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid
    dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
@@ -4022,17 +4020,16 @@ if(enc_dist == "binomial" & sex_sigma  == TRUE){
 } else
  if(enc_dist == "poisson" & sex_sigma  == TRUE){
   scrcode <- nimble::nimbleCode({
-      alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
-      EN <- sum(EN_site[1:nSites])
+      alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
+      EN <- sum(mu[1:nPix])
       psi <- EN/M # derived inclusion prob 
-     for(g in 1:nSites){  
-      EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
-      for(j in 1:nPix[g]){
-      probs[j,g] <- mu[j,g]/EN
-      mu[j,g] <- exp(alpha0) * pixArea
+      for(j in 1:nPix){
+      probs[j] <- mu[j]/EN
+      mu[j] <- exp(alpha0) * pixArea
      } # j pixels
-    lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
-  } # g sites
+    for(g in 1:nSites){
+      lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
+    } # g sites
    psi_sex ~ dunif(0,1) # probability sex = 1
    sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
    sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
@@ -4040,7 +4037,7 @@ if(enc_dist == "binomial" & sex_sigma  == TRUE){
    z[i]~dbern(psi)
    sex[i] ~ dbern(psi_sex)
    sx[i] <- sex[i] + 1
-   s[i] ~ dcat(probs[1:nPix[site[i]],site[i]])
+   s[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
    x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
    y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid
    dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
@@ -4065,20 +4062,19 @@ if(dim_y == 3){
   if(enc_dist == "binomial" & sex_sigma  == FALSE){
 scrcode <- nimble::nimbleCode({
 sigma ~ dunif(0, sigma_upper) # scaling parameter
-alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
-EN <- sum(EN_site[1:nSites])
+alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
+EN <- sum(mu[1:nPix])
 psi <- EN/M # derived inclusion prob 
-for(g in 1:nSites){  
-EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
-for(j in 1:nPix[g]){
-probs[j,g] <- mu[j,g]/EN
-mu[j,g] <- exp(alpha0) * pixArea
+for(j in 1:nPix){
+probs[j] <- mu[j]/EN
+mu[j] <- exp(alpha0) * pixArea
 } # j pixels
+for(g in 1:nSites){
 p0[g] ~ dunif(0,1) # baseline encounter probability
 } # g sites
 for(i in 1:M){
 z[i]~dbern(psi)
-s[i] ~ dcat(probs[1:nPix[site[i]],site[i]])
+s[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
 x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
 y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid
 dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
@@ -4104,20 +4100,19 @@ D <- N/A
 if(enc_dist == "poisson" & sex_sigma  == FALSE){
 scrcode <- nimble::nimbleCode({
 sigma ~ dunif(0, sigma_upper) # scaling parameter
-alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
-EN <- sum(EN_site[1:nSites])
+alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
+EN <- sum(mu[1:nPix])
 psi <- EN/M # derived inclusion prob 
-for(g in 1:nSites){  
-EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
-for(j in 1:nPix[g]){
-probs[j,g] <- mu[j,g]/EN
-mu[j,g] <- exp(alpha0) * pixArea
+for(j in 1:nPix){
+probs[j] <- mu[j]/EN
+mu[j] <- exp(alpha0) * pixArea
 } # j pixels
+for(g in 1:nSites){
 lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
 } # g sites
 for(i in 1:M){
   z[i]~dbern(psi)
-  s[i] ~ dcat(probs[1:nPix[site[i]],site[i]])
+  s[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
   x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
   y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid 
   dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
@@ -4145,22 +4140,21 @@ scrcode <- nimble::nimbleCode({
   psi_sex ~ dunif(0,1) # probability sex = 1
   sigma[1] ~ dunif(0, sigma_upper) # scaling parameter, sex = 0
   sigma[2] ~ dunif(0, sigma_upper) # scaling parameter, sex = 1
-  alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
-  EN <- sum(EN_site[1:nSites])
+  alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
+  EN <- sum(mu[1:nPix])
   psi <- EN/M # derived inclusion prob 
-  for(g in 1:nSites){  
-  EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
-  for(j in 1:nPix[g]){
-  probs[j,g] <- mu[j,g]/EN
-  mu[j,g] <- exp(alpha0) * pixArea
+  for(j in 1:nPix){
+  probs[j] <- mu[j]/EN
+  mu[j] <- exp(alpha0) * pixArea
   } # j pixels
+  for(g in 1:nSites){
   p0[g] ~ dunif(0,1) # baseline encounter probability
   } # g sites
   for(i in 1:M){
     z[i]~dbern(psi)
     sex[i] ~ dbern(psi_sex)
     sx[i] <- sex[i] + 1
-    s[i] ~ dcat(probs[1:nPix[site[i]],site[i]])
+    s[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
     x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
     y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid 
     dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
@@ -4185,15 +4179,14 @@ scrcode <- nimble::nimbleCode({
 } else
 if(enc_dist == "poisson" & sex_sigma  == TRUE){
   scrcode <- nimble::nimbleCode({
-alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
-EN <- sum(EN_site[1:nSites])
+alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
+EN <- sum(mu[1:nPix])
 psi <- EN/M # derived inclusion prob 
-for(g in 1:nSites){  
-EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
-for(j in 1:nPix[g]){
-probs[j,g] <- mu[j,g]/EN
-mu[j,g] <- exp(alpha0) * pixArea
+for(j in 1:nPix){
+probs[j] <- mu[j]/EN
+mu[j] <- exp(alpha0) * pixArea
 } # j pixels
+for(g in 1:nSites){
 lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
 } # g sites
 psi_sex ~ dunif(0,1) # probability sex = 1
@@ -4203,7 +4196,7 @@ for(i in 1:M){
   z[i]~dbern(psi)
   sex[i] ~ dbern(psi_sex)
   sx[i] <- sex[i] + 1
-  s[i] ~ dcat(probs[1:nPix[site[i]],site[i]])
+  s[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
   x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
   y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid 
   dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
@@ -4238,7 +4231,7 @@ if(type == "unmarked"){
               probs[j] <- mu[j]/EN
               mu[j] <- exp(alpha0) * pixArea
             }
-            alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+            alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
             EN <- sum(mu[1:nPix]) # expected abundance
             psiu <- EN/m # derived inclusion prob
             lam0 ~ dunif(0,lam0_upper) # baseline encounter probability
@@ -4269,7 +4262,7 @@ if(type == "unmarked"){
               probs[j] <- mu[j]/EN
               mu[j] <- exp(alpha0) * pixArea
             }
-            alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
+            alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
             EN <- sum(mu[1:nPix]) # expected abundance
             psiu <- EN/m # derived inclusion prob
             lam0 ~ dunif(0,lam0_upper) # baseline encounter rate
@@ -4300,22 +4293,20 @@ if(type == "unmarked"){
  if(trapsClustered){
  if(isFALSE(occ_specific)){
    scrcode <- nimble::nimbleCode({
-      alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
-      EN <- sum(EN_site[1:nSites])
-       
+      alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
+      EN <- sum(mu[1:nPix])
       psiu <- EN/m # derived inclusion prob 
-     for(g in 1:nSites){  
-      EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
-      for(j in 1:nPix[g]){
-      probs[j,g] <- mu[j,g]/EN
-      mu[j,g] <- exp(alpha0) * pixArea
-     } # j pixels
+      for(j in 1:nPix){
+      probs[j] <- mu[j]/EN
+      mu[j] <- exp(alpha0) * pixArea
+      } # j pixels
+    for(g in 1:nSites){
       lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
-  } # g sites
+    } # g sites
     sigma ~ dunif(0, sigma_upper) # scaling parameter
   for(i in 1:m){
  zu[i]~dbern(psiu)
- su[i] ~ dcat(probs[1:nPix[site[i]],site[i]])
+ su[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
  x0gu[i] <- grid[su[i],1,site[i]] # x-coordinate of state-space grid
  y0gu[i] <- grid[su[i],2,site[i]] # y-coordinate of state-space grid 
  distu[i,1:J] <- sqrt((x0gu[i]-X[1:J,1,site[i]])^2 + (y0gu[i]-X[1:J,2,site[i]])^2)
@@ -4338,20 +4329,19 @@ if(type == "unmarked"){
 if(isFALSE(occ_specific)==FALSE){ # occasion-specific models
 scrcode <- nimble::nimbleCode({
 sigma ~ dunif(0, sigma_upper) # scaling parameter
-alpha0 ~ dt(0, 1/10^2, 1) # Gelman cauchy prior on density
-EN <- sum(EN_site[1:nSites])
+alpha0 ~ dunif(-20,20) # Gelman cauchy prior on density
+EN <- sum(mu[1:nPix])
 psiu <- EN/m # derived inclusion prob 
-for(g in 1:nSites){  
-EN_site[g] <- sum(mu[1:nPix[g],g]) # expected abundance
-for(j in 1:nPix[g]){
-probs[j,g] <- mu[j,g]/EN
-mu[j,g] <- exp(alpha0) * pixArea
+for(j in 1:nPix){
+probs[j] <- mu[j]/EN
+mu[j] <- exp(alpha0) * pixArea
 } # j pixels
+for(g in 1:nSites){  
 lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
 } # g sites
 for(i in 1:m){
  zu[i]~dbern(psiu)
- su[i] ~ dcat(probs[1:nPix[site[i]],site[i]])
+ su[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
  x0gu[i] <- grid[su[i],1,site[i]] # x-coordinate of state-space grid
  y0gu[i] <- grid[su[i],2,site[i]] # y-coordinate of state-space grid 
  distu[i,1:J] <- sqrt((x0gu[i]-X[1:J,1,site[i]])^2 + (y0gu[i]-X[1:J,2,site[i]])^2)
