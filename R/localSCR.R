@@ -3926,7 +3926,7 @@ if(type=="marked"){
      sigma ~ dunif(0, sigma_upper) # scaling parameter
  for(i in 1:M){
   z[i]~dbern(psi)
-  s[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
+  s[i] ~ dcat(probs[npixSite[site[i],1]:npixSite[site[i],2]])
   x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
   y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid
   dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
@@ -3960,7 +3960,7 @@ if(type=="marked"){
     sigma ~ dunif(0, sigma_upper) # scaling parameter
   for(i in 1:M){
    z[i]~dbern(psi)
-   s[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
+   s[i] ~ dcat(probs[npixSite[site[i],1]:npixSite[site[i],2]])
    x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
    y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid
    dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
@@ -3999,7 +3999,7 @@ if(enc_dist == "binomial" & sex_sigma  == TRUE){
    z[i]~dbern(psi)
    sex[i] ~ dbern(psi_sex)
    sx[i] <- sex[i] + 1
-   s[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
+   s[i] ~ dcat(probs[npixSite[site[i],1]:npixSite[site[i],2]])
    x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
    y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid
    dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
@@ -4037,7 +4037,7 @@ if(enc_dist == "binomial" & sex_sigma  == TRUE){
    z[i]~dbern(psi)
    sex[i] ~ dbern(psi_sex)
    sx[i] <- sex[i] + 1
-   s[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
+   s[i] ~ dcat(probs[npixSite[site[i],1]:npixSite[site[i],2]])
    x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
    y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid
    dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
@@ -4074,7 +4074,7 @@ p0[g] ~ dunif(0,1) # baseline encounter probability
 } # g sites
 for(i in 1:M){
 z[i]~dbern(psi)
-s[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
+s[i] ~ dcat(probs[npixSite[site[i],1]:npixSite[site[i],2]])
 x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
 y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid
 dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
@@ -4112,7 +4112,7 @@ lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
 } # g sites
 for(i in 1:M){
   z[i]~dbern(psi)
-  s[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
+  s[i] ~ dcat(probs[npixSite[site[i],1]:npixSite[site[i],2]])
   x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
   y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid 
   dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
@@ -4154,7 +4154,7 @@ scrcode <- nimble::nimbleCode({
     z[i]~dbern(psi)
     sex[i] ~ dbern(psi_sex)
     sx[i] <- sex[i] + 1
-    s[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
+    s[i] ~ dcat(probs[npixSite[site[i],1]:npixSite[site[i],2]])
     x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
     y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid 
     dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
@@ -4196,7 +4196,7 @@ for(i in 1:M){
   z[i]~dbern(psi)
   sex[i] ~ dbern(psi_sex)
   sx[i] <- sex[i] + 1
-  s[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
+  s[i] ~ dcat(probs[npixSite[site[i],1]:npixSite[site[i],2]])
   x0g[i] <- grid[s[i],1,site[i]] # x-coordinate of state-space grid
   y0g[i] <- grid[s[i],2,site[i]] # y-coordinate of state-space grid 
   dist[i,1:J] <- sqrt((x0g[i]-X[1:J,1,site[i]])^2 + (y0g[i]-X[1:J,2,site[i]])^2)
@@ -4306,7 +4306,7 @@ if(type == "unmarked"){
     sigma ~ dunif(0, sigma_upper) # scaling parameter
   for(i in 1:m){
  zu[i]~dbern(psiu)
- su[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
+ su[i] ~ dcat(probs[npixSite[site[i],1]:npixSite[site[i],2]])
  x0gu[i] <- grid[su[i],1,site[i]] # x-coordinate of state-space grid
  y0gu[i] <- grid[su[i],2,site[i]] # y-coordinate of state-space grid 
  distu[i,1:J] <- sqrt((x0gu[i]-X[1:J,1,site[i]])^2 + (y0gu[i]-X[1:J,2,site[i]])^2)
@@ -4341,7 +4341,7 @@ lam0[g] ~ dunif(0,lam0_upper) # baseline encounter rate
 } # g sites
 for(i in 1:m){
  zu[i]~dbern(psiu)
- su[i] ~ dcat(probs[npixSite[i],1]:npixSite[site[i],2])
+ su[i] ~ dcat(probs[npixSite[site[i],1]:npixSite[site[i],2]])
  x0gu[i] <- grid[su[i],1,site[i]] # x-coordinate of state-space grid
  y0gu[i] <- grid[su[i],2,site[i]] # y-coordinate of state-space grid 
  distu[i,1:J] <- sqrt((x0gu[i]-X[1:J,1,site[i]])^2 + (y0gu[i]-X[1:J,2,site[i]])^2)
