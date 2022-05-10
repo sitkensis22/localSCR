@@ -1,7 +1,7 @@
 ---
 title: "Local classic SCR models: continuous state-space and marked individuals"
 description: >
-  Learn how to simulate and analyze basic spatial capture-recapture data 
+  Learn how to simulate and analyze basic spatial capture-recapture data using a local approach
 author: "Daniel Eacker"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -638,4 +638,4 @@ Turek, D., C. Milleret, T. Ergon, and H. Brøseth 2021. Efficient estimation of 
 Royle, J. A., R. B. Chandler, R. Sollmann, and B. Gardner. 2014. Spatial
 capture‐recapture. Academic Press, Waltham, Massachusetts, USA.
 
-Woodruff, S., D. R. Eacker, and L. Waits. 2020. Estimating coyote density in local, discrete  Bayesian capture-recapture models. Journal of Wildlife Management 10.1002/jwmg.21967
+Woodruff, S., D. R. Eacker, and L. Waits. 2020. Estimating coyote density in local, discrete  Bayesian capture-recapture models. Journal of Wildlife Management 10.1002/jwmg.21967.
