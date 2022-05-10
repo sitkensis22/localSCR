@@ -146,8 +146,8 @@ Finally, in some SCR designs, clusters of trap arrays may be spread out over the
 <p>This tutorial includes three parts:</p>
 <ol style="list-style-type: decimal">
 <li>Create ‘classic’ SCR data and convert to discretized format</li>
-<li>Workflow for discrete SCR model for marked individuals using a 2D trap array, sex-specific scaling parameter and habitat mask</li>
-<li>Workflow for discrete SCR model for marked individuals using a 3D trap array, sex-specific scaling parameter and habitat mask</li>
+<li>Workflow for discrete SCR model for marked individuals using a 2D trap array, a single scaling parameter and habitat mask</li>
+<li>Workflow for discrete SCR model for marked individuals using a 3D trap array,a single scaling parameter and habitat mask</li>
 </ol>
 <br><p>
 </p>
@@ -250,7 +250,7 @@ prev_mask <span class="op">=</span> <span class="cn">NULL</span><span class="op"
 <p><br></p>
 </div>
 <div class="section level3">
-<h3 id="workflow-for-discrete-scr-model-for-marked-individuals-using-a-2d-trap-array-sex-specific-scaling-parameter-and-habitat-mask">(2) Workflow for discrete SCR model for marked individuals using a 2D trap array, sex-specific scaling parameter and habitat mask<a class="anchor" aria-label="anchor" href="#workflow-for-discrete-scr-model-for-marked-individuals-using-a-2d-trap-array-sex-specific-scaling-parameter-and-habitat-mask"></a>
+<h3 id="workflow-for-discrete-scr-model-for-marked-individuals-using-a-2d-trap-array-single-scaling-parameter-and-habitat-mask">(2) Workflow for discrete SCR model for marked individuals using a 2D trap array, single scaling parameter and habitat mask<a class="anchor" aria-label="anchor" href="#workflow-for-discrete-scr-model-for-marked-individuals-using-a-2d-trap-array-single-scaling-parameter-and-habitat-mask"></a>
 </h3>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># prepare data</span>
@@ -346,6 +346,10 @@ In this example, we also use the ‘raster’ package to make a simple plot of t
 <img src="../reference/figures/vignette_04/Fig3.png" style="width:70%"></p>
 <br><p>
 </p>
+</div>
+<div class="section level3">
+<h3 id="workflow-for-discrete-scr-model-for-marked-individuals-using-a-3d-trap-array-a-single-scaling-parameter-and-habitat-mask">(3) Workflow for discrete SCR model for marked individuals using a 3D trap array, a single scaling parameter and habitat mask<a class="anchor" aria-label="anchor" href="#workflow-for-discrete-scr-model-for-marked-individuals-using-a-3d-trap-array-a-single-scaling-parameter-and-habitat-mask"></a>
+</h3>
 <p>Next we repeat a similar workflow but now we have two trap arrays that are clustered in space, and thus, there is a negligble chance of detecting an individual at more than one trap array. In this case, the functions in ‘localSCR’ can automatically detect that the traps are in a 3-dimensional format and we note that <code>sim_classic</code> will return a variable called <code>site</code> that identifies which trap array that each individual (both detected and not detected) belongs to. Note that the number of rows in the simulated data <code>y</code> will equal the simulated population size (here in the example, <code>N = 200</code>). However, because we are using a trick provided by Chandler (2018) to separate the data augmentation process into two steps, we only need the encounter data for those individuals that were detected in the model likelihood. Also, because we have no occasion-specific detection covariates, we can sum <code>y</code> over individuals and traps to result in a 2-dimensional encounter history array (i.e., <code>y[i,j]</code>). This speeds up the model under these conditions and we can specify this when we get the SCR model template by setting <code>y_dim = 2</code> in <code>get_classic(y_dim = 2,...)</code>. Otherwise, the workflow is very similar to having a 2-dimensional trap array in the previous example.</p>
 
 <p><br></p>

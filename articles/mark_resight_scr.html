@@ -114,19 +114,6 @@ The third vignette of the ‘localSCR’ package builds on ‘classic’ Bayesia
 </ol>
 <p>In some SCR problems, there are landscape features that create ‘unsuitable’ habitat for the study species. Habitat masks are used to account for these features and designate suitable (1) or unsuitable (0) habitat, and can be represented as a matrix or array of binary values. We follow the methods of Milleret et al. (2019) to implement the “ones” trick to account for habitat suitability. This restricts the possible locations of latent activity centers to only suitable habitat. The ‘localSCR’ package provides functions to construct a habitat mask from either raster or polygon data.</p>
 
-<br><p>
-</p>
-</div>
-<div class="section level2">
-<h2 id="turtorial">Turtorial<a class="anchor" aria-label="anchor" href="#turtorial"></a>
-</h2>
-<p>This tutorial includes four parts:</p>
-<ol style="list-style-type: decimal">
-<li>Create traps (or detectors), state-space grid and extent, and habitat mask</li>
-<li>Simulate ‘classic’ SCR data for marked individuals</li>
-<li>Simulate spatial count data for unmarked individuals</li>
-<li>Workflow for spatial mark-resight with 2D trap array and habitat mask</li>
-</ol>
 <p><br></p>
 <p>
 </p>
@@ -158,6 +145,18 @@ The third vignette of the ‘localSCR’ package builds on ‘classic’ Bayesia
 <li>
 <code><a href="../reference/sim_classic.html">sim_classic()</a></code> simulate basic spatial capture-recapture data</li>
 </ul>
+<p><br></p>
+</div>
+<div class="section level2">
+<h2 id="turtorial">Turtorial<a class="anchor" aria-label="anchor" href="#turtorial"></a>
+</h2>
+<p>This tutorial includes four parts:</p>
+<ol style="list-style-type: decimal">
+<li>Create traps (or detectors), state-space grid and extent, and habitat mask</li>
+<li>Simulate ‘classic’ SCR data for marked individuals</li>
+<li>Simulate spatial count data for unmarked individuals</li>
+<li>Workflow for spatial mark-resight with 2D trap array and habitat mask</li>
+</ol>
 <p><br></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># load 'localSCR' package</span>
