@@ -41,7 +41,6 @@ Finally, in some SCR designs, clusters of trap arrays may be spread out over the
 <p>
 
 ## Functions used from 'localSCR' package:
-* `discretize_classic()` discretize traps and initial activity centers
 * `get_discrete()` grabs template model for given inputs using the `nimbleCode()` function
 * `grid_classic()` define state-space grid and extent 
 * `initialize_classic()` generate starting locations for activity area centers
@@ -86,7 +85,8 @@ mycrs = 32608 # EPSG for WGS 84 / UTM zone 8N
 pixelWidth = 200 # store pixelWidth or grid resolution
 
 # create state-space
-Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = pixelWidth)
+Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, 
+                    res = pixelWidth)
 
 # create polygon for mask
 library(sf)
@@ -105,7 +105,7 @@ Nsim = 200
 data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs, 
                      sigma_ = mysigma,  prop_sex = 1, N = Nsim, K = 4, 
                      base_encounter = 0.15,enc_dist = "binomial",
-                     hab_mask = hab_mask, setSeed = 100)
+                     hab_mask = hab_mask, setSeed = 200)
 
 # total augmented population size 
 M = 400
@@ -141,7 +141,8 @@ ggplot() + geom_point(data=as.data.frame(d_list$grid),aes(x=x,y=y),
     geom_point(data=as.data.frame(d_list$grid[d_list$s.st,]),
                aes(x=x,y=y),color="orangered",size=0.75) +
     theme_classic() + ylab("Northing") + xlab("Easting") +
-    theme(axis.text = element_text(size=12),axis.title = element_text(size=16))
+    theme(axis.text = element_text(size=12),
+          axis.title = element_text(size=16))
 ```
 
 <p align="center" >
@@ -167,7 +168,8 @@ Next, we'll use these data components we created above in a discrete SCR model. 
 # prepare data
 data = list(y=data3d$y)
 data$y = data$y[which(apply(data$y, 1, sum)!=0),,] # remove augmented records 
-data$y = apply(data$y, c(1,2), sum) # covert to 2d by summing over individuals and traps
+# covert to 2d by summing over individuals and traps
+data$y = apply(data$y, c(1,2), sum) 
 
 # add discretized traps
 data$X = d_list$X/1000 # convert to km units
@@ -178,8 +180,8 @@ data$grid = d_list$grid/1000 # convert to km units
 # prepare constants (note that density is now in activity centers/km2 
 # and each cell is now 0.01 km2 in area
 constants = list(M = M,n0 = nrow(data$y),J=dim(data$y)[2], 
-                 K=dim(data3d$y)[3],nPix=d_list$nPix,pixArea = 0.01,
-                 sigma_upper = 1, A = (sum(hab_mask)*(0.1^2)))
+                 K=dim(data3d$y)[3],nPix=d_list$nPix,pixArea = (pixelWidth/1000)^2,
+                 sigma_upper = 1, A = sum(hab_mask)*((pixelWidth/1000)^2))
 
 # add z and zeros vector data for latent inclusion indicator
 data$z = c(rep(1,constants$n0),rep(NA,constants$M - constants$n0))
@@ -187,7 +189,7 @@ data$zeros =  c(rep(NA,constants$n0),rep(0,constants$M - constants$n0))
 
 # define all initial values 
 inits = list(sigma = runif(1, 0.250, 0.350), s = d_list$s.st,
-            alpha0 = 2.89, p0 = runif(1, 0.05, 0.15),
+            alpha0 = 2.8, p0 = runif(1, 0.05, 0.15),
             z=c(rep(NA,constants$n0),rep(0,constants$M-constants$n0)))
 
 # parameters to monitor
@@ -209,12 +211,13 @@ out = run_discrete(model = discrete_model, data=data, constants=constants,
         inits=inits, params = params,niter = 5000, nburnin=1000, 
         thin=1, nchains=2, parallel=TRUE,  RNGseed = 500)
 toc()
-#> 1075.138 sec elapsed
+#> 1025.869 sec elapsed
 
 # histogram of posterior samples for N (abundance)
 samples = do.call(rbind, out)
 par(mfrow=c(1,1))
-hist(samples[,which(dimnames(out[[1]])[[2]]=="N")], xlab = "Abundance", xlim = c(0,400), main="")
+hist(samples[,which(dimnames(out[[1]])[[2]]=="N")], xlab = "Abundance", 
+     xlim = c(0,400), main="")
 abline(v=Nsim, col="red") # add line for simulated abundance
 ```
 
@@ -226,26 +229,27 @@ abline(v=Nsim, col="red") # add line for simulated abundance
 
 We note that the discrete model takes much longer to run compared to the continuous SCR model equivalent (i.e., 'classic' model). This results from using the categorical distribution to sample the pixels of our discrete state-space. In this example we have a somewhat fine grid at 200 m, which results 270 cells that the model has to consider for each individual in our augmented population size of `M = 400`. We also can't take advantage of the block sampling of activity center coordinates that greatly speeds up the classic model runs. 
 
-We can see from the histogram of the posterior samples of `N` that our model estimates were close to the simulated value of 200 individuals (shown by red line) and were biased slightly high at around 217 individuals. This is expected since this is only one realization of the detection process. In this example, we divided the pixelWidth by 1,000 in deriving the area (`A`) in our list of constants. This allowed us to estimate density in activity centers/km<sup>2</sup> rather than activity centers/m<sup>2</sup>. Note that care must be taken with any rescaling of the data or constants.
+We can see from the histogram of the posterior samples of `N` that our model estimates were close to the simulated value of 200 individuals (shown by red line) and were biased just slightly low at around 196 individuals. This is expected since this is only one realization of the detection process. In this example, we divided the pixelWidth by 1,000 in deriving the area (`A`) in our list of constants. This allowed us to estimate density in activity centers/km<sup>2</sup> rather than activity centers/m<sup>2</sup>. Note that care must be taken with any rescaling of the data or constants.
 
-Next we use`nimSummary()` to quickly summarize the MCMC samples. Note that there are other options to summarize MCMC output, but this function is provided with the package and depends partly on the 'coda' package. Then, we make a realized density plot of the MCMC samples using `realized_density()`. In this function we make use of the list of grid and extent we created earlier called `Grid` as well as our saved coordinates reference system (`mycrs`). 
+Next we use`nimSummary()` to quickly summarize the MCMC samples. Note that there are other options to summarize MCMC output, but this function is provided with the package and depends partly on the 'coda' package. Then, we make a realized density plot of the MCMC samples using `realized_density()`. In this function we make use of the list of grid and extent we created earlier called `Grid` as well as our saved coordinates reference system (`mycrs`). I'll also note that we need to use the argument `discrete = TRUE` to indicate that we need to transform the pixel indices saved for `s` into the state-space grid coordinates. The function will automate this for us. 
 
-In this example, we also use the 'raster' package to make a simple plot of the realized density output. For the discrete problem, we need to manually take the samples of pixel indices for each individual (`s`) and recover the grid coordinates for them; thus, we write a bit of manual code to accomplish this using a for loop. We can see that the habitat mask has resulted in some cells having `NA` values where the habitat was unsuitable as expected.
+In this example, we also use the 'raster' package to make a simple plot of the realized density output. 
 </p>
 <br>
 ```{r, fig.show='hide',eval=FALSE}
 # summarize MCMC samples (exclude parameters and don't plot)
 nimSummary(out, exclude = c("s","z"), trace=FALSE)
 #>        post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat
-#> D         80.726   8.206  65.926  80.370  98.148  1 233.799 1.005
-#> EN       217.378  24.517 170.019 216.722 268.463  1 225.645 1.004
-#> N        217.960  22.157 178.000 217.000 265.000  1 233.799 1.005
-#> alpha0     4.382   0.113   4.143   4.385   4.599  1 235.489 1.002
-#> p0         0.151   0.020   0.116   0.150   0.192  1 296.483 1.007
-#> psi        0.543   0.061   0.425   0.542   0.671  1 225.645 1.004
-#> sigma      0.323   0.021   0.285   0.322   0.367  1 218.121 1.001
+#> D         18.222   1.768  15.093  18.148  21.944  1 314.957 1.006
+#> EN       196.003  21.492 157.391 194.404 241.130  1 307.866 1.006
+#> N        196.798  19.091 163.000 196.000 237.000  1 314.957 1.006
+#> alpha0     2.893   0.110   2.679   2.890   3.106  1 316.798 1.006
+#> p0         0.167   0.023   0.126   0.167   0.214  1 316.707 1.016
+#> psi        0.490   0.054   0.393   0.486   0.603  1 307.866 1.006
+#> sigma      0.310   0.021   0.274   0.308   0.358  1 201.439 1.043
 
-# make realized density plot (we don't use the habitat mask here for discrete model)
+# make realized density plot (we don't use the habitat mask here for 
+# discrete model)
 r = realized_density(samples = out, grid = d_list$grid, crs_ = mycrs, 
                      site = NULL, hab_mask = FALSE,discrete=TRUE)       
       
@@ -255,7 +259,7 @@ library(raster)
 
 # make simple raster plot
 plot(r, col=viridis(100),
-     main=expression("Realized density (activity centers/km"^2*")"),
+     main=expression("Realized density (activity centers/0.2 km"^2*")"),
      ylab="Northing",xlab="Easting")
 ```
 
@@ -266,36 +270,42 @@ plot(r, col=viridis(100),
 <br>
 <p>
 
-Next we repeat a similar workflow but now we have two trap arrays that are clustered in space, and thus, there is a negligble chance of detecting an individual at more than one trap array. In this case, the functions in 'localSCR' can automatically detect that the traps are in a 3-dimensional format and we note that `sim_classic` will return a variable called `site` that identifies which trap array that each individual (both detected and not detected) belongs to. Note that the number of rows in the simulated data `y` will equal the simulated population size (here in the example, `N = 200`). However, because we are using a trick provided by Chandler (2018) to separate the data augmentation process into two steps, we only need the encounter data for those individuals that were detected in the model likelihood. Also, because we have no occasion-specific detection covariates, we can sum `y` over individuals and traps to result in a 2-dimensional encounter history array (i.e., `y[i,j]`). This speeds us the model under these conditions and we can specify this when we get the SCR model template by setting `y_dim = 2` in `get_classic(y_dim = 2,...)`. Otherwise, the workflow is very similar to having a 2-dimensional trap array in the previous example.
+Next we repeat a similar workflow but now we have two trap arrays that are clustered in space, and thus, there is a negligble chance of detecting an individual at more than one trap array. In this case, the functions in 'localSCR' can automatically detect that the traps are in a 3-dimensional format and we note that `sim_classic` will return a variable called `site` that identifies which trap array that each individual (both detected and not detected) belongs to. Note that the number of rows in the simulated data `y` will equal the simulated population size (here in the example, `N = 200`). However, because we are using a trick provided by Chandler (2018) to separate the data augmentation process into two steps, we only need the encounter data for those individuals that were detected in the model likelihood. Also, because we have no occasion-specific detection covariates, we can sum `y` over individuals and traps to result in a 2-dimensional encounter history array (i.e., `y[i,j]`). This speeds up the model under these conditions and we can specify this when we get the SCR model template by setting `y_dim = 2` in `get_classic(y_dim = 2,...)`. Otherwise, the workflow is very similar to having a 2-dimensional trap array in the previous example.
 
 </p>
 <br>
 
 ```{r, fig.show='hide',eval=FALSE}
-# create an array of traps, as an approach where individuals will only be detected 
-# at one of the trap arrays (e.g., Furnas et al. 2018)
+# create an array of traps, as an approach where individuals will only be 
+# detected at one of the trap arrays (e.g., Furnas et al. 2018)
 Xarray = array(NA, dim=c(nrow(traps),2,2))
 Xarray[,,1]=traps
-Xarray[,,2]=traps+4000 # shift trapping grid to new locations
+Xarray[,,2]=traps+6000 # shift trapping grid to new locations
 
 # create grid and extent for 3D trap array
-GridX = grid_classic(X = Xarray, crs_ = mycrs, buff = 3*max(mysigma), res = pixelWidth)
+GridX = grid_classic(X = Xarray, crs_ = mycrs, buff = 3*max(mysigma), 
+                     res = pixelWidth)
 
 # create polygon to use as a mask
 library(sf)
-poly = st_sfc(st_polygon(x=list(matrix(c(-1660,-1900,5730,-1050,5470,
-5650,0,6050,-1800,5700,-1660,-1900),ncol=2, byrow=TRUE))), crs =  mycrs)
+poly = st_sfc(st_polygon(x=list(matrix(c(-1660,-1750,8730,-1050,7470,
+7550,0,7950,-1800,8200,-1660,-1750),ncol=2, byrow=TRUE))), crs =  mycrs)
 
 # make ggplot
-ggplot() + geom_point(data=as.data.frame(GridX$grid[,,1]),aes(x=V1,y=V2),color="grey60",size=1.25) +
-    geom_point(data=as.data.frame(Xarray[,,1]),aes(x=V1,y=V2),color="blue",size=2) +
-    geom_point(data=as.data.frame(GridX$grid[,,2]),aes(x=V1,y=V2),color="grey60",size=1.25) +
-    geom_point(data=as.data.frame(Xarray[,,2]),aes(x=V1,y=V2),color="blue",size=2) +
+g1=ggplot() + geom_point(data=as.data.frame(GridX$grid[,,1]),
+                      aes(x=V1,y=V2),color="grey60",size=1.25) +
+    geom_point(data=as.data.frame(Xarray[,,1]),
+               aes(x=V1,y=V2),color="blue",size=2) +
+    geom_point(data=as.data.frame(GridX$grid[,,2]),
+               aes(x=V1,y=V2),color="grey60",size=1.25) +
+    geom_point(data=as.data.frame(Xarray[,,2]),
+               aes(x=V1,y=V2),color="blue",size=2) +
     geom_sf(data=poly, fill = NA) + coord_sf(datum=st_crs(mycrs)) +
     theme_classic() + ylab("Northing") + xlab("Easting") +
-    scale_x_continuous(limits=c(-2000,6000)) +
-    scale_y_continuous(limits=c(-2000,6000)) + 
-    theme(axis.text = element_text(size=12),axis.title = element_text(size=16))
+    scale_x_continuous(limits=c(-2000,9000)) +
+    scale_y_continuous(limits=c(-2000,9000)) + 
+    theme(axis.text = element_text(size=12),
+               axis.title = element_text(size=16))
 ```
 
 <p align="center">
@@ -303,7 +313,7 @@ ggplot() + geom_point(data=as.data.frame(GridX$grid[,,1]),aes(x=V1,y=V2),color="
 </p>
 <br>
 <p>
-In the figure we can see our two spatially separated trapping grids and that the polgon overlaps some of the gridded area. The area outside the polygon will be considered unsuitable when the habitat matrix is created. Note that the `site` variable will be only as long as the simulated population size (here, 200) and thus, we will need to augment the variable to have the length equal to the total augmented population size (i.e., `M = 400`). Otherwise the workflow is very similar to the previous one where we'll use `discretize_classic()` to convert our 'classic' SCR data to a discrete format. We'll use some of the items we created above in this example (e.g., `traps`,`Nsim`).
+In the figure we can see our two spatially separated trapping grids and that the polgon overlaps some of the gridded area. The area outside the polygon will be considered unsuitable when the habitat matrix is created. Note that the `site` variable will be only as long as the simulated population size (here, 300) and thus, we will need to augment the variable to have the length equal to the total augmented population size (i.e., `M = 600`). Otherwise the workflow is very similar to the previous one where we'll use `discretize_classic()` to convert our 'classic' SCR data to a discrete format. We'll use some of the items we created above in this example (e.g., `mysigma`,`mycrs`).
 </p>
 <br>
 ```{r, fig.show='hide',fig.width = 8,fig.height=14,eval=FALSE}
@@ -311,10 +321,19 @@ In the figure we can see our two spatially separated trapping grids and that the
 hab_mask = mask_polygon(poly = poly, grid = GridX$grid, crs_ = mycrs, 
 prev_mask = NULL)
 
-# simulate data for uniform state-space and habitat mask (N is simulated abundance)
-data4d = sim_classic(X = Xarray, ext = GridX$ext, crs_ = mycrs, sigma_ = mysigma, 
-                prop_sex = 1,N = Nsim, K = 4, base_encounter = 0.15, 
-                enc_dist = "binomial",hab_mask = hab_mask, setSeed = 500)
+# simuated population size
+Nsim = 300
+
+# augmented population size
+M=600
+
+# simulate data for uniform state-space and habitat mask 
+# (N is simulated abundance)
+data4d = sim_classic(X = Xarray, ext = GridX$ext, crs_ = mycrs, 
+                 sigma_ = mysigma, prop_sex = 1,N = Nsim, 
+                 K = 4, base_encounter = 0.15, 
+                 enc_dist = "binomial",hab_mask = hab_mask, 
+                 setSeed = 300)
 
 # augment site identifier
 site = c(data4d$site,c(rep(1,((M-length(data4d$site))/2)),
@@ -331,36 +350,44 @@ d_list = discretize_classic(X=Xarray, grid = GridX$grid, s.st = s.st,
 # inspect discrete data list
 str(d_list)
 #> List of 4
-#>  $ grid: num [1:286, 1:2, 1:2] -1608 -1408 -1208 -1008 -808 ...
-#>  $ nPix: int [1:2] 286 273
+#>  $ grid: num [1:284, 1:2, 1:2] -1608 -1408 -1208 -1008 -808 ...
+#>  $ nPix: int [1:2] 284 278
 #>  $ X   : num [1:25, 1:2, 1:2] -807.71 -407.71 -7.71 392.29 792.29 ...
-#>  $ s.st: num [1:400] 115 149 75 199 93 183 107 213 95 141 ...
+#>  $ s.st: num [1:600] 98 115 115 165 77 94 77 96 75 109 ...
 
 # prepare data
 data = list(y=data4d$y)
 data$y = data$y[which(apply(data$y, 1, sum)!=0),,] # remove augmented records 
-data$y = apply(data$y, c(1,2), sum) # covert to 2d by summing over individuals and traps
+# covert to 2d by summing over individuals and traps
+data$y = apply(data$y, c(1,2), sum) 
 
 # add discretized traps
-data$X = d_list$X/1000 # convert to km units
+data$X = d_list$X #/1000 # convert to km units
 
 # add grid
-data$grid = d_list$grid/1000 # convert to km units
+data$grid = d_list$grid #/1000 # convert to km units
 
 # prepare constants (note that density is now in activity centers/km2 
-# and each cell is now 0.01 km2 in area
+# and each cell is now 0.02 km2 in area
 constants = list(M = M,n0 = nrow(data$y),J=dim(data$y)[2],site=site,
-                 K=dim(data3d$y)[3],nPix=d_list$nPix,pixArea = 0.01,
-                 sigma_upper = 1, A = (sum(hab_mask)*(0.1^2)),
+                 K=dim(data4d$y)[3],nPix=sum(d_list$nPix),
+                 pixArea = (pixelWidth^2),
+                 sigma_upper = 1000, 
+                 A = (sum(hab_mask)*((pixelWidth/1000)^2)),
                  nSites = dim(d_list$X)[3])
+
+constants$npixSite = matrix(c(1,d_list$nPix[1],
+                              d_list$nPix[1]+1,
+                              sum(d_list$nPix)),
+                            ncol=2,byrow=TRUE)
 
 # add z and zeros vector data for latent inclusion indicator
 data$z = c(rep(1,constants$n0),rep(NA,constants$M - constants$n0))
 data$zeros =  c(rep(NA,constants$n0),rep(0,constants$M - constants$n0))
 
 # define all initial values 
-inits = list(sigma = runif(1, 0.250, 0.350), s = d_list$s.st,
-            alpha0 = 2.89, p0 = runif(dim(d_list$X)[3], 0.05, 0.15),
+inits = list(sigma = runif(1, 250, 350), s = d_list$s.st,
+            alpha0 = -11.25, p0 = runif(dim(d_list$X)[3], 0.05, 0.15),
             z=c(rep(NA,constants$n0),rep(0,constants$M-constants$n0)))
 
 # parameters to monitor
@@ -382,32 +409,46 @@ out = run_discrete(model = discrete_model, data=data, constants=constants,
         inits=inits, params = params,niter = 5000, nburnin=1000, 
         thin=1, nchains=2, parallel=TRUE,  RNGseed = 500)
 toc()
-#> 1148.79 sec elapsed
+#> 1612.656 sec elapsed
 
-# summary table of MCMC output (exclude "s" and "z" parameters)
-nimSummary(out, exclude = c("s","z"))
-#>        post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat
-#> D         34.196   4.440  26.655  33.810  43.649  1 194.115 1.010
-#> EN       190.931  26.812 143.620 188.845 246.948  1 202.528 1.011
-#> N        191.155  24.817 149.000 189.000 244.000  1 194.115 1.010
-#> alpha0     3.521   0.141   3.246   3.520   3.788  1 210.636 1.013
-#> p0[1]      0.141   0.035   0.084   0.138   0.218  1 311.640 1.003
-#> p0[2]      0.166   0.031   0.111   0.164   0.232  1 293.793 1.000
-#> psi        0.477   0.067   0.359   0.472   0.617  1 202.528 1.011
-#> sigma      0.282   0.022   0.242   0.280   0.333  1 207.903 1.000
+# histogram of posterior samples for N (abundance)
+samples = do.call(rbind, out)
+par(mfrow=c(1,1))
+hist(samples[,which(dimnames(out[[1]])[[2]]=="EN")], xlab = "Expected abundance", 
+     xlim = c(0,600), main="")
+abline(v=Nsim, col="red") # add line for simulated abundance
 ```
+
+<p align="center">
+  <img src="../man/figures/vignette_04/Fig5.png" style="width:70%" />
+</p>
+<br>
+
 
 <br>
 <p>
-We might run a few more iterations to have everything nicely converged, but we won't do that here given that it took about 20 minutes to run the model. 
+We might run a few more iterations to have everything nicely converged, but we won't do that here given that it took about 20 minutes to run the model. We'll use`nimSummary()` to quickly summarize the MCMC samples and check convergence. 
 
-We again make a realized density surface and note that the `realized_density()` function outputs a list of length 2 in this example since we have 2 spatially separated trapping grids here that are in a 3-dimensional array format. 
+We again make a realized density surface and note that the `realized_density()` function outputs a list of length 2 in this example since we have 2 spatially separated trapping grids here that are in a 3-dimensional array format. I'll again note that we need to use the argument `discrete = TRUE` to indicate that we need to transform the pixel indices saved for `s` into the state-space grid coordinates. The function will automate this for us. We'll need to provide the extent `ext = GridX$ext` since we have a 3-dimensional trapping array. 
 </p>
 <br>
+
 ```{r, fig.show='hide',eval=FALSE}
+# summary table of MCMC output (exclude "s" and "z" parameters)
+nimSummary(out, exclude = c("s","z"))
+#>        post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat
+#> D         13.131   1.397  10.676  12.989  16.192  1 175.165 1.011
+#> EN       294.564  33.831 232.157 291.304 367.164  1 178.972 1.011
+#> N        295.180  31.395 240.000 292.000 364.000  1 175.165 1.011
+#> alpha0   -11.249   0.114 -11.481 -11.254 -11.022  0 188.347 1.013
+#> p0[1]      0.148   0.025   0.104   0.147   0.199  1 294.255 1.033
+#> p0[2]      0.128   0.023   0.088   0.127   0.179  1 324.642 1.032
+#> psi        0.491   0.056   0.387   0.486   0.612  1 178.972 1.011
+#> sigma    287.695  23.052 250.820 284.677 339.804  1 139.887 1.103
+
 # generate realized density surface
-r = realized_density(samples=out, grid=d_list$grid, crs_=mycrs,
-                site=constants$site, hab_mask=FALSE, discrete=TRUE)
+r = realized_density(samples=out, grid=d_list$grid, ext = GridX$ext,
+            crs_=mycrs,site=constants$site, discrete=TRUE)
 
 # load needed packages for multiplot
 library(viridis) 
@@ -419,7 +460,7 @@ library(rasterVis)
 # plot raster from site 1
 p1<-gplot(r[[1]]) + geom_raster(aes(fill = value)) +
           scale_fill_viridis(na.value = NA, name="Density",
-          limits=c(0,0.6),breaks=seq(0,0.6,by=0.2)) +
+          limits=c(0,1.5),breaks=seq(0,1.5,by=0.5)) +
           xlab("") + ylab("") + theme_classic() +
           scale_x_continuous(expand=c(0, 0)) + 
           scale_y_continuous(expand=c(0, 0)) + 
@@ -428,7 +469,7 @@ p1<-gplot(r[[1]]) + geom_raster(aes(fill = value)) +
 # plot raster from site 2
 p2<-gplot(r[[2]]) + geom_raster(aes(fill = value)) +
           scale_fill_viridis(na.value = NA, name="Density",
-          limits=c(0,0.6),breaks=seq(0,0.6,by=0.2)) +
+          limits=c(0,1.5),breaks=seq(0,1.5,by=0.5)) +
           xlab("") + ylab("") + theme_classic() + 
           scale_x_continuous(expand=c(0, 0)) + 
           scale_y_continuous(expand=c(0, 0)) + 
@@ -462,11 +503,12 @@ pcomb
 ```
 
 <p align="center">
-  <img src="../man/figures/vignette_04/Fig5.png" style="width:90%"/>
+  <img src="../man/figures/vignette_04/Fig6.png" style="width:90%"/>
 </p>
 <br>
 <p>
-That's it for the discrete models! You've made it through the fourth 'localSCR' tutorial. Please see Royle et al. (2014) for more details about SCR theory and modeling. The next tutorials will focus on applying localapproaches to 'classic' and discrete SCR models. We'll see that significant reductions in computational run time can occur with local approaches depending on the problem, but especially for discrete SCR models where we deal with relatively slow run time. 
+
+That's it for the discrete models! You've made it through the fourth 'localSCR' tutorial. Please see Royle et al. (2014) for more details about SCR theory and modeling. The next tutorials will focus on applying localapproaches to 'classic' and discrete SCR models. We'll see that significant reductions in computational run time can occur with local approaches depending on the problem, but especially for discrete SCR models where we deal with relatively slow run time when there are many pixels to sample from. 
 
 </p>
 <br>

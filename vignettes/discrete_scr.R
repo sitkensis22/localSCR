@@ -21,7 +21,8 @@ library(localSCR)
 #  pixelWidth = 200 # store pixelWidth or grid resolution
 #  
 #  # create state-space
-#  Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma, res = pixelWidth)
+#  Grid = grid_classic(X = traps, crs_ = mycrs, buff = 3*mysigma,
+#                      res = pixelWidth)
 #  
 #  # create polygon for mask
 #  library(sf)
@@ -40,7 +41,7 @@ library(localSCR)
 #  data3d = sim_classic(X = traps, ext = Grid$ext, crs_ = mycrs,
 #                       sigma_ = mysigma,  prop_sex = 1, N = Nsim, K = 4,
 #                       base_encounter = 0.15,enc_dist = "binomial",
-#                       hab_mask = hab_mask, setSeed = 100)
+#                       hab_mask = hab_mask, setSeed = 200)
 #  
 #  # total augmented population size
 #  M = 400
@@ -76,13 +77,15 @@ library(localSCR)
 #      geom_point(data=as.data.frame(d_list$grid[d_list$s.st,]),
 #                 aes(x=x,y=y),color="orangered",size=0.75) +
 #      theme_classic() + ylab("Northing") + xlab("Easting") +
-#      theme(axis.text = element_text(size=12),axis.title = element_text(size=16))
+#      theme(axis.text = element_text(size=12),
+#            axis.title = element_text(size=16))
 
 ## ---- fig.show='hide',eval=FALSE----------------------------------------------
 #  # prepare data
 #  data = list(y=data3d$y)
 #  data$y = data$y[which(apply(data$y, 1, sum)!=0),,] # remove augmented records
-#  data$y = apply(data$y, c(1,2), sum) # covert to 2d by summing over individuals and traps
+#  # covert to 2d by summing over individuals and traps
+#  data$y = apply(data$y, c(1,2), sum)
 #  
 #  # add discretized traps
 #  data$X = d_list$X/1000 # convert to km units
@@ -93,8 +96,8 @@ library(localSCR)
 #  # prepare constants (note that density is now in activity centers/km2
 #  # and each cell is now 0.01 km2 in area
 #  constants = list(M = M,n0 = nrow(data$y),J=dim(data$y)[2],
-#                   K=dim(data3d$y)[3],nPix=d_list$nPix,pixArea = 0.01,
-#                   sigma_upper = 1, A = (sum(hab_mask)*(0.1^2)))
+#                   K=dim(data3d$y)[3],nPix=d_list$nPix,pixArea = (pixelWidth/1000)^2,
+#                   sigma_upper = 1, A = sum(hab_mask)*((pixelWidth/1000)^2))
 #  
 #  # add z and zeros vector data for latent inclusion indicator
 #  data$z = c(rep(1,constants$n0),rep(NA,constants$M - constants$n0))
@@ -102,7 +105,7 @@ library(localSCR)
 #  
 #  # define all initial values
 #  inits = list(sigma = runif(1, 0.250, 0.350), s = d_list$s.st,
-#              alpha0 = 2.89, p0 = runif(1, 0.05, 0.15),
+#              alpha0 = 2.8, p0 = runif(1, 0.05, 0.15),
 #              z=c(rep(NA,constants$n0),rep(0,constants$M-constants$n0)))
 #  
 #  # parameters to monitor
@@ -124,27 +127,29 @@ library(localSCR)
 #          inits=inits, params = params,niter = 5000, nburnin=1000,
 #          thin=1, nchains=2, parallel=TRUE,  RNGseed = 500)
 #  toc()
-#  #> 1075.138 sec elapsed
+#  #> 1025.869 sec elapsed
 #  
 #  # histogram of posterior samples for N (abundance)
 #  samples = do.call(rbind, out)
 #  par(mfrow=c(1,1))
-#  hist(samples[,which(dimnames(out[[1]])[[2]]=="N")], xlab = "Abundance", xlim = c(0,400), main="")
+#  hist(samples[,which(dimnames(out[[1]])[[2]]=="N")], xlab = "Abundance",
+#       xlim = c(0,400), main="")
 #  abline(v=Nsim, col="red") # add line for simulated abundance
 
 ## ---- fig.show='hide',eval=FALSE----------------------------------------------
 #  # summarize MCMC samples (exclude parameters and don't plot)
 #  nimSummary(out, exclude = c("s","z"), trace=FALSE)
 #  #>        post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat
-#  #> D         80.726   8.206  65.926  80.370  98.148  1 233.799 1.005
-#  #> EN       217.378  24.517 170.019 216.722 268.463  1 225.645 1.004
-#  #> N        217.960  22.157 178.000 217.000 265.000  1 233.799 1.005
-#  #> alpha0     4.382   0.113   4.143   4.385   4.599  1 235.489 1.002
-#  #> p0         0.151   0.020   0.116   0.150   0.192  1 296.483 1.007
-#  #> psi        0.543   0.061   0.425   0.542   0.671  1 225.645 1.004
-#  #> sigma      0.323   0.021   0.285   0.322   0.367  1 218.121 1.001
+#  #> D         18.222   1.768  15.093  18.148  21.944  1 314.957 1.006
+#  #> EN       196.003  21.492 157.391 194.404 241.130  1 307.866 1.006
+#  #> N        196.798  19.091 163.000 196.000 237.000  1 314.957 1.006
+#  #> alpha0     2.893   0.110   2.679   2.890   3.106  1 316.798 1.006
+#  #> p0         0.167   0.023   0.126   0.167   0.214  1 316.707 1.016
+#  #> psi        0.490   0.054   0.393   0.486   0.603  1 307.866 1.006
+#  #> sigma      0.310   0.021   0.274   0.308   0.358  1 201.439 1.043
 #  
-#  # make realized density plot (we don't use the habitat mask here for discrete model)
+#  # make realized density plot (we don't use the habitat mask here for
+#  # discrete model)
 #  r = realized_density(samples = out, grid = d_list$grid, crs_ = mycrs,
 #                       site = NULL, hab_mask = FALSE,discrete=TRUE)
 #  
@@ -154,44 +159,59 @@ library(localSCR)
 #  
 #  # make simple raster plot
 #  plot(r, col=viridis(100),
-#       main=expression("Realized density (activity centers/km"^2*")"),
+#       main=expression("Realized density (activity centers/0.2 km"^2*")"),
 #       ylab="Northing",xlab="Easting")
 
 ## ---- fig.show='hide',eval=FALSE----------------------------------------------
-#  # create an array of traps, as an approach where individuals will only be detected
-#  # at one of the trap arrays (e.g., Furnas et al. 2018)
+#  # create an array of traps, as an approach where individuals will only be
+#  # detected at one of the trap arrays (e.g., Furnas et al. 2018)
 #  Xarray = array(NA, dim=c(nrow(traps),2,2))
 #  Xarray[,,1]=traps
-#  Xarray[,,2]=traps+4000 # shift trapping grid to new locations
+#  Xarray[,,2]=traps+6000 # shift trapping grid to new locations
 #  
 #  # create grid and extent for 3D trap array
-#  GridX = grid_classic(X = Xarray, crs_ = mycrs, buff = 3*max(mysigma), res = pixelWidth)
+#  GridX = grid_classic(X = Xarray, crs_ = mycrs, buff = 3*max(mysigma),
+#                       res = pixelWidth)
 #  
 #  # create polygon to use as a mask
 #  library(sf)
-#  poly = st_sfc(st_polygon(x=list(matrix(c(-1660,-1900,5730,-1050,5470,
-#  5650,0,6050,-1800,5700,-1660,-1900),ncol=2, byrow=TRUE))), crs =  mycrs)
+#  poly = st_sfc(st_polygon(x=list(matrix(c(-1660,-1750,8730,-1050,7470,
+#  7550,0,7950,-1800,8200,-1660,-1750),ncol=2, byrow=TRUE))), crs =  mycrs)
 #  
 #  # make ggplot
-#  ggplot() + geom_point(data=as.data.frame(GridX$grid[,,1]),aes(x=V1,y=V2),color="grey60",size=1.25) +
-#      geom_point(data=as.data.frame(Xarray[,,1]),aes(x=V1,y=V2),color="blue",size=2) +
-#      geom_point(data=as.data.frame(GridX$grid[,,2]),aes(x=V1,y=V2),color="grey60",size=1.25) +
-#      geom_point(data=as.data.frame(Xarray[,,2]),aes(x=V1,y=V2),color="blue",size=2) +
+#  g1=ggplot() + geom_point(data=as.data.frame(GridX$grid[,,1]),
+#                        aes(x=V1,y=V2),color="grey60",size=1.25) +
+#      geom_point(data=as.data.frame(Xarray[,,1]),
+#                 aes(x=V1,y=V2),color="blue",size=2) +
+#      geom_point(data=as.data.frame(GridX$grid[,,2]),
+#                 aes(x=V1,y=V2),color="grey60",size=1.25) +
+#      geom_point(data=as.data.frame(Xarray[,,2]),
+#                 aes(x=V1,y=V2),color="blue",size=2) +
 #      geom_sf(data=poly, fill = NA) + coord_sf(datum=st_crs(mycrs)) +
 #      theme_classic() + ylab("Northing") + xlab("Easting") +
-#      scale_x_continuous(limits=c(-2000,6000)) +
-#      scale_y_continuous(limits=c(-2000,6000)) +
-#      theme(axis.text = element_text(size=12),axis.title = element_text(size=16))
+#      scale_x_continuous(limits=c(-2000,9000)) +
+#      scale_y_continuous(limits=c(-2000,9000)) +
+#      theme(axis.text = element_text(size=12),
+#                 axis.title = element_text(size=16))
 
 ## ---- fig.show='hide',fig.width = 8,fig.height=14,eval=FALSE------------------
 #  # get 3D habitat mask array for 3D grid
 #  hab_mask = mask_polygon(poly = poly, grid = GridX$grid, crs_ = mycrs,
 #  prev_mask = NULL)
 #  
-#  # simulate data for uniform state-space and habitat mask (N is simulated abundance)
-#  data4d = sim_classic(X = Xarray, ext = GridX$ext, crs_ = mycrs, sigma_ = mysigma,
-#                  prop_sex = 1,N = Nsim, K = 4, base_encounter = 0.15,
-#                  enc_dist = "binomial",hab_mask = hab_mask, setSeed = 500)
+#  # simuated population size
+#  Nsim = 300
+#  
+#  # augmented population size
+#  M=600
+#  
+#  # simulate data for uniform state-space and habitat mask
+#  # (N is simulated abundance)
+#  data4d = sim_classic(X = Xarray, ext = GridX$ext, crs_ = mycrs,
+#                   sigma_ = mysigma, prop_sex = 1,N = Nsim,
+#                   K = 4, base_encounter = 0.15,
+#                   enc_dist = "binomial",hab_mask = hab_mask,
+#                   setSeed = 300)
 #  
 #  # augment site identifier
 #  site = c(data4d$site,c(rep(1,((M-length(data4d$site))/2)),
@@ -208,36 +228,44 @@ library(localSCR)
 #  # inspect discrete data list
 #  str(d_list)
 #  #> List of 4
-#  #>  $ grid: num [1:286, 1:2, 1:2] -1608 -1408 -1208 -1008 -808 ...
-#  #>  $ nPix: int [1:2] 286 273
+#  #>  $ grid: num [1:284, 1:2, 1:2] -1608 -1408 -1208 -1008 -808 ...
+#  #>  $ nPix: int [1:2] 284 278
 #  #>  $ X   : num [1:25, 1:2, 1:2] -807.71 -407.71 -7.71 392.29 792.29 ...
-#  #>  $ s.st: num [1:400] 115 149 75 199 93 183 107 213 95 141 ...
+#  #>  $ s.st: num [1:600] 98 115 115 165 77 94 77 96 75 109 ...
 #  
 #  # prepare data
 #  data = list(y=data4d$y)
 #  data$y = data$y[which(apply(data$y, 1, sum)!=0),,] # remove augmented records
-#  data$y = apply(data$y, c(1,2), sum) # covert to 2d by summing over individuals and traps
+#  # covert to 2d by summing over individuals and traps
+#  data$y = apply(data$y, c(1,2), sum)
 #  
 #  # add discretized traps
-#  data$X = d_list$X/1000 # convert to km units
+#  data$X = d_list$X #/1000 # convert to km units
 #  
 #  # add grid
-#  data$grid = d_list$grid/1000 # convert to km units
+#  data$grid = d_list$grid #/1000 # convert to km units
 #  
 #  # prepare constants (note that density is now in activity centers/km2
-#  # and each cell is now 0.01 km2 in area
+#  # and each cell is now 0.02 km2 in area
 #  constants = list(M = M,n0 = nrow(data$y),J=dim(data$y)[2],site=site,
-#                   K=dim(data3d$y)[3],nPix=d_list$nPix,pixArea = 0.01,
-#                   sigma_upper = 1, A = (sum(hab_mask)*(0.1^2)),
+#                   K=dim(data4d$y)[3],nPix=sum(d_list$nPix),
+#                   pixArea = (pixelWidth^2),
+#                   sigma_upper = 1000,
+#                   A = (sum(hab_mask)*((pixelWidth/1000)^2)),
 #                   nSites = dim(d_list$X)[3])
+#  
+#  constants$npixSite = matrix(c(1,d_list$nPix[1],
+#                                d_list$nPix[1]+1,
+#                                sum(d_list$nPix)),
+#                              ncol=2,byrow=TRUE)
 #  
 #  # add z and zeros vector data for latent inclusion indicator
 #  data$z = c(rep(1,constants$n0),rep(NA,constants$M - constants$n0))
 #  data$zeros =  c(rep(NA,constants$n0),rep(0,constants$M - constants$n0))
 #  
 #  # define all initial values
-#  inits = list(sigma = runif(1, 0.250, 0.350), s = d_list$s.st,
-#              alpha0 = 2.89, p0 = runif(dim(d_list$X)[3], 0.05, 0.15),
+#  inits = list(sigma = runif(1, 250, 350), s = d_list$s.st,
+#              alpha0 = -11.25, p0 = runif(dim(d_list$X)[3], 0.05, 0.15),
 #              z=c(rep(NA,constants$n0),rep(0,constants$M-constants$n0)))
 #  
 #  # parameters to monitor
@@ -259,24 +287,31 @@ library(localSCR)
 #          inits=inits, params = params,niter = 5000, nburnin=1000,
 #          thin=1, nchains=2, parallel=TRUE,  RNGseed = 500)
 #  toc()
-#  #> 1148.79 sec elapsed
+#  #> 1612.656 sec elapsed
 #  
+#  # histogram of posterior samples for N (abundance)
+#  samples = do.call(rbind, out)
+#  par(mfrow=c(1,1))
+#  hist(samples[,which(dimnames(out[[1]])[[2]]=="EN")], xlab = "Expected abundance",
+#       xlim = c(0,600), main="")
+#  abline(v=Nsim, col="red") # add line for simulated abundance
+
+## ---- fig.show='hide',eval=FALSE----------------------------------------------
 #  # summary table of MCMC output (exclude "s" and "z" parameters)
 #  nimSummary(out, exclude = c("s","z"))
 #  #>        post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat
-#  #> D         34.196   4.440  26.655  33.810  43.649  1 194.115 1.010
-#  #> EN       190.931  26.812 143.620 188.845 246.948  1 202.528 1.011
-#  #> N        191.155  24.817 149.000 189.000 244.000  1 194.115 1.010
-#  #> alpha0     3.521   0.141   3.246   3.520   3.788  1 210.636 1.013
-#  #> p0[1]      0.141   0.035   0.084   0.138   0.218  1 311.640 1.003
-#  #> p0[2]      0.166   0.031   0.111   0.164   0.232  1 293.793 1.000
-#  #> psi        0.477   0.067   0.359   0.472   0.617  1 202.528 1.011
-#  #> sigma      0.282   0.022   0.242   0.280   0.333  1 207.903 1.000
-
-## ---- fig.show='hide',eval=FALSE----------------------------------------------
+#  #> D         13.131   1.397  10.676  12.989  16.192  1 175.165 1.011
+#  #> EN       294.564  33.831 232.157 291.304 367.164  1 178.972 1.011
+#  #> N        295.180  31.395 240.000 292.000 364.000  1 175.165 1.011
+#  #> alpha0   -11.249   0.114 -11.481 -11.254 -11.022  0 188.347 1.013
+#  #> p0[1]      0.148   0.025   0.104   0.147   0.199  1 294.255 1.033
+#  #> p0[2]      0.128   0.023   0.088   0.127   0.179  1 324.642 1.032
+#  #> psi        0.491   0.056   0.387   0.486   0.612  1 178.972 1.011
+#  #> sigma    287.695  23.052 250.820 284.677 339.804  1 139.887 1.103
+#  
 #  # generate realized density surface
-#  r = realized_density(samples=out, grid=d_list$grid, crs_=mycrs,
-#                  site=constants$site, hab_mask=FALSE, discrete=TRUE)
+#  r = realized_density(samples=out, grid=d_list$grid, ext = GridX$ext,
+#              crs_=mycrs,site=constants$site, discrete=TRUE)
 #  
 #  # load needed packages for multiplot
 #  library(viridis)
@@ -288,7 +323,7 @@ library(localSCR)
 #  # plot raster from site 1
 #  p1<-gplot(r[[1]]) + geom_raster(aes(fill = value)) +
 #            scale_fill_viridis(na.value = NA, name="Density",
-#            limits=c(0,0.6),breaks=seq(0,0.6,by=0.2)) +
+#            limits=c(0,1.5),breaks=seq(0,1.5,by=0.5)) +
 #            xlab("") + ylab("") + theme_classic() +
 #            scale_x_continuous(expand=c(0, 0)) +
 #            scale_y_continuous(expand=c(0, 0)) +
@@ -297,7 +332,7 @@ library(localSCR)
 #  # plot raster from site 2
 #  p2<-gplot(r[[2]]) + geom_raster(aes(fill = value)) +
 #            scale_fill_viridis(na.value = NA, name="Density",
-#            limits=c(0,0.6),breaks=seq(0,0.6,by=0.2)) +
+#            limits=c(0,1.5),breaks=seq(0,1.5,by=0.5)) +
 #            xlab("") + ylab("") + theme_classic() +
 #            scale_x_continuous(expand=c(0, 0)) +
 #            scale_y_continuous(expand=c(0, 0)) +

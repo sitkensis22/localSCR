@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Daniel Eacker" />
+
+<meta name="date" content="2022-05-10" />
+
+<title>Local classic SCR models: continuous state-space and marked individuals</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Local classic SCR models: continuous
+state-space and marked individuals</h1>
+<h4 class="author">Daniel Eacker</h4>
+<h4 class="date">2022-05-10</h4>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>
+The fifth vignette of the ‘localSCR’ package expands what I define as a
+set of ‘classic’ Bayesian spatial capture-recapture (SCR) models (Royle
+et al. 2014) to allow for local evaluation of the state-space (see
+Milleret et al. 2019). As we’ll see, this adds another layer of
+complexity, but the ‘localSCR’ package provides data processing function
+to ease this approach. These models are designed to model SCR data for
+‘marked’ or ‘unmarked’ individuals under the assumption of uniformly
+distributed activity centers (i.e,. a continuous state-space). Although
+many distance detection functions are possible, the package currently
+includes only a bivariate normal model of space use, which is commonly
+employed in the literature. The package is meant to ease implementation
+of Bayesian SCR models using the ‘nimble’ package (de Valpine et a.
+2022), which allows for increased flexibility with the ability for the
+user to include custom functions and assign different algorithms to
+specific model parameters. I took advantage of this functionality with
+the goal of building a simple, straightforward workflow that was
+flexible enough to handle most mainstream SCR analysis problems. Visit
+<a href="https://r-nimble.org/download" class="uri">https://r-nimble.org/download</a> for information on
+installing ‘nimble’ and Rtools on your computer.
+</p>
+<p><br></p>
+</div>
+<div id="implementation" class="section level2">
+<h2>Implementation</h2>
+<p>
+<p>The ‘localSCR’ package implements Bayesian SCR models using the
+‘nimble’ package (de Valpine et a. 2022) following methods described in
+Royle et al. (2014). We take advantage of recent developments in
+computation of SCR models. In this tutorial, four methods are
+implemented to decrease computational run time:</p>
+<ol style="list-style-type: decimal">
+<li>Block updating of x and y activity center coordinates (Turek et
+al. 2021)</li>
+<li>Using vectorized declarations for traps in distance function
+calculations</li>
+<li>Separating the data augmentation process into two steps (Chandler
+2018)</li>
+<li>Local evaluation of the state-space (Milleret et al. 2019)</li>
+</ol>
+<p>In some SCR problems, there are landscape features that create
+‘unsuitable’ habitat for the study species. Habitat masks are used to
+account for these features and designate suitable (1) or unsuitable (0)
+habitat, and can be represented as a matrix or array of binary values.
+We follow the methods of Milleret et al. (2019) to implement the “ones”
+trick to account for habitat suitability. This restricts the possible
+locations of latent activity centers to only suitable habitat. The
+‘localSCR’ package provides functions to construct a habitat mask from
+either raster or polygon data.</p>
+Finally, in some SCR designs, clusters of trap arrays may be spread out
+over the study area such that individuals can only be detected at one of
+multiple trap arrays (e.g., Furnas et al. 2018). This necessitates
+including the traps as a 3-dimensional array, using a site identifier to
+track which site a detected or augmented individual belongs to, and
+using a dynamic indexing in the model.
+</p>
+<br>
+<p>
+</div>
+<div id="functions-used-from-localscr-package" class="section level2">
+<h2>Functions used from ‘localSCR’ package:</h2>
+<ul>
+<li><code>customize_model()</code> delete and/or append lines from model
+code</li>
+<li><code>get_classic()</code> grabs template model for given inputs
+using the <code>nimbleCode()</code> function</li>
+<li><code>grid_classic()</code> define state-space grid and extent</li>
+<li><code>initialize_classic()</code> generate starting locations for
+activity area centers</li>
+<li><code>localize_classic()</code> prepare classic data componets for
+local approach</li>
+<li><code>mask_polygon()</code> create habitat mask matrix or array from
+polygon</li>
+<li><code>nimSummary()</code> summarize lists of Markov Chain Monte
+Carlo (MCMC) output</li>
+<li><code>realized_density()</code> generate realized density surface
+from MCMC output</li>
+<li><code>rescale_local()</code> rescale inputs to prepare data for
+using habitat mask</li>
+<li><code>run_classic()</code> wrapper function to run classic models
+using ‘nimble’ package</li>
+<li><code>sim_classic()</code> simulate basic spatial capture-recapture
+data</li>
+</ul>
+</p>
+<p><br></p>
+</div>
+<div id="turtorial" class="section level2">
+<h2>Turtorial</h2>
+<p>This tutorial includes three parts:</p>
+<ol style="list-style-type: decimal">
+<li>Create ‘classic’ SCR data and convert to localized format</li>
+<li>Workflow for local SCR model for marked individuals using a 2D trap
+array, single scaling parameter and habitat mask</li>
+<li>Workflow for local SCR model for marked individuals using a 3D trap
+array, single scaling parameter and habitat mask
+</p>
+<br>
+<p></li>
+</ol>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load &#39;localSCR&#39; package</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(localSCR)</span></code></pre></div>
+<p><br></p>
+<div id="create-classic-scr-data-and-convert-to-localized-format" class="section level3">
+<h3>(1) Create ‘classic’ SCR data and convert to localized format</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># simulate a single trap array with random positional noise</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1600</span>, <span class="dv">1600</span>, <span class="at">length.out =</span> <span class="dv">6</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1600</span>, <span class="dv">1600</span>, <span class="at">length.out =</span> <span class="dv">6</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>traps <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">expand.grid</span>(<span class="at">x =</span> x, <span class="at">y =</span> y))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># add some random noise to locations</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>traps <span class="ot">&lt;-</span> traps <span class="sc">+</span> <span class="fu">runif</span>(<span class="fu">prod</span>(<span class="fu">dim</span>(traps)),<span class="sc">-</span><span class="dv">20</span>,<span class="dv">20</span>) </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>mysigma <span class="ot">=</span> <span class="dv">300</span> <span class="co"># simulate sigma of 300 m</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>mycrs <span class="ot">=</span> <span class="dv">32608</span> <span class="co"># EPSG for WGS 84 / UTM zone 8N</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>pixelWidth <span class="ot">=</span> <span class="dv">100</span> <span class="co"># grid resolution</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulated abundance</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>Nsim <span class="ot">=</span> <span class="dv">250</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># manually create state-space grid and extent (note that I ran the code through</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># the localize_classic() using the same settings as other vignettes for </span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># grid_classic() without using a habitat mask to get the extent</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># for the scaled-up state-space grid)</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># make raster layer of grid</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>r_grid <span class="ot">=</span> raster<span class="sc">::</span><span class="fu">raster</span>(<span class="at">xmn=</span><span class="sc">-</span><span class="fl">2698.706</span>,<span class="at">xmx=</span><span class="fl">2701.294</span>,<span class="at">ymn=</span><span class="sc">-</span><span class="fl">2700.908</span>,<span class="at">ymx=</span><span class="fl">2699.092</span>,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>                        <span class="at">res =</span> pixelWidth, <span class="at">crs =</span> mycrs)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>Grid <span class="ot">=</span> <span class="fu">list</span>() <span class="co"># create Grid list</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>Grid<span class="sc">$</span>grid <span class="ot">=</span> raster<span class="sc">::</span><span class="fu">coordinates</span>(r_grid)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>Grid<span class="sc">$</span>ext <span class="ot">=</span> raster<span class="sc">::</span><span class="fu">extent</span>(r_grid)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co"># create polygon to use as a mask</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>poly <span class="ot">=</span> <span class="fu">st_sfc</span>(<span class="fu">st_polygon</span>(<span class="at">x=</span><span class="fu">list</span>(<span class="fu">matrix</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="dv">2465</span>,<span class="sc">-</span><span class="dv">2465</span>,<span class="dv">2530</span>,<span class="sc">-</span><span class="dv">2550</span>,<span class="dv">2650</span>,<span class="dv">2550</span>,</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="dv">0</span>,<span class="dv">2550</span>,<span class="sc">-</span><span class="dv">800</span>,<span class="dv">2500</span>,<span class="sc">-</span><span class="dv">2350</span>,<span class="dv">2300</span>,<span class="sc">-</span><span class="dv">2465</span>,<span class="sc">-</span><span class="dv">2465</span>),<span class="at">ncol=</span><span class="dv">2</span>, <span class="at">byrow=</span><span class="cn">TRUE</span>))), <span class="at">crs =</span>  mycrs)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co"># make simple plot</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(Grid<span class="sc">$</span>grid, <span class="at">pch=</span><span class="dv">20</span>, <span class="at">col=</span><span class="st">&quot;gray60&quot;</span>)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(traps, <span class="at">col=</span><span class="st">&quot;blue&quot;</span>,<span class="at">pch=</span><span class="dv">20</span>)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(poly, <span class="at">add=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<p align="center">
+<img src="data:image/png;base64,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" style="width:70%" />
+</p>
+<p>
+<p><br> Here, we can see the state-space grid that was created from
+<code>grid_classic()</code>. Also, the traps (or detectors) are plotted
+over top in blue. We arbitrarily chose a grid resolution of 100 in this
+example (i.g., <code>res = 100</code>), but this will vary by problem.
+In situations involving habitat masks or discrete models, it is prudent
+to test the effect of different grid resolutions on the estimated
+abundance and density in SCR models (see Royle et al. 2014). Also, note
+the use to the EPSG code to define the coordinate reference system for
+our state-space (see <a href="https://epsg.io/32608" class="uri">https://epsg.io/32608</a>).</p>
+<p>Now lets simulate some spatial capture-recapture data using
+<code>sim_classic()</code>. Note for this example, we will simulate a
+‘true’ population size of 200 individuals (<code>N = 200</code>), 4
+sampling occasions (<code>K = 4</code>), a scaling parameter
+(<code>sigma_</code>) of 300 m, a baseline encounter probability of 0.15
+(<code>base_encounter = 0.15</code>), no sex-specificity
+(<code>prop_sex = 1</code>), and no habitat mask
+(<code>hab_mask = FALSE</code>). We also use <code>setSeed = 100</code>
+to make the simulation reproducible. We provide the function the extent
+of the state-space output from <code>grid_classic()</code> as
+<code>ext = Grid$ext</code>. Note that Grid is a list.</p>
+<p>Also, we’ll need the function <code>localize_classic()</code> that
+will convert our ‘classic’ data components to a format that can be used
+in the local evaluation approach. This function will do the heavy
+lifting and takes under a minute depending upon that data set and
+computer as there are some spatial operations that must occur to build
+the individual state-space grids and then scale up to the study-area
+level state-space.</p>
+<p>We’ll first create a habitat mask and simulate some SCR data, and
+then covert it to local format.</p>
+</p>
+<p><br></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create habitat mask from polygon</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>hab_mask <span class="ot">=</span> <span class="fu">mask_polygon</span>(<span class="at">poly =</span> poly, <span class="at">grid =</span> Grid<span class="sc">$</span>grid, <span class="at">crs_ =</span> mycrs, </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="at">prev_mask =</span> <span class="cn">NULL</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># simulate SCR data</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>data3d <span class="ot">=</span> <span class="fu">sim_classic</span>(<span class="at">X =</span> traps, <span class="at">ext =</span> Grid<span class="sc">$</span>ext, <span class="at">crs_ =</span> mycrs, <span class="at">sigma_ =</span> mysigma, </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">prop_sex =</span> <span class="dv">1</span>, <span class="at">N =</span> Nsim, <span class="at">K =</span> <span class="dv">4</span>, <span class="at">base_encounter =</span> <span class="fl">0.15</span>, </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">enc_dist =</span> <span class="st">&quot;binomial&quot;</span>, <span class="at">hab_mask =</span> hab_mask, <span class="at">setSeed =</span> <span class="dv">100</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># augmented population size (detected + augmented individuals)</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>M<span class="ot">=</span><span class="dv">500</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># generate initial activity center coordinates for 2D trap array without </span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># habitat mask</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>s.st <span class="ot">=</span> <span class="fu">initialize_classic</span>(<span class="at">y=</span>data3d<span class="sc">$</span>y, <span class="at">M=</span>M, <span class="at">X=</span>traps, <span class="at">ext =</span> Grid<span class="sc">$</span>ext, </span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="at">hab_mask =</span> hab_mask)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># now use grid_classic to create an individual-level state-space (with origin 0, 0)</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>Grid_ind <span class="ot">=</span> <span class="fu">grid_classic</span>(<span class="at">X =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>),<span class="at">nrow=</span><span class="dv">1</span>), <span class="at">crs_ =</span> mycrs, <span class="at">buff =</span> <span class="dv">3</span><span class="sc">*</span>mysigma, <span class="at">res =</span> <span class="dv">100</span>)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co"># now localize the data components created above (a bit time consuming ~ 20 sec)</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co"># set layers to equal to evenly augment state-space</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tictoc)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>local_list <span class="ot">=</span> <span class="fu">localize_classic</span>(<span class="at">y =</span> data3d<span class="sc">$</span>y, <span class="at">grid_ind =</span> Grid_ind<span class="sc">$</span>grid, <span class="at">X=</span>traps, </span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>                            <span class="at">crs_ =</span> mycrs, <span class="at">sigma_ =</span> mysigma, <span class="at">s.st =</span> s.st,</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>                            <span class="at">hab_mask =</span> hab_mask)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 40.25 sec elapsed</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="co"># inspect local_list</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(local_list)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; List of 8</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ y           : int [1:99, 1:36, 1:4] 0 0 0 0 0 0 0 0 0 0 ...</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ X           : num [1:500, 1:36, 1:2] -1608 -965 -970 965 -1588 ...</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ grid        : num [1:2916, 1:2] -2649 -2549 -2449 -2349 -2249 ...</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   ..- attr(*, &quot;dimnames&quot;)=List of 2</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   .. ..$ : NULL</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   .. ..$ : chr [1:2] &quot;x&quot; &quot;y&quot;</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ prop_habitat: num [1:500] 1 1 1 1 0.981 ...</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ ext_mat     : num [1:500, 1:4] -573 -1226 -572 716 -1843 ...</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ ext         :Formal class &#39;Extent&#39; [package &quot;raster&quot;] with 4 slots</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   .. ..@ xmin: num -2699</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   .. ..@ xmax: num 2701</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   .. ..@ ymin: num -2701</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   .. ..@ ymax: num 2699</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ Jind        : num [1:500] 35 26 35 19 24 24 24 26 35 25 ...</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ s.st        : num [1:500, 1:2] 327 -326 328 1616 -943 ...</span></span></code></pre></div>
+<p>
+<p><br></p>
+<p>Here, we can see the data components created from
+<code>localize_classic()</code> that we will use in the next step to fit
+the localized version of a ‘classic’ SCR models. Specifically, we can
+see that many data components now have a dimension for the individual.
+For instance, we can see that our traps (<code>X</code>) now has 500
+rows, one for each individual. This allows individuals to be exposed to
+traps that are within 9 x sigma from the center of their activity
+coordinates. The activity center is estimated as the average trap
+location for marked individuals and the center of the augmented
+individual state-spaces for ‘augmented’ individuals. Also, we’ll see
+that the object <code>ext_mat</code> contains individual-specific
+extents that restrict the possible individual activity center locations
+based on the object <code>Grid_ind$grid</code> that we created for the
+individual state-space grid. Finally, we track the number of traps that
+each individual is exposed to using the object <code>Jind</code> (see
+the help for the function by entering <code>?localize_classic</code>
+into the console.</p>
+</p>
+<p><br></p>
+</div>
+<div id="workflow-for-local-scr-model-for-marked-individuals-using-a-2d-trap-array-single-scaling-parameter-and-habitat-mask" class="section level3">
+<h3>(2) Workflow for local SCR model for marked individuals using a 2D
+trap array, single scaling parameter and habitat mask</h3>
+<p>
+<p><br></p>
+<p>Next, we will use the converted data list above to carry out our
+local SCR model workflow. We’ll use the <code>rescale_local()</code>
+function to rescale our data components since we are using a habitat
+mask; otherwise, this would not be necessary. We’ll also convert our 3D
+encounter data to a 2D version since we do not have any
+occasion-specific variables to explain detection probability; thus, we
+do not need to loop over the occasions and model run time is reduced.
+We’ll want to account for the proportion of habitat
+(<code>prop.habitat</code> in our data list) that is suitable for each
+individual’s state-space grid (Milleret et al. 2019. Finally, as a last
+step before we initiate the model, we’ll use
+<code>customize_model()</code> to add some specific model code that we
+need for the local approach. Rather than build another function to
+define templates for local models, we choose to just modify our other
+‘classic’ and discrete models and make it easy to add code. This code
+could also be copied and pasted and then manually edited as well.</p>
+</p>
+<p><br></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># rescale inputs</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>rescale_list <span class="ot">=</span> <span class="fu">rescale_local</span>(<span class="at">X =</span> local_list<span class="sc">$</span>X, <span class="at">ext =</span> local_list<span class="sc">$</span>ext, </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">ext_mat =</span> local_list<span class="sc">$</span>ext_mat,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">s.st =</span> local_list<span class="sc">$</span>s.st, <span class="at">hab_mask =</span> hab_mask)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># prepare encounter data data</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>data <span class="ot">=</span> <span class="fu">list</span>(<span class="at">y=</span>local_list<span class="sc">$</span>y)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>y <span class="ot">=</span> <span class="fu">apply</span>(data<span class="sc">$</span>y, <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), sum) <span class="co"># covert to 2d by summing over individuals and traps</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># add rescaled traps</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>X <span class="ot">=</span> rescale_list<span class="sc">$</span>X</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># prepare constants (rescale area to activity centers/km 2)</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>constants <span class="ot">=</span> <span class="fu">list</span>(<span class="at">M =</span> M,<span class="at">n0 =</span> <span class="fu">nrow</span>(data<span class="sc">$</span>y),<span class="at">Jind =</span> local_list<span class="sc">$</span>Jind, <span class="at">K =</span> <span class="dv">4</span>,</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>                 <span class="at">xy_bounds =</span> rescale_list<span class="sc">$</span>ext_mat, <span class="at">sigma_upper =</span> <span class="dv">1000</span>, </span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>                 <span class="at">pixelWidth=</span>pixelWidth,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>                 <span class="at">A =</span> <span class="fu">prod</span>(<span class="fu">c</span>(<span class="fu">abs</span>(<span class="fu">diff</span>(local_list<span class="sc">$</span>ext[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]))<span class="sc">/</span><span class="dv">1000</span>,</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">abs</span>(<span class="fu">diff</span>(local_list<span class="sc">$</span>ext[<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>]))<span class="sc">/</span><span class="dv">1000</span>)))</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co"># add z and zeros vector data for latent inclusion indicator</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>z <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">1</span>,constants<span class="sc">$</span>n0),<span class="fu">rep</span>(<span class="cn">NA</span>,constants<span class="sc">$</span>M <span class="sc">-</span> constants<span class="sc">$</span>n0))</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>zeros <span class="ot">=</span>  <span class="fu">c</span>(<span class="fu">rep</span>(<span class="cn">NA</span>,constants<span class="sc">$</span>n0),<span class="fu">rep</span>(<span class="dv">0</span>,constants<span class="sc">$</span>M <span class="sc">-</span> constants<span class="sc">$</span>n0))</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="co"># add hab_mask,OK for habitat check, and proportion of available habitat</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>hab_mask <span class="ot">=</span> hab_mask</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>OK <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">1</span>,constants<span class="sc">$</span>M)</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>prop.habitat <span class="ot">=</span> local_list<span class="sc">$</span>prop_habitat</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="co"># define all initial values</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>inits <span class="ot">=</span> <span class="fu">list</span>(<span class="at">sigma =</span> <span class="fu">runif</span>(<span class="dv">1</span>, <span class="dv">250</span>, <span class="dv">350</span>), <span class="at">s =</span> rescale_list<span class="sc">$</span>s.st,<span class="at">psi=</span><span class="fu">runif</span>(<span class="dv">1</span>,<span class="fl">0.2</span>,<span class="fl">0.3</span>),</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>          <span class="at">p0 =</span> <span class="fu">runif</span>(<span class="dv">1</span>, <span class="fl">0.05</span>, <span class="fl">0.15</span>), <span class="at">z=</span><span class="fu">c</span>(<span class="fu">rep</span>(<span class="cn">NA</span>,constants<span class="sc">$</span>n0),<span class="fu">rep</span>(<span class="dv">0</span>,constants<span class="sc">$</span>M<span class="sc">-</span>constants<span class="sc">$</span>n0)),</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>          <span class="at">pOK=</span>data<span class="sc">$</span>OK)</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="co"># parameters to monitor</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>params <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;sigma&quot;</span>,<span class="st">&quot;psi&quot;</span>,<span class="st">&quot;p0&quot;</span>,<span class="st">&quot;N&quot;</span>,<span class="st">&quot;D&quot;</span>,<span class="st">&quot;s&quot;</span>,<span class="st">&quot;z&quot;</span>)</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="co"># get model</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>scr_model <span class="ot">=</span> <span class="fu">get_classic</span>(<span class="at">dim_y =</span> <span class="dv">2</span>, <span class="at">enc_dist =</span> <span class="st">&quot;binomial&quot;</span>,<span class="at">sex_sigma =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="at">hab_mask=</span><span class="cn">TRUE</span>,<span class="at">trapsClustered =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="co"># show lines of model to help with editing</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="fu">print_model</span>(scr_model)</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="co"># add code to inject localization lines</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>add_model <span class="ot">=</span> nimble<span class="sc">::</span><span class="fu">nimbleCode</span>({</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>  z[i] <span class="sc">~</span> <span class="fu">dbern</span>(psim[i])                                                         </span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>  psim[i] <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> (<span class="dv">1</span> <span class="sc">-</span> psi)<span class="sc">^</span>prop.habitat[i]) </span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>  s[i,<span class="dv">1</span>] <span class="sc">~</span> <span class="fu">dunif</span>(xy_bounds[i,<span class="dv">1</span>], xy_bounds[i,<span class="dv">2</span>])</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>  s[i,<span class="dv">2</span>] <span class="sc">~</span> <span class="fu">dunif</span>(xy_bounds[i,<span class="dv">3</span>], xy_bounds[i,<span class="dv">4</span>])</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>  dist[i, <span class="dv">1</span><span class="sc">:</span>Jind[i]] <span class="ot">&lt;-</span> <span class="fu">sqrt</span>((s[i,<span class="dv">1</span>] <span class="sc">-</span> X[i,<span class="dv">1</span><span class="sc">:</span>Jind[i],<span class="dv">1</span>])<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (s[i, <span class="dv">2</span>] <span class="sc">-</span> X[i,<span class="dv">1</span><span class="sc">:</span>Jind[i], <span class="dv">2</span>])<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>  p[i,<span class="dv">1</span><span class="sc">:</span>Jind[i]] <span class="ot">&lt;-</span> p0 <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span>dist[i, <span class="dv">1</span><span class="sc">:</span>Jind[i]]<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>(<span class="dv">2</span> <span class="sc">*</span> sigma.pixel<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n0) {                                                          </span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>     <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Jind[i]) {                                                       </span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>         y[i, j] <span class="sc">~</span> <span class="fu">dbin</span>(p[i, j], K)                                         </span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>     }                                                                      </span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>  }                                                                          </span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> (n0 <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>M) {                                                    </span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>     zeros[i] <span class="sc">~</span> <span class="fu">dbern</span>((<span class="dv">1</span> <span class="sc">-</span> <span class="fu">prod</span>(<span class="dv">1</span> <span class="sc">-</span> p[i, <span class="dv">1</span><span class="sc">:</span>Jind[i]])<span class="sc">^</span>K) <span class="sc">*</span> z[i])                   </span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>  } </span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a><span class="co"># edit model (injecting two new lines on line 7, otherwise 1-1 line replacement)</span></span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>local_model <span class="ot">=</span> <span class="fu">customize_model</span>(<span class="at">model =</span> scr_model,<span class="at">append_code =</span> add_model,</span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>                              <span class="at">remove_line =</span> <span class="fu">c</span>(<span class="dv">7</span>,<span class="dv">8</span><span class="sc">:</span><span class="dv">9</span>,<span class="dv">12</span><span class="sc">:</span><span class="dv">13</span>,<span class="dv">15</span><span class="sc">:</span><span class="dv">22</span>), </span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>                              <span class="at">append_line =</span> <span class="fu">c</span>(<span class="dv">7</span>,<span class="dv">7</span>,<span class="dv">8</span><span class="sc">:</span><span class="dv">9</span>,<span class="dv">12</span><span class="sc">:</span><span class="dv">13</span>,<span class="dv">15</span><span class="sc">:</span><span class="dv">22</span>))</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="co"># run model</span></span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tictoc)</span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>() <span class="co"># track time elapsed</span></span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>out <span class="ot">=</span> <span class="fu">run_classic</span>(<span class="at">model =</span> local_model, <span class="at">data=</span>data, <span class="at">constants=</span>constants, </span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>      <span class="at">inits=</span>inits, <span class="at">params =</span> params, <span class="at">niter =</span> <span class="dv">10000</span>, <span class="at">nburnin=</span><span class="dv">1000</span>, </span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>      <span class="at">thin=</span><span class="dv">1</span>, <span class="at">nchains=</span><span class="dv">2</span>, <span class="at">parallel=</span><span class="cn">TRUE</span>, <span class="at">RNGseed =</span> <span class="dv">500</span>)</span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 125.08 sec elapsed</span></span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a><span class="co"># summarize output</span></span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">=</span> <span class="fu">do.call</span>(rbind, out)</span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(samples[,<span class="fu">which</span>(<span class="fu">dimnames</span>(out[[<span class="dv">1</span>]])[[<span class="dv">2</span>]]<span class="sc">==</span><span class="st">&quot;N&quot;</span>)], <span class="at">xlab =</span> <span class="st">&quot;Abundance&quot;</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">500</span>), <span class="at">main=</span><span class="st">&quot;&quot;</span>)</span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v=</span>Nsim, <span class="at">col=</span><span class="st">&quot;red&quot;</span>) <span class="co"># add line for simulated abundance</span></span></code></pre></div>
+<p align="center">
+<img src="data:image/png;base64,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" style="width:70%" />
+</p>
+<br>
+<p>
+<p>With this particular problem, we don’t see much of a gain in run
+time. In fact, the model seems to take slightly longer to run compared
+to not using the local approach. This is due to the scale of the problem
+since our traps are not spaced out that far from each other and there
+aren’t that many augmented individuals. Upon inspecting the vector
+<code>constants$Jind</code>, we see that most individuals are exposed to
+about 24/36 (~67%) of the traps still. Given that our state-space was
+not that larger relative to the simulated animal activity areas (i.e.,
+<code>sigma = 300 m</code>), we really don’t gain that much with this
+approach. However, we’ll see in the discrete tutorial that we’ll save a
+lot of time by applying the approach outlined in Woodruff et al. (2020),
+especially when the number of state-space pixels in large.</p>
+<p>We can also see from the histogram of the posterior samples of
+<code>N</code> that our model estimates were very close to the simulated
+value of 250 individuals (shown by red line) at around 260 individuals.
+This is expected since this is only one realization of the detection
+process. In this example, we divided the pixelWidth by 1,000 in deriving
+the area (<code>A</code>) in our list of constants. This allowed us to
+estimate density in activity centers/km<sup>2</sup> rather than activity
+centers/m<sup>2</sup>. Note that care must be taken with any rescaling
+of the data or constants.</p>
+Next we use<code>nimSummary()</code> to quickly summarize the MCMC
+samples and check for convergence. Note that there are other options to
+summarize MCMC output, but this function is provided with the package
+and depends partly on the ‘coda’ package. Then, we make a realized
+density plot of the MCMC samples using <code>realized_density()</code>.
+In this function we make use of the list of grid and extent we created
+earlier called <code>Grid</code> as well as our saved coordinates
+reference system (<code>mycrs</code>). In this example, we use the
+‘raster’ package to make a simple plot of the output. We can see that
+the habitat mask has resulted in some cells having <code>NA</code>
+values where the habitat was unsuitable.
+</p>
+<p><br></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># summarize MCMC samples (exclude parameters and don&#39;t plot)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nimSummary</span>(out, <span class="at">exclude =</span> <span class="fu">c</span>(<span class="st">&quot;s&quot;</span>,<span class="st">&quot;z&quot;</span>), <span class="at">trace=</span><span class="cn">FALSE</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D         8.901   1.099   7.064   8.779  11.351  1 346.433 1.013</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; N       259.560  32.057 206.000 256.000 331.000  1 346.433 1.013</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; p0        0.194   0.039   0.127   0.191   0.280  1 361.349 1.014</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; psi       0.567   0.069   0.446   0.561   0.716  1 330.496 1.014</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma   272.652  22.015 233.584 271.202 322.137  1 294.354 1.004</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># make realized density plot </span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>r <span class="ot">=</span> <span class="fu">realized_density</span>(<span class="at">samples =</span> out, <span class="at">grid =</span> local_list<span class="sc">$</span>grid, </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                     <span class="at">crs_ =</span> mycrs, <span class="at">hab_mask =</span> hab_mask)      </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co"># load virdiis color palette and raster libraries      </span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(viridis)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(raster)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co"># make simple raster plot</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(r, <span class="at">col=</span><span class="fu">viridis</span>(<span class="dv">100</span>),</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>     <span class="at">main=</span><span class="fu">expression</span>(<span class="st">&quot;Realized density (activity centers/100 m&quot;</span><span class="sc">^</span><span class="dv">2</span><span class="sc">*</span><span class="st">&quot;)&quot;</span>),</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab=</span><span class="st">&quot;Northing&quot;</span>,<span class="at">xlab=</span><span class="st">&quot;Easting&quot;</span>)</span></code></pre></div>
+<p align="center">
+<img src="data:image/png;base64,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" style="width:70%" />
+</p>
+<p><br></p>
+<p>
+Next we repeat a similar workflow but now we have two trap arrays that
+are clustered in space, and thus, there is a negligble chance of
+detecting an individual at more than one trap array. In this case, the
+functions in ‘localSCR’ can automatically detect that the traps are in a
+3-dimensional format and we note that <code>sim_classic()</code> will
+return a variable called <code>site</code> that identifies which trap
+array that each individual (both detected and not detected) belongs to.
+Note that the number of rows in the simulated data <code>y</code> will
+equal the simulated population size (here in the example,
+<code>N = 200</code>). However, because we are using a trick provided by
+Chandler (2018) to separate the data augmentation process into two
+steps, we only need the encounter data for those individuals that were
+detected in the model likelihood. Also, because we have no
+occasion-specific detection covariates, we can sum <code>y</code> over
+individuals and traps to result in a 2-dimensional encounter history
+array (i.e., <code>y[i,j]</code>). This speeds up the model under these
+conditions and we can specify this when we get the SCR model template by
+setting <code>y_dim = 2</code> in
+<code>get_classic(y_dim = 2,...)</code>. Otherwise, the workflow is very
+similar to having a 2-dimensional trap array in the previous example.
+</p>
+<p><br></p>
+</div>
+<div id="workflow-for-local-scr-model-for-marked-individuals-using-a-3d-trap-array-single-scaling-parameter-and-habitat-mask" class="section level3">
+<h3>(3) Workflow for local SCR model for marked individuals using a 3D
+trap array, single scaling parameter and habitat mask</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># simulate a single trap array with random positional noise</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1600</span>, <span class="dv">1600</span>, <span class="at">length.out =</span> <span class="dv">6</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1600</span>, <span class="dv">1600</span>, <span class="at">length.out =</span> <span class="dv">6</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>traps <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">expand.grid</span>(<span class="at">x =</span> x, <span class="at">y =</span> y))</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># add some random noise to locations</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>traps <span class="ot">&lt;-</span> traps <span class="sc">+</span> <span class="fu">runif</span>(<span class="fu">prod</span>(<span class="fu">dim</span>(traps)),<span class="sc">-</span><span class="dv">20</span>,<span class="dv">20</span>) </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>mysigma <span class="ot">=</span> <span class="dv">300</span> <span class="co"># simulate sigma of 300 m</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>mycrs <span class="ot">=</span> <span class="dv">32608</span> <span class="co"># EPSG for WGS 84 / UTM zone 8N</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>pixelWidth <span class="ot">=</span> <span class="dv">100</span> <span class="co"># grid resolution</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulated abundance</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>Nsim <span class="ot">=</span> <span class="dv">400</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co"># create an array of traps, as an approach where individuals will only be detected </span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co"># at one of the trap arrays (e.g., Furnas et al. 2018)</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>Xarray <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="at">dim=</span><span class="fu">c</span>(<span class="fu">nrow</span>(traps),<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>Xarray[,,<span class="dv">1</span>]<span class="ot">=</span>traps</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>Xarray[,,<span class="dv">2</span>]<span class="ot">=</span>traps<span class="sc">+</span><span class="dv">10000</span> <span class="co"># shift trapping grid to new locations</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co"># create grid and extent for 3D trap array</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>GridX <span class="ot">=</span> <span class="fu">grid_classic</span>(<span class="at">X =</span> Xarray, <span class="at">crs_ =</span> mycrs, <span class="at">buff =</span> <span class="dv">3</span><span class="sc">*</span><span class="fu">max</span>(mysigma), <span class="at">res =</span> <span class="dv">100</span>)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co"># create polygon to use as a mask</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>poly <span class="ot">=</span> <span class="fu">st_sfc</span>(<span class="fu">st_polygon</span>(<span class="at">x=</span><span class="fu">list</span>(<span class="fu">matrix</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="dv">2160</span>,<span class="sc">-</span><span class="dv">2900</span>,<span class="dv">14430</span>,<span class="sc">-</span><span class="dv">1550</span>,<span class="dv">12270</span>,</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="dv">12400</span>,<span class="dv">0</span>,<span class="dv">13050</span>,<span class="sc">-</span><span class="dv">2800</span>,<span class="dv">13100</span>,<span class="sc">-</span><span class="dv">2160</span>,<span class="sc">-</span><span class="dv">2900</span>),<span class="at">ncol=</span><span class="dv">2</span>, <span class="at">byrow=</span><span class="cn">TRUE</span>))), <span class="at">crs =</span>  mycrs)</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="co"># make a simple plot</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(Xarray[,,<span class="dv">1</span>],<span class="at">xlim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">3000</span>,<span class="dv">16000</span>),<span class="at">ylim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">3000</span>,<span class="dv">16000</span>),</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">&quot;Easting&quot;</span>,<span class="at">ylab=</span><span class="st">&quot;Northing&quot;</span>)</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(GridX<span class="sc">$</span>grid[,,<span class="dv">2</span>],<span class="at">col=</span><span class="st">&quot;gray60&quot;</span>,<span class="at">pch=</span><span class="dv">20</span>)</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(GridX<span class="sc">$</span>grid[,,<span class="dv">1</span>],<span class="at">col=</span><span class="st">&quot;gray60&quot;</span>,<span class="at">pch=</span><span class="dv">20</span>)</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(Xarray[,,<span class="dv">1</span>],<span class="at">pch=</span><span class="dv">20</span>,<span class="at">col=</span><span class="st">&quot;blue&quot;</span>)</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(Xarray[,,<span class="dv">2</span>],<span class="at">pch=</span><span class="dv">20</span>,<span class="at">col=</span><span class="st">&quot;blue&quot;</span>)</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(poly, <span class="at">add=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<p align="center">
+<img src="data:image/png;base64,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" style="width:70%" />
+</p>
+<p><br></p>
+<p>In the figure we can see our two spatially separated trapping grids
+and that the polgon overlaps some of the gridded area. The area outside
+the polygon will be considered unsuitable when the habitat matrix is
+created. Note that the <code>site</code> variable will be only as long
+as the simulated population size (here, 400) and thus, we will need to
+augment the variable to have the length equal to the total augmented
+population size (i.e., <code>M = 800</code>). Otherwise the workflow is
+very similar to the previous one and we’ll just run it through without
+examining all the steps.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get 3D habitat mask array for 3D grid</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>hab_mask <span class="ot">=</span> <span class="fu">mask_polygon</span>(<span class="at">poly =</span> poly, <span class="at">grid =</span> GridX<span class="sc">$</span>grid, <span class="at">crs_ =</span> mycrs, </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="at">prev_mask =</span> <span class="cn">NULL</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># simulate data for uniform state-space and habitat mask (N is simulated abundance)</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>data4d <span class="ot">=</span> <span class="fu">sim_classic</span>(<span class="at">X =</span> Xarray, <span class="at">ext =</span> GridX<span class="sc">$</span>ext, <span class="at">crs_ =</span> mycrs, <span class="at">sigma_ =</span> mysigma, </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">prop_sex =</span> <span class="dv">1</span>,<span class="at">N =</span> Nsim, <span class="at">K =</span> <span class="dv">4</span>, <span class="at">base_encounter =</span> <span class="fl">0.15</span>, </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">enc_dist =</span> <span class="st">&quot;binomial&quot;</span>,<span class="at">hab_mask =</span> hab_mask, <span class="at">setSeed =</span> <span class="dv">500</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>M<span class="ot">=</span><span class="dv">800</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co"># augment site identifier</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>site <span class="ot">=</span> <span class="fu">c</span>(data4d<span class="sc">$</span>site,<span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">1</span>,((M<span class="sc">-</span><span class="fu">length</span>(data4d<span class="sc">$</span>site))<span class="sc">/</span><span class="dv">2</span>)),</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">rep</span>(<span class="dv">2</span>,((M<span class="sc">-</span><span class="fu">length</span>(data4d<span class="sc">$</span>site))<span class="sc">/</span><span class="dv">2</span>))))</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># get initial activity center starting values </span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>s.st <span class="ot">=</span> <span class="fu">initialize_classic</span>(<span class="at">y=</span>data4d<span class="sc">$</span>y, <span class="at">M=</span>M, <span class="at">X=</span>Xarray, <span class="at">ext=</span>GridX<span class="sc">$</span>ext, </span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>                            <span class="at">site =</span> site, <span class="at">hab_mask =</span> hab_mask)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co"># now use grid_classic to create an individual-level state-space (with origin 0, 0)</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>Grid_ind <span class="ot">=</span> <span class="fu">grid_classic</span>(<span class="at">X =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>),<span class="at">nrow=</span><span class="dv">1</span>), <span class="at">crs_ =</span> mycrs, <span class="at">buff =</span> <span class="dv">3</span><span class="sc">*</span>mysigma, <span class="at">res =</span> <span class="dv">100</span>)</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="co"># now localize the data components created above (a bit time consuming ~ 40 sec)</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="co"># set layers to equal to evenly augment state-space</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tictoc)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>local_list <span class="ot">=</span> <span class="fu">localize_classic</span>(<span class="at">y =</span> data4d<span class="sc">$</span>y, <span class="at">grid_ind =</span> Grid_ind<span class="sc">$</span>grid, <span class="at">X=</span>Xarray, </span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>                            <span class="at">crs_ =</span> mycrs, <span class="at">sigma_ =</span> mysigma, <span class="at">s.st =</span> s.st,</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>                            <span class="at">site =</span> site,<span class="at">hab_mask =</span> hab_mask)</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="co"># inspect local list</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(local_list)</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; List of 8</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ y           : int [1:150, 1:36, 1:4] 0 0 0 0 0 0 0 0 0 0 ...</span></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ X           : num [1:800, 1:36, 1:2] 965 -970 959 -1608 -1588 ...</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ grid        : num [1:2916, 1:2, 1:2] -2649 -2549 -2449 -2349 -2249 ...</span></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ prop_habitat: num [1:800] 1 1 1 1 1 ...</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ ext_mat     : num [1:800, 1:4] 716 707 691 -593 -1843 ...</span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ ext         :List of 2</span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   ..$ :Formal class &#39;Extent&#39; [package &quot;raster&quot;] with 4 slots</span></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   .. .. ..@ xmin: num -2699</span></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   .. .. ..@ xmax: num 2701</span></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   .. .. ..@ ymin: num -2701</span></span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   .. .. ..@ ymax: num 2699</span></span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   ..$ :Formal class &#39;Extent&#39; [package &quot;raster&quot;] with 4 slots</span></span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   .. .. ..@ xmin: num 7301</span></span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   .. .. ..@ xmax: num 12701</span></span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   .. .. ..@ ymin: num 7299</span></span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   .. .. ..@ ymax: num 12699</span></span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ Jind        : num [1:800] 19 21 24 32 24 26 30 25 29 24 ...</span></span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ s.st        : num [1:800, 1:2] 1616 1607 1591 307 -943 ...</span></span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a><span class="co"># rescale inputs</span></span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>rescale_list <span class="ot">=</span> <span class="fu">rescale_local</span>(<span class="at">X =</span> local_list<span class="sc">$</span>X, <span class="at">ext =</span> local_list<span class="sc">$</span>ext, <span class="at">ext_mat =</span> local_list<span class="sc">$</span>ext_mat,</span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>                             <span class="at">s.st =</span> local_list<span class="sc">$</span>s.st, <span class="at">site =</span> site, <span class="at">hab_mask =</span> hab_mask)</span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a><span class="co"># prepare encounter data data</span></span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>data <span class="ot">=</span> <span class="fu">list</span>(<span class="at">y=</span>local_list<span class="sc">$</span>y)</span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>y <span class="ot">=</span> <span class="fu">apply</span>(data<span class="sc">$</span>y, <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), sum) <span class="co"># covert to 2d by summing over individuals and traps</span></span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a><span class="co"># add rescaled traps</span></span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>X <span class="ot">=</span> rescale_list<span class="sc">$</span>X</span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a><span class="co"># prepare constants (rescale area to activity centers/km 2)</span></span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>constants <span class="ot">=</span> <span class="fu">list</span>(<span class="at">M =</span> M,<span class="at">n0 =</span> <span class="fu">nrow</span>(data<span class="sc">$</span>y),<span class="at">Jind =</span> local_list<span class="sc">$</span>Jind, <span class="at">K =</span> <span class="dv">4</span>,</span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a>                 <span class="at">xy_bounds =</span> rescale_list<span class="sc">$</span>ext_mat, <span class="at">sigma_upper =</span> <span class="dv">1000</span>, </span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>                 <span class="at">pixelWidth=</span>pixelWidth,</span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a>                 <span class="at">A =</span> (<span class="fu">sum</span>(hab_mask)<span class="sc">*</span>(pixelWidth<span class="sc">/</span><span class="dv">1000</span>)<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a>                 <span class="at">nSites=</span><span class="fu">dim</span>(Xarray)[<span class="dv">3</span>],<span class="at">site =</span> site)</span>
+<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a><span class="co"># add z and zeros vector data for latent inclusion indicator</span></span>
+<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>z <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">1</span>,constants<span class="sc">$</span>n0),<span class="fu">rep</span>(<span class="cn">NA</span>,constants<span class="sc">$</span>M <span class="sc">-</span> constants<span class="sc">$</span>n0))</span>
+<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>zeros <span class="ot">=</span>  <span class="fu">c</span>(<span class="fu">rep</span>(<span class="cn">NA</span>,constants<span class="sc">$</span>n0),<span class="fu">rep</span>(<span class="dv">0</span>,constants<span class="sc">$</span>M <span class="sc">-</span> constants<span class="sc">$</span>n0))</span>
+<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a><span class="co"># add hab_mask,OK for habitat check, and proportion of available habitat</span></span>
+<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>hab_mask <span class="ot">=</span> hab_mask</span>
+<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>OK <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">1</span>,constants<span class="sc">$</span>M)</span>
+<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>prop.habitat <span class="ot">=</span> local_list<span class="sc">$</span>prop_habitat</span>
+<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a><span class="co"># define all initial values</span></span>
+<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>inits <span class="ot">=</span> <span class="fu">list</span>(<span class="at">sigma =</span> <span class="fu">runif</span>(<span class="dv">1</span>, <span class="dv">250</span>, <span class="dv">350</span>), <span class="at">s =</span> rescale_list<span class="sc">$</span>s.st,<span class="at">psi=</span><span class="fu">runif</span>(<span class="dv">1</span>,<span class="fl">0.2</span>,<span class="fl">0.3</span>),</span>
+<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a>          <span class="at">p0 =</span> <span class="fu">runif</span>(constants<span class="sc">$</span>nSites, <span class="fl">0.05</span>, <span class="fl">0.15</span>),</span>
+<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a>          <span class="at">z=</span><span class="fu">c</span>(<span class="fu">rep</span>(<span class="cn">NA</span>,constants<span class="sc">$</span>n0),<span class="fu">rep</span>(<span class="dv">0</span>,constants<span class="sc">$</span>M<span class="sc">-</span>constants<span class="sc">$</span>n0)),</span>
+<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a>          <span class="at">pOK=</span>data<span class="sc">$</span>OK)</span>
+<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a><span class="co"># parameters to monitor</span></span>
+<span id="cb7-88"><a href="#cb7-88" aria-hidden="true" tabindex="-1"></a>params <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;sigma&quot;</span>,<span class="st">&quot;psi&quot;</span>,<span class="st">&quot;p0&quot;</span>,<span class="st">&quot;N&quot;</span>,<span class="st">&quot;D&quot;</span>,<span class="st">&quot;s&quot;</span>,<span class="st">&quot;z&quot;</span>)</span>
+<span id="cb7-89"><a href="#cb7-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a><span class="co"># get model</span></span>
+<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a>scr_model <span class="ot">=</span> <span class="fu">get_classic</span>(<span class="at">dim_y =</span> <span class="dv">2</span>, <span class="at">enc_dist =</span> <span class="st">&quot;binomial&quot;</span>,<span class="at">sex_sigma =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a><span class="at">hab_mask=</span><span class="cn">TRUE</span>,<span class="at">trapsClustered =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a><span class="co"># show lines of model to help with editing</span></span>
+<span id="cb7-95"><a href="#cb7-95" aria-hidden="true" tabindex="-1"></a><span class="fu">print_model</span>(scr_model)</span>
+<span id="cb7-96"><a href="#cb7-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-97"><a href="#cb7-97" aria-hidden="true" tabindex="-1"></a><span class="co"># create code to inject localization lines</span></span>
+<span id="cb7-98"><a href="#cb7-98" aria-hidden="true" tabindex="-1"></a>add_model <span class="ot">=</span> nimble<span class="sc">::</span><span class="fu">nimbleCode</span>({</span>
+<span id="cb7-99"><a href="#cb7-99" aria-hidden="true" tabindex="-1"></a>  psim[i] <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> (<span class="dv">1</span> <span class="sc">-</span> psi)<span class="sc">^</span>prop.habitat[i])</span>
+<span id="cb7-100"><a href="#cb7-100" aria-hidden="true" tabindex="-1"></a>  s[i,<span class="dv">1</span>] <span class="sc">~</span> <span class="fu">dunif</span>(xy_bounds[i,<span class="dv">1</span>], xy_bounds[i,<span class="dv">2</span>])</span>
+<span id="cb7-101"><a href="#cb7-101" aria-hidden="true" tabindex="-1"></a>  s[i,<span class="dv">2</span>] <span class="sc">~</span> <span class="fu">dunif</span>(xy_bounds[i,<span class="dv">3</span>], xy_bounds[i,<span class="dv">4</span>])</span>
+<span id="cb7-102"><a href="#cb7-102" aria-hidden="true" tabindex="-1"></a>  dist[i, <span class="dv">1</span><span class="sc">:</span>Jind[i]] <span class="ot">&lt;-</span> <span class="fu">sqrt</span>((s[i,<span class="dv">1</span>] <span class="sc">-</span> X[i,<span class="dv">1</span><span class="sc">:</span>Jind[i],<span class="dv">1</span>])<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (s[i, <span class="dv">2</span>] <span class="sc">-</span> X[i,<span class="dv">1</span><span class="sc">:</span>Jind[i], <span class="dv">2</span>])<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb7-103"><a href="#cb7-103" aria-hidden="true" tabindex="-1"></a>  p[i,<span class="dv">1</span><span class="sc">:</span>Jind[i]] <span class="ot">&lt;-</span> p0[site[i]] <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span>dist[i, <span class="dv">1</span><span class="sc">:</span>Jind[i]]<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>(<span class="dv">2</span> <span class="sc">*</span> sigma.pixel<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb7-104"><a href="#cb7-104" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n0) {                                                          </span>
+<span id="cb7-105"><a href="#cb7-105" aria-hidden="true" tabindex="-1"></a>     <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Jind[i]) {                                                       </span>
+<span id="cb7-106"><a href="#cb7-106" aria-hidden="true" tabindex="-1"></a>         y[i, j] <span class="sc">~</span> <span class="fu">dbin</span>(p[i, j], K)                                         </span>
+<span id="cb7-107"><a href="#cb7-107" aria-hidden="true" tabindex="-1"></a>     }                                                                      </span>
+<span id="cb7-108"><a href="#cb7-108" aria-hidden="true" tabindex="-1"></a>  }                                                                          </span>
+<span id="cb7-109"><a href="#cb7-109" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> (n0 <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>M) {                                                    </span>
+<span id="cb7-110"><a href="#cb7-110" aria-hidden="true" tabindex="-1"></a>     zeros[i] <span class="sc">~</span> <span class="fu">dbern</span>((<span class="dv">1</span> <span class="sc">-</span> <span class="fu">prod</span>(<span class="dv">1</span> <span class="sc">-</span> p[i, <span class="dv">1</span><span class="sc">:</span>Jind[i]])<span class="sc">^</span>K) <span class="sc">*</span> z[i])                   </span>
+<span id="cb7-111"><a href="#cb7-111" aria-hidden="true" tabindex="-1"></a>  } </span>
+<span id="cb7-112"><a href="#cb7-112" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb7-113"><a href="#cb7-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-114"><a href="#cb7-114" aria-hidden="true" tabindex="-1"></a><span class="co"># edit model (a straight 1-1 line replacement here)</span></span>
+<span id="cb7-115"><a href="#cb7-115" aria-hidden="true" tabindex="-1"></a>local_model <span class="ot">=</span> <span class="fu">customize_model</span>(<span class="at">model =</span> scr_model,<span class="at">append_code =</span> add_model,</span>
+<span id="cb7-116"><a href="#cb7-116" aria-hidden="true" tabindex="-1"></a>                              <span class="at">remove_line =</span> <span class="fu">c</span>(<span class="dv">10</span><span class="sc">:</span><span class="dv">12</span>,<span class="dv">15</span><span class="sc">:</span><span class="dv">16</span>,<span class="dv">18</span><span class="sc">:</span><span class="dv">25</span>), </span>
+<span id="cb7-117"><a href="#cb7-117" aria-hidden="true" tabindex="-1"></a>                              <span class="at">append_line =</span> <span class="fu">c</span>(<span class="dv">10</span><span class="sc">:</span><span class="dv">12</span>,<span class="dv">15</span><span class="sc">:</span><span class="dv">16</span>,<span class="dv">18</span><span class="sc">:</span><span class="dv">25</span>))</span>
+<span id="cb7-118"><a href="#cb7-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-119"><a href="#cb7-119" aria-hidden="true" tabindex="-1"></a><span class="co"># run model</span></span>
+<span id="cb7-120"><a href="#cb7-120" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tictoc)</span>
+<span id="cb7-121"><a href="#cb7-121" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>() <span class="co"># track time elapsed</span></span>
+<span id="cb7-122"><a href="#cb7-122" aria-hidden="true" tabindex="-1"></a>out <span class="ot">=</span> <span class="fu">run_classic</span>(<span class="at">model =</span> local_model, <span class="at">data=</span>data, <span class="at">constants=</span>constants, </span>
+<span id="cb7-123"><a href="#cb7-123" aria-hidden="true" tabindex="-1"></a>      <span class="at">inits=</span>inits, <span class="at">params =</span> params, <span class="at">niter =</span> <span class="dv">10000</span>, <span class="at">nburnin=</span><span class="dv">1000</span>, </span>
+<span id="cb7-124"><a href="#cb7-124" aria-hidden="true" tabindex="-1"></a>      <span class="at">thin=</span><span class="dv">1</span>, <span class="at">nchains=</span><span class="dv">2</span>, <span class="at">parallel=</span><span class="cn">TRUE</span>, <span class="at">RNGseed =</span> <span class="dv">500</span>)</span>
+<span id="cb7-125"><a href="#cb7-125" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span>
+<span id="cb7-126"><a href="#cb7-126" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 237.82 sec elapsed</span></span>
+<span id="cb7-127"><a href="#cb7-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-128"><a href="#cb7-128" aria-hidden="true" tabindex="-1"></a><span class="co"># summarize MCMC output</span></span>
+<span id="cb7-129"><a href="#cb7-129" aria-hidden="true" tabindex="-1"></a><span class="fu">nimSummary</span>(out, <span class="at">exclude =</span> <span class="fu">c</span>(<span class="st">&quot;s&quot;</span>,<span class="st">&quot;z&quot;</span>))</span>
+<span id="cb7-130"><a href="#cb7-130" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat</span></span>
+<span id="cb7-131"><a href="#cb7-131" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D         8.754   0.823   7.314   8.694  10.527  1 361.800 1.004</span></span>
+<span id="cb7-132"><a href="#cb7-132" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; N       424.939  39.928 355.000 422.000 511.000  1 361.800 1.004</span></span>
+<span id="cb7-133"><a href="#cb7-133" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; p0[1]     0.167   0.029   0.116   0.165   0.230  1 476.028 1.010</span></span>
+<span id="cb7-134"><a href="#cb7-134" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; p0[2]     0.176   0.030   0.126   0.174   0.242  1 514.860 1.013</span></span>
+<span id="cb7-135"><a href="#cb7-135" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; psi       0.540   0.053   0.447   0.537   0.650  1 348.219 1.004</span></span>
+<span id="cb7-136"><a href="#cb7-136" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma   276.489  16.936 244.493 276.152 310.937  1 328.285 1.010</span></span>
+<span id="cb7-137"><a href="#cb7-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-138"><a href="#cb7-138" aria-hidden="true" tabindex="-1"></a><span class="co"># plot posterior abundance with line for simulated abundance</span></span>
+<span id="cb7-139"><a href="#cb7-139" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">=</span> <span class="fu">do.call</span>(rbind, out)</span>
+<span id="cb7-140"><a href="#cb7-140" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb7-141"><a href="#cb7-141" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(samples[,<span class="fu">which</span>(<span class="fu">dimnames</span>(out[[<span class="dv">1</span>]])[[<span class="dv">2</span>]]<span class="sc">==</span><span class="st">&quot;N&quot;</span>)], <span class="at">xlab =</span> <span class="st">&quot;Abundance&quot;</span>,</span>
+<span id="cb7-142"><a href="#cb7-142" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">900</span>), <span class="at">main=</span><span class="st">&quot;&quot;</span>)</span>
+<span id="cb7-143"><a href="#cb7-143" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v=</span>Nsim, <span class="at">col=</span><span class="st">&quot;red&quot;</span>) <span class="co"># add line for simulated abundance</span></span></code></pre></div>
+<p align="center">
+<img src="data:image/png;base64,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" style="width:70%" />
+</p>
+<br>
+<p>
+<p>We can see that again, our estimated abundance is pretty close to the
+simulated value (red line) and biased high by only about 25 individuals.
+However, the model finishes in about 4 minutes despite having an
+augmented population size of 800 individuals.</p>
+We again make a realized density surface and note that the
+<code>realized_density()</code> function outputs a list of length 2 in
+this example since we have 2 spatially separated trapping grids here
+that are in a 3-dimensional array format. We’ll need to provide the
+extent <code>ext = local_list$ext</code> since we have a 3-dimensional
+trapping array.
+</p>
+<p><br></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># make realized density plot (must trace &quot;s&quot; and &quot;z&quot; above)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>r <span class="ot">=</span> <span class="fu">realized_density</span>(<span class="at">samples=</span>out, <span class="at">grid=</span>local_list<span class="sc">$</span>grid, <span class="at">ext =</span> local_list<span class="sc">$</span>ext, </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">crs_=</span>mycrs, <span class="at">site=</span>constants<span class="sc">$</span>site, <span class="at">hab_mask=</span>hab_mask)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># load needed packages for multiplot</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(viridis) </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(grid)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggpubr) </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rasterVis)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co"># plot raster from site 1</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>p1<span class="ot">&lt;-</span><span class="fu">gplot</span>(r[[<span class="dv">1</span>]]) <span class="sc">+</span> <span class="fu">geom_raster</span>(<span class="fu">aes</span>(<span class="at">fill =</span> value)) <span class="sc">+</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>          <span class="fu">scale_fill_viridis</span>(<span class="at">na.value =</span> <span class="cn">NA</span>, <span class="at">name=</span><span class="st">&quot;Density&quot;</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">limits=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="fl">0.3</span>),<span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="fl">0.3</span>,<span class="at">by=</span><span class="fl">0.1</span>)) <span class="sc">+</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>          <span class="fu">xlab</span>(<span class="st">&quot;&quot;</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">&quot;&quot;</span>) <span class="sc">+</span> <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>          <span class="fu">scale_x_continuous</span>(<span class="at">expand=</span><span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span> </span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>          <span class="fu">scale_y_continuous</span>(<span class="at">expand=</span><span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span> </span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>           <span class="fu">theme</span>(<span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">18</span>))</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co"># plot raster from site 2</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>p2<span class="ot">&lt;-</span><span class="fu">gplot</span>(r[[<span class="dv">2</span>]]) <span class="sc">+</span> <span class="fu">geom_raster</span>(<span class="fu">aes</span>(<span class="at">fill =</span> value)) <span class="sc">+</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>          <span class="fu">scale_fill_viridis</span>(<span class="at">na.value =</span> <span class="cn">NA</span>, <span class="at">name=</span><span class="st">&quot;Density&quot;</span>,</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>          <span class="at">limits=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="fl">0.3</span>),<span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="fl">0.3</span>,<span class="at">by=</span><span class="fl">0.1</span>)) <span class="sc">+</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>          <span class="fu">xlab</span>(<span class="st">&quot;&quot;</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">&quot;&quot;</span>) <span class="sc">+</span> <span class="fu">theme_classic</span>() <span class="sc">+</span> </span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>          <span class="fu">scale_x_continuous</span>(<span class="at">expand=</span><span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span> </span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>          <span class="fu">scale_y_continuous</span>(<span class="at">expand=</span><span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span> </span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>          <span class="fu">theme</span>(<span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">18</span>))</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="co"># arrange the two plots in a single row</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>prow <span class="ot">&lt;-</span> <span class="fu">plot_grid</span>(p1 <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">&quot;none&quot;</span>),</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>           p2 <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">&quot;none&quot;</span>),</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>           <span class="at">align =</span> <span class="st">&#39;vh&#39;</span>,</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>           <span class="at">labels =</span> <span class="cn">NULL</span>,</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>           <span class="at">hjust =</span> <span class="sc">-</span><span class="dv">1</span>,</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>           <span class="at">nrow =</span> <span class="dv">1</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>           )</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="co"># extract the legend from one of the plots</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>legend_t <span class="ot">&lt;-</span> <span class="fu">get_legend</span>(p1 <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;top&quot;</span>,</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>                        <span class="at">legend.direction =</span> <span class="st">&quot;horizontal&quot;</span>,</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>                        <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">14</span>),</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>                        <span class="at">legend.title =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">16</span>)))</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="co"># add the legend above the row we made earlier. Give it 20% of the height</span></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a><span class="co"># of one plot (via rel_heights).</span></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>pcomb <span class="ot">&lt;-</span> <span class="fu">plot_grid</span>(legend_t, prow, <span class="at">ncol =</span> <span class="dv">1</span>, <span class="at">rel_heights =</span> <span class="fu">c</span>(.<span class="dv">2</span>, <span class="dv">1</span>))</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="co"># add x and y axis labels</span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>pcomb <span class="ot">&lt;-</span><span class="fu">annotate_figure</span>(pcomb, <span class="at">bottom =</span> <span class="fu">textGrob</span>(<span class="st">&quot;Easting&quot;</span>, </span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>              <span class="at">gp=</span><span class="fu">gpar</span>(<span class="at">fontsize=</span><span class="dv">18</span>), <span class="at">vjust =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">hjust =</span> <span class="dv">0</span>),</span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>              <span class="at">left =</span> <span class="fu">textGrob</span>(<span class="st">&quot;Northing&quot;</span>, <span class="at">rot=</span><span class="dv">90</span>, <span class="at">gp=</span><span class="fu">gpar</span>(<span class="at">fontsize=</span><span class="dv">18</span>),</span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>              <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>))</span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>pcomb</span></code></pre></div>
+<p align="center">
+<img src="data:image/png;base64,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" style="width:90%" />
+</p>
+<p><br></p>
+<p>
+Congrats! You’ve made it through the fifth ‘localSCR’ tutorial. Please
+see Royle et al. (2014) for more details about SCR theory and modeling.
+The next tutorial will be similar but focused on applying the local
+approach to a discrete SCR model.
+</p>
+<p><br></p>
+</div>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Chandler, R. B. 2018. Speeding up data augmentation in BUGS. <a href="https://groups.google.com/forum/#!topic/hmecology/o6cWDqHHgOE" class="uri">https://groups.google.com/forum/#!topic/hmecology/o6cWDqHHgOE</a>.</p>
+<p>de Valpine P, C. Paciorek, D. Turek, N. Michaud, C. Anderson-Bergman,
+F. Obermeyer, C. C. Wehrhahn, A. Rodrìguez, L. D. Temple, and S.
+Paganin. 2022. <em>NIMBLE: MCMC, Particle Filtering, and Programmable
+Hierarchical Modeling</em>. doi: 10.5281/zenodo.1211190 (URL: <a href="https://doi.org/10.5281/zenodo.1211190" class="uri">https://doi.org/10.5281/zenodo.1211190</a>), R package
+version 0.12.2, URL: <a href="https://cran.r-project.org/package=nimble" class="uri">https://cran.r-project.org/package=nimble</a>.</p>
+<p>Furnas, B. J., R. H. Landers, S. Hill, S. S. Itoga, and B. N. Sacks.
+2018. Integrated modeling to estimate population size and composition of
+mule deer. Journal of Wildlife Management 82:1429–1441.</p>
+<p>Milleret, C., P. Dupont, C. Bonenfant, H. Henrik Brøseth, Ø.
+Flagstad, C. Sutherland, and R. Bischof. 2019. A local evaluation of the
+individual state‐space to scale up Bayesian spatial capture‐recapture.
+Ecology and Evolution 9:352–363.</p>
+<p>Turek, D., C. Milleret, T. Ergon, and H. Brøseth 2021. Efficient
+estimation of large‐scale spatial capture–recapture model. Ecosphere <a href="DOI:10.1002/ecs2.338" class="uri">DOI:10.1002/ecs2.338</a>5.</p>
+<p>Royle, J. A., R. B. Chandler, R. Sollmann, and B. Gardner. 2014.
+Spatial capture‐recapture. Academic Press, Waltham, Massachusetts,
+USA.</p>
+<p>Woodruff, S., D. R. Eacker, and L. Waits. 2020. Estimating coyote
+density in local, discrete Bayesian capture-recapture models. Journal of
+Wildlife Management 10.1002/jwmg.21967</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

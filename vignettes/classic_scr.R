@@ -337,7 +337,7 @@ library(localSCR)
 
 ## ---- fig.show='hide',eval=FALSE----------------------------------------------
 #  # generate realized density surface
-#  r = realized_density(samples=out, grid=GridX$grid, crs_=mycrs,
+#  r = realized_density(samples=out, grid=GridX$grid, ext=GridX$exnt crs_=mycrs,
 #                        site=constants$site, hab_mask=hab_mask)
 #  
 #  # load needed packages for multiplot

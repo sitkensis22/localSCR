@@ -630,14 +630,14 @@ nimSummary(out, exclude = c("su","zu"))
 
 <br>
 <p>
-These results are similar to our model run in part 4 with the informative priors as expected. We again make a realized density surface and note that the `realized_density()` function outputs a list of length 2 in this example since we have 2 spatially separated trapping grids here that are in a 3-dimensional array format. 
+These results are similar to our model run in part 4 with the informative priors as expected. We again make a realized density surface and note that the `realized_density()` function outputs a list of length 2 in this example since we have 2 spatially separated trapping grids here that are in a 3-dimensional array format. We'll need to provide the extent `ext = GridX$ext` since we have a 3-dimensional trapping array. 
 </p>
 <br>
 
 ```{r, fig.show='hide',eval=FALSE}
 # generate realized density surface (note setting z_alias and s_alias)
-r = realized_density(samples=out, grid=GridX$grid, crs_=mycrs,
-                      site=constants$site, hab_mask=hab_mask,
+r = realized_density(samples=out, grid=GridX$grid, ext = GridX$ext,
+                      crs_=mycrs,site=constants$site, hab_mask=hab_mask,
                        z_alias = "zu", s_alias = "su")
 
 # load needed packages for multiplot
