@@ -111,7 +111,7 @@ The forth vignette of the ‘localSCR’ package covers a set of ‘discrete’ 
 <li>Using vectorized declarations for traps in distance function calculations</li>
 <li>Separating the data augmentation process into two steps (Chandler 2018)</li>
 </ol>
-<p>In some SCR problems, there are landscape features that create ‘unsuitable’ habitat for the study species. Habitat masks are used to account for these features and designate suitable (1) or unsuitable (0) habitat, and can be represented as a matrix or array of binary values. We follow the methods of Milleret et al. (2019) to implement the “ones” trick to account for habitat suitability. This restricts the possible locations of latent activity centers to only suitable habitat. The ‘localSCR’ package provides functions to construct a habitat mask from either raster or polygon data. In the discrete model, we’ll use the habitat mask to limit the ‘pixels’ or ‘cells’ of our discrete state-space, such that only available cells will be sampled.</p>
+<p>In some SCR problems, there are landscape features that create ‘unsuitable’ habitat for the study species. Habitat masks are used to account for these features and designate suitable (1) or unsuitable (0) habitat, and can be represented as a matrix or array of binary values. This restricts the possible locations of latent activity centers to only suitable habitat, and in our discrete problem we simply exclude the unsuitable pixels and keep track of the cell indexes. The ‘localSCR’ package provides functions to construct a habitat mask from either raster or polygon data. In the discrete model, we’ll use the habitat mask to limit the ‘pixels’ or ‘cells’ of our discrete state-space, such that only available cells will be sampled.</p>
 Finally, in some SCR designs, clusters of trap arrays may be spread out over the study area such that individuals can only be detected at one of multiple trap arrays (e.g., Furnas et al. 2018). This necessitates including the traps as a 3-dimensional array, using a site identifier to track which site a detected or augmented individual belongs to, and using a dynamic indexing in the model.
 
 <br><p>
@@ -567,7 +567,7 @@ We again make a realized density surface and note that the <code><a href="../ref
 <img src="../reference/figures/vignette_04/Fig6.png" style="width:90%"></p>
 <br><p>
 </p>
-<p>That’s it for the discrete models! You’ve made it through the fourth ‘localSCR’ tutorial. Please see Royle et al. (2014) for more details about SCR theory and modeling. The next tutorials will focus on applying localapproaches to ‘classic’ and discrete SCR models. We’ll see that significant reductions in computational run time can occur with local approaches depending on the problem, but especially for discrete SCR models where we deal with relatively slow run time when there are many pixels to sample from.</p>
+<p>That’s it for the discrete models! You’ve made it through the fourth ‘localSCR’ tutorial. Please see Royle et al. (2014) for more details about SCR theory and modeling. The next tutorials will focus on applying local approaches to ‘classic’ and discrete SCR models. We’ll see that significant reductions in computational run time can occur with local approaches depending on the problem, but especially for discrete SCR models where we deal with relatively slow run time when there are many pixels to sample from.</p>
 
 <p><br></p>
 </div>
@@ -578,7 +578,6 @@ We again make a realized density surface and note that the <code><a href="../ref
 <p>Chandler, R. B. 2018. Speeding up data augmentation in BUGS. <a href="https://groups.google.com/forum/#!topic/hmecology/o6cWDqHHgOE" class="external-link uri">https://groups.google.com/forum/#!topic/hmecology/o6cWDqHHgOE</a>.</p>
 <p>de Valpine P, C. Paciorek, D. Turek, N. Michaud, C. Anderson-Bergman, F. Obermeyer, C. C. Wehrhahn, A. Rodrìguez, L. D. Temple, and S. Paganin. 2022. <em>NIMBLE: MCMC, Particle Filtering, and Programmable Hierarchical Modeling</em>. doi: 10.5281/zenodo.1211190 (URL: <a href="https://doi.org/10.5281/zenodo.1211190" class="external-link uri">https://doi.org/10.5281/zenodo.1211190</a>), R package version 0.12.2, URL: <a href="https://cran.r-project.org/package=nimble" class="external-link uri">https://cran.r-project.org/package=nimble</a>.</p>
 <p>Furnas, B. J., R. H. Landers, S. Hill, S. S. Itoga, and B. N. Sacks. 2018. Integrated modeling to estimate population size and composition of mule deer. Journal of Wildlife Management 82:1429–1441.</p>
-<p>Milleret, C., P. Dupont, C. Bonenfant, H. Henrik Brøseth, Ø. Flagstad, C. Sutherland, and R. Bischof. 2019. A local evaluation of the individual state‐space to scale up Bayesian spatial capture‐recapture. Ecology and Evolution 9:352–363.</p>
 <p>Royle, J. A., R. B. Chandler, R. Sollmann, and B. Gardner. 2014. Spatial capture‐recapture. Academic Press, Waltham, Massachusetts, USA.</p>
 </div>
   </div>
