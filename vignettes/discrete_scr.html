@@ -424,9 +424,9 @@ data</li>
 <ol style="list-style-type: decimal">
 <li>Create ‘classic’ SCR data and convert to discretized format</li>
 <li>Workflow for discrete SCR model for marked individuals using a 2D
-trap array, sex-specific scaling parameter and habitat mask</li>
+trap array, a single scaling parameter and habitat mask</li>
 <li>Workflow for discrete SCR model for marked individuals using a 3D
-trap array, sex-specific scaling parameter and habitat mask</li>
+trap array,a single scaling parameter and habitat mask</li>
 </ol>
 </p>
 <br>
@@ -556,9 +556,9 @@ process.</p>
 </p>
 <p><br></p>
 </div>
-<div id="workflow-for-discrete-scr-model-for-marked-individuals-using-a-2d-trap-array-sex-specific-scaling-parameter-and-habitat-mask" class="section level3">
+<div id="workflow-for-discrete-scr-model-for-marked-individuals-using-a-2d-trap-array-single-scaling-parameter-and-habitat-mask" class="section level3">
 <h3>(2) Workflow for discrete SCR model for marked individuals using a
-2D trap array, sex-specific scaling parameter and habitat mask</h3>
+2D trap array, single scaling parameter and habitat mask</h3>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># prepare data</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>data <span class="ot">=</span> <span class="fu">list</span>(<span class="at">y=</span>data3d<span class="sc">$</span>y)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>y <span class="ot">=</span> data<span class="sc">$</span>y[<span class="fu">which</span>(<span class="fu">apply</span>(data<span class="sc">$</span>y, <span class="dv">1</span>, sum)<span class="sc">!=</span><span class="dv">0</span>),,] <span class="co"># remove augmented records </span></span>
@@ -680,6 +680,10 @@ of the realized density output.
 </p>
 <br>
 <p>
+</div>
+<div id="workflow-for-discrete-scr-model-for-marked-individuals-using-a-3d-trap-array-a-single-scaling-parameter-and-habitat-mask" class="section level3">
+<h3>(3) Workflow for discrete SCR model for marked individuals using a
+3D trap array, a single scaling parameter and habitat mask</h3>
 <p>Next we repeat a similar workflow but now we have two trap arrays
 that are clustered in space, and thus, there is a negligble chance of
 detecting an individual at more than one trap array. In this case, the

@@ -57,8 +57,8 @@ Finally, in some SCR designs, clusters of trap arrays may be spread out over the
 This tutorial includes three parts:
 
 1) Create 'classic' SCR data and convert to discretized format
-2) Workflow for discrete SCR model for marked individuals using a 2D trap array, sex-specific scaling parameter and habitat mask
-3) Workflow for discrete SCR model for marked individuals using a 3D trap array, sex-specific scaling parameter and habitat mask
+2) Workflow for discrete SCR model for marked individuals using a 2D trap array, a single scaling parameter and habitat mask
+3) Workflow for discrete SCR model for marked individuals using a 3D trap array,a single scaling parameter and habitat mask
 
 </p>
 <br>
@@ -162,7 +162,7 @@ Next, we'll use these data components we created above in a discrete SCR model. 
 </p>
 <br>
 
-### (2) Workflow for discrete SCR model for marked individuals using a 2D trap array, sex-specific scaling parameter and habitat mask
+### (2) Workflow for discrete SCR model for marked individuals using a 2D trap array, single scaling parameter and habitat mask
 
 ```{r, fig.show='hide',eval=FALSE}
 # prepare data
@@ -269,6 +269,8 @@ plot(r, col=viridis(100),
 </p>
 <br>
 <p>
+
+### (3) Workflow for discrete SCR model for marked individuals using a 3D trap array, a single scaling parameter and habitat mask
 
 Next we repeat a similar workflow but now we have two trap arrays that are clustered in space, and thus, there is a negligble chance of detecting an individual at more than one trap array. In this case, the functions in 'localSCR' can automatically detect that the traps are in a 3-dimensional format and we note that `sim_classic` will return a variable called `site` that identifies which trap array that each individual (both detected and not detected) belongs to. Note that the number of rows in the simulated data `y` will equal the simulated population size (here in the example, `N = 200`). However, because we are using a trick provided by Chandler (2018) to separate the data augmentation process into two steps, we only need the encounter data for those individuals that were detected in the model likelihood. Also, because we have no occasion-specific detection covariates, we can sum `y` over individuals and traps to result in a 2-dimensional encounter history array (i.e., `y[i,j]`). This speeds up the model under these conditions and we can specify this when we get the SCR model template by setting `y_dim = 2` in `get_classic(y_dim = 2,...)`. Otherwise, the workflow is very similar to having a 2-dimensional trap array in the previous example.
 
