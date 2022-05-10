@@ -2689,6 +2689,8 @@ if(is.null(exclude)){
 #' \code{\link{run_classic}}.
 #' @param grid A matrix or array object of the the state-space grid. This is 
 #' returned from \code{\link{grid_classic}}.
+#' @param ext An \code{Extent} object from the \code{raster} package. This is 
+#' returned from \code{\link{grid_classic}}.
 #' @param crs_ The UTM coordinate reference system (EPSG code) used for your
 #' location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).
 #' @param site Site identifier variable included for detected and augmented 
@@ -2779,8 +2781,9 @@ if(is.null(exclude)){
 #' 
 #' library(tictoc)       
 #' tic() # track time
-#' r = realized_density(samples = out, grid = Grid$grid, crs_ = mycrs, 
-#' site = NULL, hab_mask = FALSE, discrete = FALSE)       
+#' r = realized_density(samples = out, grid = Grid$grid, 
+#' ext = Grid$ext, crs_ = mycrs, site = NULL, hab_mask = FALSE, 
+#' discrete = FALSE)       
 #' toc()      
 #' 
 #' # load virdiis color pallete library      
@@ -2793,130 +2796,174 @@ if(is.null(exclude)){
 #'}
 #' @name realized_density
 #' @export
-realized_density <- function(samples, grid, crs_, site, hab_mask = FALSE, 
+realized_density <- function(samples, grid, ext, crs_, site, hab_mask = FALSE, 
                              discrete = FALSE, s_alias = "s", z_alias = "z"){
   if (discrete) {
     smat <- list()
-    for (i in 1:length(samples)) {
-      zlen <- samples[[i]][, grep(paste0(z_alias, "\\["), 
-                                  colnames(samples[[i]]))]
-      stemp <- samples[[i]][, grep(paste0(s_alias, "\\["), 
-                                   colnames(samples[[i]]))]
-      smat[[i]] <- matrix(NA, nrow = nrow(samples[[i]]), 
+    for (g in 1:length(samples)) {
+      zlen <- samples[[g]][, grep(paste0(z_alias, "\\["), 
+                                  colnames(samples[[g]]))]
+      stemp <- samples[[g]][, grep(paste0(s_alias, "\\["), 
+                                   colnames(samples[[g]]))]
+      smat[[g]] <- matrix(NA, nrow = nrow(samples[[g]]), 
                           ncol = dim(zlen)[2] * 2)
-      for (j in 1:dim(samples[[i]])[1]) {
-        if(length(dim(grid))==2){
-        smat[[i]][j, 1:(ncol(smat[[i]])/2)] <- grid[stemp[j, 
-        ], 1]
-        smat[[i]][j, ((ncol(smat[[i]])/2) + 1):ncol(smat[[i]])] <- grid[stemp[j, 
-        ], 2]} else
-        if(length(dim(grid))==3){
-        smat[[i]][j, 1:(ncol(smat[[i]])/2)] <- grid[stemp[j,site==i 
-        ], 1, i]
-        smat[[i]][j, ((ncol(smat[[i]])/2) + 1):ncol(smat[[i]])] <- grid[stemp[j,site==i 
-        ], 2, i] 
+      for (j in 1:dim(samples[[g]])[1]) {
+        if (length(dim(grid)) == 2) {
+          smat[[g]][j,1:dim(zlen)[2]] <- grid[stemp[j,], 1]
+          smat[[g]][j,(dim(zlen)[2] + 1):ncol(smat[[g]])] <- grid[stemp[j,], 2]
+        }
+        else if (length(dim(grid)) == 3) {
+          for(i in 1:dim(grid)[3]){
+          smat[[g]][j,1:dim(zlen)[2]][site==i] <- grid[stemp[j,site==i], 1, i]
+          smat[[g]][j,(dim(zlen)[2] + 1):ncol(smat[[g]])][site==i] <- 
+            grid[stemp[j,site==i], 2, i]
+          }
         }
       }
-      samples[[i]] <- cbind(zlen, smat[[i]])
-      dimnames(samples[[i]])[[2]][(dim(zlen)[2]+1):dim(samples[[i]])[2]] <-
-        c(paste(s_alias, 
-                "[", 1:dim(zlen)[2], ",", " 1", "]", 
-                sep = ""), paste(s_alias, "[", 1:dim(zlen)[2], 
-                                 ",", " 2", "]", sep = ""))
+      samples[[g]] <- cbind(zlen, smat[[g]])
+      dimnames(samples[[g]])[[2]][(dim(zlen)[2] + 1):dim(samples[[g]])[2]] <- 
+        c(paste(s_alias,"[", 1:dim(zlen)[2], ",", " 1", "]", sep = ""), 
+           paste(s_alias, "[", 1:dim(zlen)[2], ",", " 2",  "]", sep = ""))
     }
-    hab_mask = FALSE
+    if (length(samples) > 1) {
+      samples <- do.call(rbind, samples)
+    }
+    n.iter <- dim(samples)[1]
+    if (length(dim(grid)) != 2 & length(dim(grid)) != 3) {
+      stop("State-space grid must be only 2 or 3 dimensions")
+    }
+    if (length(dim(grid)) == 2) {
+      z <- samples[, grep(paste0(z_alias, "\\["), colnames(samples))]
+      z_vec <- as.vector(z)
+      sx <- samples[, grep(paste0(s_alias, "\\["), colnames(samples))][,1:dim(z)[2]]
+      sx_vec <- as.vector(sx)[z_vec == 1]
+      sy <- samples[, grep(paste0(s_alias, "\\["), colnames(samples))][,(dim(z)[2] + 1):(dim(z)[2] * 2)]
+      sy_vec <- as.vector(sy)[z_vec == 1]
+        ac_pts <- sp::SpatialPoints(cbind(sx_vec, sy_vec), 
+                                    proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
+        r <- raster::rasterFromXYZ(grid, crs = crs_)
+        tab <- table(raster::cellFromXY(r, ac_pts))
+        r[as.numeric(names(tab))] <- tab/n.iter
+    }
+        else if (length(dim(grid)) == 3) {
+          if(isFALSE(hab_mask)){
+            r <- apply(grid, 3, function(x) raster::rasterFromXYZ(x, 
+                                                        crs = crs_))
+          }else
+          if(isFALSE(hab_mask)==FALSE){
+            r=list()
+            for (g in 1:dim(grid)[3]) {
+              r[[g]] <- raster::raster(nrows=dim(hab_mask)[2],ncols=dim(hab_mask)[1],
+                                       ext=ext[[g]], crs = crs_)
+            }
+           }
+            z <- samples[, grep(paste0(z_alias, "\\["), colnames(samples))]
+            sx <- samples[, grep(paste0(s_alias, "\\["), colnames(samples))][,1:dim(z)[2]]
+            sy <- samples[, grep(paste0(s_alias, "\\["), colnames(samples))][,(dim(z)[2] + 1):(dim(z)[2] * 2)]
+            for (g in 1:dim(grid)[3]) {
+              z_site <- z[, site == g]
+              z_vec <- as.vector(z_site)
+              sx_site <- sx[, site == g]
+              sx_vec <- as.vector(sx_site)[z_vec == 1]
+              sy_site <- sy[, site == g]
+              sy_vec <- as.vector(sy_site)[z_vec == 1]
+              ac_pts <- sp::SpatialPoints(cbind(sx_vec, sy_vec), 
+                                          proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
+              tab <- table(raster::cellFromXY(r[[g]], ac_pts))
+              r[[g]][as.numeric(names(tab))] <- tab/n.iter
+            }
+          }    # end 3D
+  }else # if not discrete
+  if(isFALSE(discrete)){
+  if (length(samples) > 1) {
+    samples <- do.call(rbind, samples)
   }
-   if(length(samples) > 1){
-    samples <- do.call(rbind, samples) # rbind mcmc samples
+  n.iter <- dim(samples)[1]
+  if (length(dim(grid)) != 2 & length(dim(grid)) != 3) {
+    stop("State-space grid must be only 2 or 3 dimensions")
+  }
+  if (length(dim(grid)) == 2) {
+    z <- samples[, grep(paste0(z_alias, "\\["), colnames(samples))]
+    z_vec <- as.vector(z)
+    sx <- samples[, grep(paste0(s_alias, "\\["), colnames(samples))][, 
+                                                                     1:dim(z)[2]]
+    sx_vec <- as.vector(sx)[z_vec == 1]
+    sy <- samples[, grep(paste0(s_alias, "\\["), colnames(samples))][, 
+                                                                     (dim(z)[2] + 1):(dim(z)[2] * 2)]
+    sy_vec <- as.vector(sy)[z_vec == 1]
+    if (isFALSE(hab_mask)) {
+      ac_pts <- sp::SpatialPoints(cbind(sx_vec, sy_vec), 
+                                  proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
+      r <- raster::rasterFromXYZ(grid, ext = ext, crs = crs_)
+      tab <- table(raster::cellFromXY(r, ac_pts))
+      r[as.numeric(names(tab))] <- tab/n.iter
+    }
+    else if (isFALSE(hab_mask) == FALSE) {
+      r <- raster::rasterFromXYZ(grid,  ext = ext, crs = crs_)
+      rescale.sx <- scales::rescale(sx_vec, to = raster::extent(r)[1:2], 
+                                    from = c(0, dim(hab_mask)[2]))
+      rescale.sy <- scales::rescale(sy_vec, to = raster::extent(r)[3:4], 
+                                    from = c(0, dim(hab_mask)[1]))
+      ac_pts <- sp::SpatialPoints(cbind(rescale.sx, rescale.sy), 
+                                  proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
+      tab <- table(raster::cellFromXY(r, ac_pts))
+      r[as.numeric(names(tab))] <- tab/n.iter
+    }
+  }
+  else if (length(dim(grid)) == 3) {
+    if (isFALSE(hab_mask)) {
+      r <- apply(grid, 3, function(x) raster::rasterFromXYZ(x,
+                                                            crs = crs_))
+      z <- samples[, grep(paste0(z_alias, "\\["), colnames(samples))]
+      sx <- samples[, grep(paste0(s_alias, "\\["), colnames(samples))][, 
+                                                                       1:dim(z)[2]]
+      sy <- samples[, grep(paste0(s_alias, "\\["), colnames(samples))][, 
+                                                                       (dim(z)[2] + 1):(dim(z)[2] * 2)]
+      for (g in 1:dim(grid)[3]) {
+        z_site <- z[, site == g]
+        z_vec <- as.vector(z_site)
+        sx_site <- sx[, site == g]
+        sx_vec <- as.vector(sx_site)[z_vec == 1]
+        sy_site <- sy[, site == g]
+        sy_vec <- as.vector(sy_site)[z_vec == 1]
+        ac_pts <- sp::SpatialPoints(cbind(sx_vec, sy_vec), 
+                                    proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
+        tab <- table(raster::cellFromXY(r[[g]], ac_pts))
+        r[[g]][as.numeric(names(tab))] <- tab/n.iter
+      }
+    }
+    else if (isFALSE(hab_mask) == FALSE) {
+          r=list()
+          for (g in 1:dim(grid)[3]) {
+            r[[g]] <- raster::raster(nrows=dim(hab_mask)[2],ncols=dim(hab_mask)[1],
+                                     ext=ext[[g]], crs = crs_)
+          }
+      for (g in 1:dim(grid)[3]) {
+        z <- samples[, grep(paste0(z_alias, "\\["), colnames(samples))]
+        z_site <- z[, site == g]
+        z_vec <- as.vector(z_site)
+        sx <- samples[, grep(paste0(s_alias, "\\["), 
+                             colnames(samples))][, 1:dim(z)[2]]
+        sx_site <- sx[, site == g]
+        sx_vec <- as.vector(sx_site)[z_vec == 1]
+        sy <- samples[, grep(paste0(s_alias, "\\["), 
+                             colnames(samples))][, (dim(z)[2] + 1):(dim(z)[2] * 
+                                                                      2)]
+        sy_site <- sy[, site == g]
+        sy_vec <- as.vector(sy_site)[z_vec == 1]
+        rescale.sx <- scales::rescale(sx_vec, to = raster::extent(r[[g]])[1:2], 
+                                      from = c(0, dim(hab_mask)[2]))
+        rescale.sy <- scales::rescale(sy_vec, to = raster::extent(r[[g]])[3:4], 
+                                      from = c(0, dim(hab_mask)[1]))
+        ac_pts <- sp::SpatialPoints(cbind(rescale.sx, 
+                                          rescale.sy), proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
+        tab <- table(raster::cellFromXY(r[[g]], ac_pts))
+        r[[g]][as.numeric(names(tab))] <- tab/n.iter
+      }
+     }
    }
-   n.iter <- dim(samples)[1] # store total number of iterations
-   # need to determine if state-space grid is 2 or 3 dimensional (stop if not)
-   if(length(dim(grid))!=2 & length(dim(grid))!=3){
-     stop("State-space grid must be only 2 or 3 dimensions")
-   } 
-   if(length(dim(grid))==2){
-# process z indicator variable and sx and sy activity center coordinates as 
-     # vectors for speed
-       z <- samples[,grep(paste0(z_alias,"\\["), colnames(samples))]
-       z_vec <- as.vector(z)
-       sx <- samples[,grep(paste0(s_alias,"\\["), 
-             colnames(samples))][,1:dim(z)[2]] # x-coordinate
-       sx_vec <- as.vector(sx)[z_vec==1]
-       sy <- samples[,grep(paste0(s_alias,"\\["), 
-            colnames(samples))][,(dim(z)[2]+1):(dim(z)[2]*2)] # y-coordinates
-       sy_vec <- as.vector(sy)[z_vec==1]
-     if(isFALSE(hab_mask)){
-         ac_pts <- sp::SpatialPoints(cbind(sx_vec, sy_vec),
-                  proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
-         r <- raster::rasterFromXYZ(grid,crs = crs_)
-         tab <- table(raster::cellFromXY(r, ac_pts))
-         r[as.numeric(names(tab))] <- tab/n.iter
-     } else 
-     if(isFALSE(hab_mask)==FALSE){
-         r <- raster::rasterFromXYZ(grid,crs = crs_)
-         rescale.sx <- scales::rescale(sx_vec, to = raster::extent(r)[1:2],
-                                       from=c(0,dim(hab_mask)[2]))
-         rescale.sy <- scales::rescale(sy_vec, to = raster::extent(r)[3:4], 
-                                       from=c(0,dim(hab_mask)[1]))
-         ac_pts <- sp::SpatialPoints(cbind(rescale.sx, rescale.sy),
-                        proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
-         tab <- table(raster::cellFromXY(r, ac_pts))
-         r[as.numeric(names(tab))] <- tab/n.iter
-     } # end habitat mask
-   } else # end 2D grid 
- if(length(dim(grid))==3){
-   if(isFALSE(hab_mask)){
-       r <- apply(grid,3,function(x) raster::rasterFromXYZ(x,crs = crs_))
- # process z indicator variable and sx and sy activity center coordinates 
-       # as vectors for speed
-         z <- samples[,grep(paste0(z_alias,"\\["), 
-               colnames(samples))] # indicator variable
-         sx <- samples[,grep(paste0(s_alias,"\\["), 
-               colnames(samples))][,1:dim(z)[2]] # x-coordinate
-         sy <- samples[,grep(paste0(s_alias,"\\["), 
-              colnames(samples))][,(dim(z)[2]+1):(dim(z)[2]*2)] # y-coordinates
-   for(g in 1:dim(grid)[3]){
-     z_site <- z[,site==g]
-     z_vec <- as.vector(z_site)
-     sx_site <- sx[,site==g]
-     sx_vec <- as.vector(sx_site)[z_vec==1]
-     sy_site <- sy[,site==g]             
-     sy_vec <- as.vector(sy_site)[z_vec==1]
-     ac_pts <- sp::SpatialPoints(cbind(sx_vec, sy_vec),
-                    proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
-     tab <- table(raster::cellFromXY(r[[g]], ac_pts))
-     r[[g]][as.numeric(names(tab))] <- tab/n.iter 
-   } # end g loop   
-       } else
- if(isFALSE(hab_mask)==FALSE){  
-     r <- apply(grid,3,function(x) raster::rasterFromXYZ(x,crs = crs_))
-     for(g in 1:dim(grid)[3]){
-       # process z indicator variable and sx and sy activity center 
-       # coordinates as vectors for speed
-       z <- samples[,grep(paste0(z_alias,"\\["), 
-                  colnames(samples))] # indicator variable
-       z_site <- z[,site==g]
-       z_vec <- as.vector(z_site)
-       sx <- samples[,grep(paste0(s_alias,"\\["),
-                  colnames(samples))][,1:dim(z)[2]] # x-coordinate
-       sx_site <- sx[,site==g]
-       sx_vec <- as.vector(sx_site)[z_vec==1]
-       sy <- samples[,grep(paste0(s_alias,"\\["), 
-               colnames(samples))][,(dim(z)[2]+1):(dim(z)[2]*2)] # y-coordinates
-       sy_site <- sy[,site==g]             
-       sy_vec <- as.vector(sy_site)[z_vec==1]
-       rescale.sx <- scales::rescale(sx_vec, 
-                  to = raster::extent(r[[g]])[1:2], from=c(0,dim(hab_mask)[2]))
-       rescale.sy <- scales::rescale(sy_vec, to = raster::extent(r[[g]])[3:4],
-                  from=c(0,dim(hab_mask)[1]))
-       ac_pts <- sp::SpatialPoints(cbind(rescale.sx, rescale.sy),
-                  proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
-       tab <- table(raster::cellFromXY(r[[g]], ac_pts))
-       r[[g]][as.numeric(names(tab))] <- tab/n.iter 
-     } # end g loop       
- } # end habitat mask    
-}
-     return(r)
+  }
+  return(r)
 } # End function 'realized_density'
 
 

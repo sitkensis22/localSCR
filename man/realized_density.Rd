@@ -7,6 +7,7 @@
 realized_density(
   samples,
   grid,
+  ext,
   crs_,
   site,
   hab_mask = FALSE,
@@ -21,6 +22,9 @@ samples from multiple chains from MCMC sampling; possibly returned from
 \code{\link{run_classic}}.}
 
 \item{grid}{A matrix or array object of the the state-space grid. This is 
+returned from \code{\link{grid_classic}}.}
+
+\item{ext}{An \code{Extent} object from the \code{raster} package. This is 
 returned from \code{\link{grid_classic}}.}
 
 \item{crs_}{The UTM coordinate reference system (EPSG code) used for your
@@ -125,8 +129,9 @@ nimSummary(out, exclude = c("s","z"), trace = TRUE)
 
 library(tictoc)       
 tic() # track time
-r = realized_density(samples = out, grid = Grid$grid, crs_ = mycrs, 
-site = NULL, hab_mask = FALSE, discrete = FALSE)       
+r = realized_density(samples = out, grid = Grid$grid, 
+ext = Grid$ext, crs_ = mycrs, site = NULL, hab_mask = FALSE, 
+discrete = FALSE)       
 toc()      
 
 # load virdiis color pallete library      
