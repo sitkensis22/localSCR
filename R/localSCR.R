@@ -2894,12 +2894,12 @@ realized_density <- function(samples, grid, ext, crs_, site, hab_mask = FALSE,
     if (isFALSE(hab_mask)) {
       ac_pts <- sp::SpatialPoints(cbind(sx_vec, sy_vec), 
                                   proj4string = sp::CRS(sf::st_crs(crs_)$proj4string))
-      r <- raster::rasterFromXYZ(grid, ext = ext, crs = crs_)
+      r <- raster::rasterFromXYZ(grid, crs = crs_)
       tab <- table(raster::cellFromXY(r, ac_pts))
       r[as.numeric(names(tab))] <- tab/n.iter
     }
     else if (isFALSE(hab_mask) == FALSE) {
-      r <- raster::rasterFromXYZ(grid,  ext = ext, crs = crs_)
+      r <- raster::rasterFromXYZ(grid,  crs = crs_)
       rescale.sx <- scales::rescale(sx_vec, to = raster::extent(r)[1:2], 
                                     from = c(0, dim(hab_mask)[2]))
       rescale.sy <- scales::rescale(sy_vec, to = raster::extent(r)[3:4], 
