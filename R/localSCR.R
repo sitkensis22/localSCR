@@ -2690,7 +2690,8 @@ if(is.null(exclude)){
 #' @param grid A matrix or array object of the the state-space grid. This is 
 #' returned from \code{\link{grid_classic}}.
 #' @param ext An \code{Extent} object from the \code{raster} package. This is 
-#' returned from \code{\link{grid_classic}}.
+#' returned from \code{\link{grid_classic}}. Note that \code{ext} is only 
+#' used when when the state-space grid is a 3-dimensional array.
 #' @param crs_ The UTM coordinate reference system (EPSG code) used for your
 #' location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).
 #' @param site Site identifier variable included for detected and augmented 

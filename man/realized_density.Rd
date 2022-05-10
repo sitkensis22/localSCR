@@ -25,7 +25,8 @@ samples from multiple chains from MCMC sampling; possibly returned from
 returned from \code{\link{grid_classic}}.}
 
 \item{ext}{An \code{Extent} object from the \code{raster} package. This is 
-returned from \code{\link{grid_classic}}.}
+returned from \code{\link{grid_classic}}. Note that \code{ext} is only 
+used when when the state-space grid is a 3-dimensional array.}
 
 \item{crs_}{The UTM coordinate reference system (EPSG code) used for your
 location provided as an integer (e.g., 32608 for WGS 84/UTM Zone 8N).}
