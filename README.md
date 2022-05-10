@@ -40,6 +40,11 @@ computer (including installing rtools): <https://r-nimble.org/download>.
 -   <a href="https://sitkensis22.github.io/localSCR/articles/mark_resight_scr.html">Mark-resight
     models: continuous state-space with both marked and unmarked
     individuals</a>
+-   <a href="https://sitkensis22.github.io/localSCR/articles/discrete_scr.html">Discrete
+    SCR models: discrete state-space and marked individuals</a>
+-   <a href="https://sitkensis22.github.io/localSCR/articles/local_classic_scr.html">Local
+    classic SCR models: continuous state-space and marked
+    individuals</a>
 
 ## References
 
@@ -60,4 +65,4 @@ capture‐recapture. Academic Press, Waltham, Massachusetts, USA.
 
 Woodruff, S., D. R. Eacker, and L. Waits. 2020. Estimating coyote
 density in local, discrete Bayesian capture-recapture models. Journal of
-Wildlife Management 10.1002/jwmg.21967
+Wildlife Management 10.1002/jwmg.21967.
