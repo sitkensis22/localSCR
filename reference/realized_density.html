@@ -70,6 +70,7 @@ coordinates (<code>s</code>)</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">realized_density</span><span class="op">(</span>
   <span class="va">samples</span>,
   <span class="va">grid</span>,
+  <span class="va">ext</span>,
   <span class="va">crs_</span>,
   <span class="va">site</span>,
   hab_mask <span class="op">=</span> <span class="cn">FALSE</span>,
@@ -87,6 +88,9 @@ samples from multiple chains from MCMC sampling; possibly returned from
 <code><a href="run_classic.html">run_classic</a></code>.</p></dd>
 <dt>grid</dt>
 <dd><p>A matrix or array object of the the state-space grid. This is 
+returned from <code><a href="grid_classic.html">grid_classic</a></code>.</p></dd>
+<dt>ext</dt>
+<dd><p>An <code>Extent</code> object from the <code>raster</code> package. This is 
 returned from <code><a href="grid_classic.html">grid_classic</a></code>.</p></dd>
 <dt>crs_</dt>
 <dd><p>The UTM coordinate reference system (EPSG code) used for your
@@ -194,8 +198,9 @@ surfaces from MCMC samples.</p>
 <span class="r-in"></span>
 <span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/collectivemedia/tictoc" class="external-link">tictoc</a></span><span class="op">)</span>       </span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># track time</span></span>
-<span class="r-in"><span class="va">r</span> <span class="op">=</span> <span class="fu">realized_density</span><span class="op">(</span>samples <span class="op">=</span> <span class="va">out</span>, grid <span class="op">=</span> <span class="va">Grid</span><span class="op">$</span><span class="va">grid</span>, crs_ <span class="op">=</span> <span class="va">mycrs</span>, </span>
-<span class="r-in">site <span class="op">=</span> <span class="cn">NULL</span>, hab_mask <span class="op">=</span> <span class="cn">FALSE</span>, discrete <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>       </span>
+<span class="r-in"><span class="va">r</span> <span class="op">=</span> <span class="fu">realized_density</span><span class="op">(</span>samples <span class="op">=</span> <span class="va">out</span>, grid <span class="op">=</span> <span class="va">Grid</span><span class="op">$</span><span class="va">grid</span>, </span>
+<span class="r-in">ext <span class="op">=</span> <span class="va">Grid</span><span class="op">$</span><span class="va">ext</span>, crs_ <span class="op">=</span> <span class="va">mycrs</span>, site <span class="op">=</span> <span class="cn">NULL</span>, hab_mask <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span class="r-in">discrete <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>       </span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span>      </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># load virdiis color pallete library      </span></span>
