@@ -84,7 +84,7 @@
       <h1 data-toc-skip>Local classic SCR models: continuous state-space and marked individuals</h1>
                         <h4 data-toc-skip class="author">Daniel Eacker</h4>
             
-            <h4 data-toc-skip class="date">2022-05-10</h4>
+            <h4 data-toc-skip class="date">2022-05-12</h4>
       
       
       <div class="hidden name"><code>local_classic_scr.Rmd</code></div>
@@ -218,7 +218,7 @@ Finally, in some SCR designs, clusters of trap arrays may be spread out over the
 <p>
 </p>
 <p><br> Here, we can see the state-space grid that was created from <code><a href="../reference/grid_classic.html">grid_classic()</a></code>. Also, the traps (or detectors) are plotted over top in blue. We arbitrarily chose a grid resolution of 100 in this example (i.g., <code>res = 100</code>), but this will vary by problem. In situations involving habitat masks or discrete models, it is prudent to test the effect of different grid resolutions on the estimated abundance and density in SCR models (see Royle et al. 2014). Also, note the use to the EPSG code to define the coordinate reference system for our state-space (see <a href="https://epsg.io/32608" class="external-link uri">https://epsg.io/32608</a>).</p>
-<p>Now lets simulate some spatial capture-recapture data using <code><a href="../reference/sim_classic.html">sim_classic()</a></code>. Note for this example, we will simulate a ‘true’ population size of 200 individuals (<code>N = 200</code>), 4 sampling occasions (<code>K = 4</code>), a scaling parameter (<code>sigma_</code>) of 300 m, a baseline encounter probability of 0.15 (<code>base_encounter = 0.15</code>), no sex-specificity (<code>prop_sex = 1</code>), and no habitat mask (<code>hab_mask = FALSE</code>). We also use <code>setSeed = 100</code> to make the simulation reproducible. We provide the function the extent of the state-space output from <code><a href="../reference/grid_classic.html">grid_classic()</a></code> as <code>ext = Grid$ext</code>. Note that Grid is a list.</p>
+<p>Now lets simulate some spatial capture-recapture data using <code><a href="../reference/sim_classic.html">sim_classic()</a></code>. Note for this example, we will simulate a ‘true’ population size of 200 individuals (<code>N = 200</code>), 4 sampling occasions (<code>K = 4</code>), a scaling parameter (<code>sigma_</code>) of 300 m, a baseline encounter probability of 0.15 (<code>base_encounter = 0.15</code>), no sex-specificity (<code>prop_sex = 1</code>), and a habitat mask (<code>hab_mask = hab_mask</code>). We also use <code>setSeed = 100</code> to make the simulation reproducible. We provide the function the extent of the state-space output from <code><a href="../reference/grid_classic.html">grid_classic()</a></code> as <code>ext = Grid$ext</code>. Note that Grid is a list.</p>
 <p>Also, we’ll need the function <code><a href="../reference/localize_classic.html">localize_classic()</a></code> that will convert our ‘classic’ data components to a format that can be used in the local evaluation approach. This function will do the heavy lifting and takes under a minute depending upon that data set and computer as there are some spatial operations that must occur to build the individual state-space grids and then scale up to the study-area level state-space.</p>
 <p>We’ll first create a habitat mask and simulate some SCR data, and then covert it to local format.</p>
 
