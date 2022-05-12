@@ -4767,7 +4767,8 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
    # first get trap indices
    grid_i <- cbind(grid_ind[,1]+s.st[i,1],grid_ind[,2]+s.st[i,2])
    ext_mat[i,] <- as.vector(raster::extent(raster::rasterFromXYZ(grid_i,crs= crs_)))
-   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = max(sigma_)*9)
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),
+                              dist = max(sigma_)*9, endCapStyle = "SQUARE")
    Xint <- unlist(sf::st_intersects(poly_buff,
                     sf::st_cast(sf::st_sfc(sf::st_multipoint(X), crs =  crs_),"POINT")))
    Jind[i] <- length(Xint) 
@@ -4797,7 +4798,8 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
   # replicate layers of individual state-space centroids
   for(i in (n0+1):nrow(s.st)){
    s.st[i,] <- aug_mat[i-n0,]
-   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = max(sigma_)*9)
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),
+                              dist = max(sigma_)*9, endCapStyle = "SQUARE")
    Xint <- unlist(sf::st_intersects(poly_buff,
                 sf::st_cast(sf::st_sfc(sf::st_multipoint(X), crs =  crs_),"POINT")))
    Jind[i] <- length(Xint) 
@@ -4845,7 +4847,8 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
    prop_habitat[i] <- mean(apply(grid_i_rescale, 1, function(x)  
       hab_mask[(trunc(x[2])+1),(trunc(x[1])+1)]),na.rm=TRUE)
    ext_mat[i,] <- as.vector(raster::extent(raster::rasterFromXYZ(grid_i,crs= crs_)))
-   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = max(sigma_)*9)
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),
+                              dist = max(sigma_)*9, endCapStyle = "SQUARE")
    Xint <- unlist(sf::st_intersects(poly_buff,
                 sf::st_cast(sf::st_sfc(sf::st_multipoint(X), crs =  crs_),"POINT")))
    Jind[i] <- length(Xint) 
@@ -4856,7 +4859,8 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
         replicate(n = ceiling((nrow(s.st) - n0)/nrow(xy_ss)), xy_ss, simplify = FALSE))
   for(i in (n0+1):nrow(s.st)){
    s.st[i,] <- aug_mat[i-n0,]
-   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = max(sigma_)*9)
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),
+                              dist = max(sigma_)*9, endCapStyle = "SQUARE")
    Xint <- unlist(sf::st_intersects(poly_buff,
                   sf::st_cast(sf::st_sfc(sf::st_multipoint(X), crs =  crs_),"POINT")))
    Jind[i] <- length(Xint) 
@@ -4902,7 +4906,8 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
    # first get trap indices
    grid_i <- cbind(grid_ind[,1]+s.st[i,1],grid_ind[,2]+s.st[i,2])
    ext_mat[i,] <- as.vector(raster::extent(raster::rasterFromXYZ(grid_i,crs= crs_)))
-   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = max(sigma_)*9)
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),
+                              dist = max(sigma_)*9, endCapStyle = "SQUARE")
    Xint <- unlist(sf::st_intersects(poly_buff,
           sf::st_cast(sf::st_sfc(sf::st_multipoint(X[,,site[i]]), crs =  crs_),"POINT")))
    Jind[i] <- length(Xint) 
@@ -4954,7 +4959,8 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
    s.st = rbind(s.st, matrix(NA,nrow=(nrow(aug_all)+n0-nrow(s.st)), ncol=2))
    for(i in (n0+1):nrow(s.st)){
    s.st[i,] <- aug_all[i-n0,]
-   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = max(sigma_)*9)
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),
+                              dist = max(sigma_)*9, endCapStyle = "SQUARE")
    Xint <- unlist(sf::st_intersects(poly_buff,
           sf::st_cast(sf::st_sfc(sf::st_multipoint(X[,,site[i]]), crs =  crs_),"POINT")))
    Jind[i] <- length(Xint) 
@@ -5009,7 +5015,8 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
    prop_habitat[i] <- mean(apply(grid_i_rescale, 1, function(x)  
       hab_mask[(trunc(x[2])+1),(trunc(x[1])+1),site[i]]),na.rm=TRUE)
    ext_mat[i,] <- as.vector(raster::extent(raster::rasterFromXYZ(grid_i,crs= crs_)))
-   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = max(sigma_)*9)
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),
+                              dist = max(sigma_)*9, endCapStyle = "SQUARE")
    Xint <- unlist(sf::st_intersects(poly_buff,
         sf::st_cast(sf::st_sfc(sf::st_multipoint(X[,,site[i]]), crs =  crs_),"POINT")))
    Jind[i] <- length(Xint) 
@@ -5029,7 +5036,8 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
    }
   for(i in (n0+1):nrow(s.st)){
    s.st[i,] <- aug_all[i-n0,]
-   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),dist = max(sigma_)*9)
+   poly_buff <- sf::st_buffer(sf::st_sfc(sf::st_point(s.st[i,]), crs = crs_),
+                              dist = max(sigma_)*9, endCapStyle = "SQUARE")
    Xint <- unlist(sf::st_intersects(poly_buff,
             sf::st_cast(sf::st_sfc(sf::st_multipoint(X[,,site[i]]), crs =  crs_),"POINT")))
    Jind[i] <- length(Xint) 

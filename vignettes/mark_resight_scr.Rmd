@@ -138,7 +138,7 @@ ggplot() + geom_point(data=grid_data,aes(x=x,y=y,fill=Suitable,color=Suitable),
 <p>
 Here, we use the same approach as in the first vignette in creating the state-space from `grid_classic()`. Again, the traps (or detectors) are plotted over top of the grid in blue. We see the effect of the habitat mask shown here as red-orange points for suitable habitat and gray for unsuitable habitat; we also see the polygon used for the habitat mask plotted over top. We arbitrarily chose a grid resolution of 100 in this example (i.g., `res = 100`), but this will vary by problem. In situations involving habitat masks or discrete models, it is prudent to test the effect of different grid resolutions on the estimated abundance and density in SCR models (see Royle et al. 2014). Also, note the use to the EPSG code to define the coordinate reference system for our state-space (see <https://epsg.io/32608>). 
 
-Now lets first simulate some spatial capture-recapture data for our 'marked' individuals using `sim_classic()`. Importantly, we use `enc_dist = "poisson"` to select the Poisson distribution to simulate counts rather than binary data. We will use this simulated data to produce our spatial count data of unmarked individuals. Note for this example, we will simulate a 'true' population size of 100 marked individuals (`N = 100`), 4 sampling occasions (`K = 4`), a scaling parameter (`sigma_`) of 300 m, a baseline encounter rate of 0.15 (`base_encounter = 0.15`), no sex-specificity (`prop_sex = 1`), and no habitat mask (`hab_mask = FALSE`). We also use `setSeed = 100` to make the simulation reproducible. Again, we provide the function the extent of the state-space output from `grid_classic()` as `ext = Grid$ext`. Note that Grid is a list.
+Now lets first simulate some spatial capture-recapture data for our 'marked' individuals using `sim_classic()`. Importantly, we use `enc_dist = "poisson"` to select the Poisson distribution to simulate counts rather than binary data. We will use this simulated data to produce our spatial count data of unmarked individuals. Note for this example, we will simulate a 'true' population size of 100 marked individuals (`N = 100`), 4 sampling occasions (`K = 4`), a scaling parameter (`sigma_`) of 300 m, a baseline encounter rate of 0.15 (`base_encounter = 0.15`), no sex-specificity (`prop_sex = 1`), and a habitat mask (`hab_mask = hab_mask`). We also use `setSeed = 100` to make the simulation reproducible. Again, we provide the function the extent of the state-space output from `grid_classic()` as `ext = Grid$ext`. Note that Grid is a list.
 </p>
 <br>
 
@@ -169,6 +169,7 @@ str(data_m)
 <p>
 We can see the data list `data_m` contains 3 elements: the encounter data `y`, a vector of for `sex`, and the simulated activity centers `s`. We really only need the encounter data since we do not have any sex-specificity to the analysis problem here. Next we create another marked data set and then covert it to unmarked by summing over traps and occasions.
 
+Now, we fall a similar routine but we'll use 'apply()' to transform our 'classic' SCR data to an unmarked format.
 </p>
 <br>
 
@@ -196,7 +197,7 @@ str(n)
 <p>
 We can see the marked data were transformed from a 3-dimensional array (`y[i,j,k]`) to a 2-dimensional array (`n[j,k]`) by summing over individuals, creating our unmarked data set called `n`. 
 
-Next, we'll create the data and constants lists and all other items needed to initialize our mark-resight model. We will use `initialize_classic()` to generate plausible starting activity center locations for all individuals. Note that because some individuals are marked and some are unmarked, that we'll need to separately intialize the starting locations for each data set. We'll use the `all_random = TRUE` argument in `initialize_classic()` to generate all random locations for our unmarked data. Given our simulated population size of 100 marked and 100 unmarked individuals, we specify the augmented population size for each data set at 200 (`M = 200` and`m = 200`); this results in a total augmented population size of 400 individuals
+Next, we'll create the data and constants lists and all other items needed to initialize our mark-resight model. We will use `initialize_classic()` to generate plausible starting activity center locations for all individuals. Note that because some individuals are marked and some are unmarked, that we'll need to separately initialize the starting locations for each data set. We'll use the `all_random = TRUE` argument in `initialize_classic()` to generate all random locations for our unmarked data. Given our simulated population size of 100 marked and 100 unmarked individuals, we specify the augmented population size for each data set at 200 (`M = 200` and`m = 200`); this results in a total augmented population size of 400 individuals
 
 </p>
 <br>
