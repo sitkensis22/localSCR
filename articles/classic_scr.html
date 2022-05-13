@@ -84,7 +84,7 @@
       <h1 data-toc-skip>Classic SCR models: continuous state-space and marked individuals</h1>
                         <h4 data-toc-skip class="author">Daniel Eacker</h4>
             
-            <h4 data-toc-skip class="date">2022-05-12</h4>
+            <h4 data-toc-skip class="date">2022-05-13</h4>
       
       
       <div class="hidden name"><code>classic_scr.Rmd</code></div>
@@ -380,7 +380,7 @@ RNGseed <span class="op">=</span> <span class="fl">500</span><span class="op">)<
 <img src="../reference/figures/vignette_01/Fig4.png" style="width:70%"></p>
 <br><p>
 </p>
-<p>We can see from the histogram of the posterior samples of <code>N</code> that our model estimates were close to the simulated value of 200 individuals (shown by red line) and were biased slightly low at around 186 individuals. This is expected since this is only one realization of the detection process. In this example, we divided the pixelWidth by 100 in deriving the area (<code>A</code>) in our list of constants. This allowed us to estimate density in activity centers/100 m<sup>2</sup> rather than activity centers/m<sup>2</sup>. Note that care must be taken with any rescaling of the data or constants.</p>
+<p>We can see from the histogram of the posterior samples of <code>N</code> that our model estimates were close to the simulated value of 200 individuals (shown by red line) and were biased slightly high at 232 individuals. This is expected since this is only one realization of the detection process. In this example, we divided the pixelWidth by 100 in deriving the area (<code>A</code>) in our list of constants. This allowed us to estimate density in activity centers/100 m<sup>2</sup> rather than activity centers/m<sup>2</sup>. Note that care must be taken with any rescaling of the data or constants.</p>
 Next we use<code><a href="../reference/nimSummary.html">nimSummary()</a></code> to quickly summarize the MCMC samples. Note that there are other options to summarize MCMC output, but this function is provided with the package and depends partly on the ‘coda’ package. Then, we make a realized density plot of the MCMC samples using <code><a href="../reference/realized_density.html">realized_density()</a></code>. In this function we make use of the list of grid and extent we created earlier called <code>Grid</code> as well as our saved coordinates reference system (<code>mycrs</code>). In this example, we use the ‘raster’ package to make a simple plot of the output. We can see that the habitat mask has resulted in some cells having <code>NA</code> values where the habitat was unsuitable.
 
 <p><br></p>
