@@ -4788,13 +4788,15 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
   } # end individual loop for detected individuals
   # now deal with augmentation
   centroid <- matrix(apply(X, 2, mean),nrow=1)
-  # get coordinates for augmented state-space centroid
-  x_coord <- seq(-max(sigma_)*6,max(sigma_)*6,max(sigma_)*6) + centroid[1]
-  y_coord <-  seq(-max(sigma_)*6,max(sigma_)*6,max(sigma_)*6) + centroid[2]
-  xy_ss <- as.matrix(expand.grid(x_coord,y_coord))
+  expand_factor <- diff(raster::extent(raster::rasterFromXYZ(grid_ind))[1:2])/sigma_
+    x_coord <- seq(-max(sigma_)*expand_factor,max(sigma_)*expand_factor,
+                   max(sigma_)*expand_factor) + centroid[1] 
+    y_coord <-  seq(-max(sigma_)*expand_factor,max(sigma_)*expand_factor,
+                    max(sigma_)*expand_factor) + centroid[2] 
+    xy_ss <- as.matrix(expand.grid(x_coord,y_coord))
   # check to see if augmented coordinates are in trap range
   poly_check <- sf::st_buffer(sf::st_cast(sf::st_sfc(sf::st_multipoint(xy_ss),
-              crs = crs_),"POINT"),dist = max(sigma_)*9)
+              crs = crs_),"POINT"),dist = max(sigma_)*9, endCapStyle = "SQUARE")
   Xcheck <- as.numeric(sf::st_intersects(poly_check,
                 sf::st_sfc(sf::st_multipoint(X), crs =  crs_)))
   # remove augmented coordinates that are out of trap range
@@ -4825,12 +4827,15 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
     # now deal with augmentation
     centroid <- matrix(apply(X, 2, mean),nrow=1)
     # get coordinates for augmented state-space centroid
-    x_coord <- seq(-max(sigma_)*6,max(sigma_)*6,max(sigma_)*6) + centroid[1]
-    y_coord <-  seq(-max(sigma_)*6,max(sigma_)*6,max(sigma_)*6) + centroid[2]
+    expand_factor <- diff(raster::extent(raster::rasterFromXYZ(grid_ind))[1:2])/sigma_
+    x_coord <- seq(-max(sigma_)*expand_factor,max(sigma_)*expand_factor,
+                   max(sigma_)*expand_factor) + centroid[1] 
+    y_coord <-  seq(-max(sigma_)*expand_factor,max(sigma_)*expand_factor,
+                    max(sigma_)*expand_factor) + centroid[2] 
     xy_ss <- as.matrix(expand.grid(x_coord,y_coord))
     # check to see if augmented coordinates are in trap range
     poly_check <- sf::st_buffer(sf::st_cast(sf::st_sfc(sf::st_multipoint(xy_ss),
-              crs = crs_),"POINT"),dist = max(sigma_)*9)
+              crs = crs_),"POINT"),dist = max(sigma_)*9, endCapStyle = "SQUARE")
     Xcheck <- as.numeric(sf::st_intersects(poly_check,
                 sf::st_sfc(sf::st_multipoint(X), crs =  crs_)))
     # remove augmented coordinates that are out of trap range
@@ -4928,15 +4933,17 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
   # now deal with augmentation
   centroid <- matrix(apply(X, c(2,3), mean),nrow=2)
   # get coordinates for augmented state-space centroid
-  x_coord <- apply(centroid, 2, function(x) seq(-max(sigma_)*6,max(sigma_)*6,max(sigma_)*6) + x[1])
-  y_coord <- apply(centroid, 2, function(x) seq(-max(sigma_)*6,max(sigma_)*6,max(sigma_)*6) + x[2])
+  x_coord <- apply(centroid, 2, function(x) seq(-max(sigma_)*expand_factor,max(sigma_)*expand_factor,
+                    max(sigma_)*expand_factor) + x[1])
+  y_coord <- apply(centroid, 2, function(x) seq(-max(sigma_)*expand_factor,max(sigma_)*expand_factor,
+                    max(sigma_)*expand_factor) + x[2])
   xy_ss <- list() # create empty list to hold course state-space coordinates for each site
   grid_out <- list() # create empty list to hold fine-scale state-space coordinates for each site
   for(i in 1:dim(X)[3]){
     xy_ss[[i]] <- as.matrix(expand.grid(x_coord[,i],y_coord[,i]))
     # check to see if augmented coordinates are in trap range
     poly_check <- sf::st_buffer(sf::st_cast(sf::st_sfc(sf::st_multipoint(xy_ss[[i]]),
-              crs = crs_),"POINT"),dist = max(sigma_)*9)
+              crs = crs_),"POINT"),dist = max(sigma_)*9, endCapStyle = "SQUARE")
     Xcheck <- as.numeric(sf::st_intersects(poly_check,
                 sf::st_sfc(sf::st_multipoint(X[,,i]), crs =  crs_)))
     # remove augmented coordinates that are out of trap range
@@ -4985,8 +4992,13 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
  if(isFALSE(hab_mask)==FALSE){ # habitat mask 
    centroid <- matrix(apply(X, c(2,3), mean),nrow=2)
    # get coordinates for augmented state-space centroid
-   x_coord <- apply(centroid, 2, function(x) seq(-max(sigma_)*6,max(sigma_)*6,max(sigma_)*6) + x[1])
-   y_coord <- apply(centroid, 2, function(x) seq(-max(sigma_)*6,max(sigma_)*6,max(sigma_)*6) + x[2])
+  # now deal with augmentation
+  centroid <- matrix(apply(X, c(2,3), mean),nrow=2)
+  # get coordinates for augmented state-space centroid
+  x_coord <- apply(centroid, 2, function(x) seq(-max(sigma_)*expand_factor,max(sigma_)*expand_factor,
+                    max(sigma_)*expand_factor) + x[1])
+  y_coord <- apply(centroid, 2, function(x) seq(-max(sigma_)*expand_factor,max(sigma_)*expand_factor,
+                    max(sigma_)*expand_factor) + x[2])
    xy_ss <- list() # create empty list to hold course state-space coordinates for each site
     # create empty list to hold fine-scale state-space coordinates for each site
    grid_out <- list()
@@ -4994,7 +5006,7 @@ localize_classic <- function(y, grid_ind, X, crs_, sigma_,
     xy_ss[[i]] <- as.matrix(expand.grid(x_coord[,i],y_coord[,i]))
     # check to see if augmented coordinates are in trap range
     poly_check <- sf::st_buffer(sf::st_cast(sf::st_sfc(sf::st_multipoint(xy_ss[[i]]),
-              crs = crs_),"POINT"),dist = max(sigma_)*9)
+              crs = crs_),"POINT"),dist = max(sigma_)*9, endCapStyle = "SQUARE")
     Xcheck <- as.numeric(sf::st_intersects(poly_check,
                 sf::st_sfc(sf::st_multipoint(X[,,i]), crs =  crs_)))
     # remove augmented coordinates that are out of trap range
