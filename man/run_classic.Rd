@@ -12,6 +12,7 @@ run_classic(
   inits,
   params,
   dimensions = NULL,
+  nimFun = NULL,
   niter = 1000,
   nburnin = 100,
   thin = 1,
@@ -36,6 +37,9 @@ trace in the MCMC simulation.}
 
 \item{dimensions}{A named list of dimensions for variables. Only needed for variables
 used with empty indices in model code that are not provided in constants or data.}
+
+\item{nimFun}{A list of nimbleFunction(s) to be used in the model when using 
+\code{parallel = TRUE}.}
 
 \item{niter}{An integer value of the total number of MCMC iterations to run 
 per chain.}
