@@ -236,11 +236,11 @@ sim_classic <- function(X, ext, crs_, N, sigma_, prop_sex, K, base_encounter,
             Y3d[i,j,1:K] <- stats::rpois(K,prob[i,j])
           }}
       }
-    # organize encountered individuals and then 0's (augmented)
-    Y3d <- Y3d[c(which(apply(Y3d,1,sum)!=0),which(apply(Y3d,1,sum)==0)),,] 
     # organize simulated activity centers
     s <- s[c(which(apply(Y3d,1,sum)!=0),which(apply(Y3d,1,sum)==0)),]
     sex[which(apply(Y3d,1,sum)==0)] <- NA
+    # organize encountered individuals and then 0's (augmented)
+    Y3d <- Y3d[c(which(apply(Y3d,1,sum)!=0),which(apply(Y3d,1,sum)==0)),,] 
   }else
     # for dim of length 3 (assumes different sites are in dimension 3)
     if(length(dim(X))==3){
