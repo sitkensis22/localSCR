@@ -174,7 +174,7 @@ library(localSCR)
 #  inits=inits, params = params,niter = 10000, nburnin=1000, thin=1, nchains=2, parallel=TRUE,
 #  RNGseed = 500)
 #  toc()
-#  #> 106.658 sec elapsed
+#  #> 175.7 sec elapsed
 #  
 #  # summarize output
 #  samples = do.call(rbind, out)
@@ -186,13 +186,13 @@ library(localSCR)
 #  # summarize MCMC samples (exclude parameters and don't plot)
 #  nimSummary(out, exclude = c("s","z"), trace=FALSE)
 #  #>          post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat
-#  #> D            0.217   0.027   0.174   0.214   0.279  1 287.723 1.003
-#  #> N          232.708  28.761 186.000 229.000 298.000  1 287.723 1.003
-#  #> p0           0.133   0.024   0.091   0.131   0.183  1 405.761 1.012
-#  #> psi          0.581   0.076   0.456   0.574   0.749  1 298.192 1.003
-#  #> psi_sex      0.758   0.054   0.648   0.761   0.855  1 465.875 1.003
-#  #> sigma[1]   306.583  45.277 236.604 299.853 411.239  1 254.652 1.000
-#  #> sigma[2]   278.029  25.147 232.727 276.585 331.032  1 273.259 1.011
+#  #> D            0.217   0.027   0.169   0.215   0.277  1 314.316 1.019
+#  #> N          230.993  28.743 180.000 229.000 295.000  1 314.316 1.019
+#  #> p0           0.133   0.023   0.093   0.131   0.182  1 447.310 1.001
+#  #> psi          0.577   0.076   0.441   0.572   0.739  1 327.934 1.020
+#  #> psi_sex      0.742   0.050   0.639   0.745   0.832  1 647.016 1.001
+#  #> sigma[1]   249.328  40.559 180.665 246.337 334.500  1 458.413 1.003
+#  #> sigma[2]   298.083  26.851 250.789 296.960 353.220  1 291.826 1.033
 #  
 #  # make realized density plot
 #  r = realized_density(samples = out, grid = Grid$grid, crs_ = mycrs,
