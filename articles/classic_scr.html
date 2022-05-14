@@ -369,7 +369,7 @@ trapsClustered<span class="op">=</span><span class="cn">FALSE</span><span class=
 inits<span class="op">=</span><span class="va">inits</span>, params <span class="op">=</span> <span class="va">params</span>,niter <span class="op">=</span> <span class="fl">10000</span>, nburnin<span class="op">=</span><span class="fl">1000</span>, thin<span class="op">=</span><span class="fl">1</span>, nchains<span class="op">=</span><span class="fl">2</span>, parallel<span class="op">=</span><span class="cn">TRUE</span>, 
 RNGseed <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; 106.658 sec elapsed</span>
+<span class="co">#&gt; 175.7 sec elapsed</span>
 
 <span class="co"># summarize output</span>
 <span class="va">samples</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">out</span><span class="op">)</span>
@@ -380,7 +380,7 @@ RNGseed <span class="op">=</span> <span class="fl">500</span><span class="op">)<
 <img src="../reference/figures/vignette_01/Fig4.png" style="width:70%"></p>
 <br><p>
 </p>
-<p>We can see from the histogram of the posterior samples of <code>N</code> that our model estimates were close to the simulated value of 200 individuals (shown by red line) and were biased slightly high at 232 individuals. This is expected since this is only one realization of the detection process. In this example, we divided the pixelWidth by 100 in deriving the area (<code>A</code>) in our list of constants. This allowed us to estimate density in activity centers/100 m<sup>2</sup> rather than activity centers/m<sup>2</sup>. Note that care must be taken with any rescaling of the data or constants.</p>
+<p>We can see from the histogram of the posterior samples of <code>N</code> that our model estimates were close to the simulated value of 200 individuals (shown by red line) and were biased slightly high at 231 individuals. This is expected since this is only one realization of the detection process. In this example, we divided the pixelWidth by 100 in deriving the area (<code>A</code>) in our list of constants. This allowed us to estimate density in activity centers/100 m<sup>2</sup> rather than activity centers/m<sup>2</sup>. Note that care must be taken with any rescaling of the data or constants.</p>
 Next we use<code><a href="../reference/nimSummary.html">nimSummary()</a></code> to quickly summarize the MCMC samples. Note that there are other options to summarize MCMC output, but this function is provided with the package and depends partly on the ‘coda’ package. Then, we make a realized density plot of the MCMC samples using <code><a href="../reference/realized_density.html">realized_density()</a></code>. In this function we make use of the list of grid and extent we created earlier called <code>Grid</code> as well as our saved coordinates reference system (<code>mycrs</code>). In this example, we use the ‘raster’ package to make a simple plot of the output. We can see that the habitat mask has resulted in some cells having <code>NA</code> values where the habitat was unsuitable.
 
 <p><br></p>
@@ -388,13 +388,13 @@ Next we use<code><a href="../reference/nimSummary.html">nimSummary()</a></code> 
 <code class="sourceCode R"><span class="co"># summarize MCMC samples (exclude parameters and don't plot)</span>
 <span class="fu"><a href="../reference/nimSummary.html">nimSummary</a></span><span class="op">(</span><span class="va">out</span>, exclude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nimble/man/nimble-R-functions.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s"</span>,<span class="st">"z"</span><span class="op">)</span>, trace<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 <span class="co">#&gt;          post.mean post.sd    q2.5     q50   q97.5 f0   n.eff  Rhat</span>
-<span class="co">#&gt; D            0.217   0.027   0.174   0.214   0.279  1 287.723 1.003</span>
-<span class="co">#&gt; N          232.708  28.761 186.000 229.000 298.000  1 287.723 1.003</span>
-<span class="co">#&gt; p0           0.133   0.024   0.091   0.131   0.183  1 405.761 1.012</span>
-<span class="co">#&gt; psi          0.581   0.076   0.456   0.574   0.749  1 298.192 1.003</span>
-<span class="co">#&gt; psi_sex      0.758   0.054   0.648   0.761   0.855  1 465.875 1.003</span>
-<span class="co">#&gt; sigma[1]   306.583  45.277 236.604 299.853 411.239  1 254.652 1.000</span>
-<span class="co">#&gt; sigma[2]   278.029  25.147 232.727 276.585 331.032  1 273.259 1.011</span>
+<span class="co">#&gt; D            0.217   0.027   0.169   0.215   0.277  1 314.316 1.019</span>
+<span class="co">#&gt; N          230.993  28.743 180.000 229.000 295.000  1 314.316 1.019</span>
+<span class="co">#&gt; p0           0.133   0.023   0.093   0.131   0.182  1 447.310 1.001</span>
+<span class="co">#&gt; psi          0.577   0.076   0.441   0.572   0.739  1 327.934 1.020</span>
+<span class="co">#&gt; psi_sex      0.742   0.050   0.639   0.745   0.832  1 647.016 1.001</span>
+<span class="co">#&gt; sigma[1]   249.328  40.559 180.665 246.337 334.500  1 458.413 1.003</span>
+<span class="co">#&gt; sigma[2]   298.083  26.851 250.789 296.960 353.220  1 291.826 1.033</span>
 
 <span class="co"># make realized density plot </span>
 <span class="va">r</span> <span class="op">=</span> <span class="fu"><a href="../reference/realized_density.html">realized_density</a></span><span class="op">(</span>samples <span class="op">=</span> <span class="va">out</span>, grid <span class="op">=</span> <span class="va">Grid</span><span class="op">$</span><span class="va">grid</span>, crs_ <span class="op">=</span> <span class="va">mycrs</span>, 
